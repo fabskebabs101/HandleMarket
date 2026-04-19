@@ -185,6 +185,10 @@ const MOCK_LISTINGS = [
   { id: 4, handle: "@DeFi_Degen", followers: 6300, value: 420, engagement: "5.5%", age: "1y", verified: false, niche: "Memecoin / Degen", status: "listed", trustScore: 68, trustLabel: "NOTED" },
   { id: 5, handle: "@OnChainMax", followers: 31500, value: 2600, engagement: "2.1%", age: "3y", verified: true, niche: "On-chain Analytics", status: "listed", trustScore: 79, trustLabel: "CREDIBLE" },
   { id: 6, handle: "@AirdropHunterX", followers: 22100, value: 1750, engagement: "1.9%", age: "2y", verified: false, niche: "Airdrops", status: "listed", trustScore: 45, trustLabel: "UNKNOWN" },
+  { id: 7, handle: "@BitcoinMaxi21M", followers: 62400, value: 5400, engagement: "2.6%", age: "5y", verified: true, niche: "Bitcoin / Maxi", status: "listed", trustScore: 89, trustLabel: "SUPREME" },
+  { id: 8, handle: "@SatoshiStacker", followers: 18900, value: 1650, engagement: "3.4%", age: "3y", verified: false, niche: "Bitcoin / DCA", status: "listed", trustScore: 81, trustLabel: "CREDIBLE" },
+  { id: 9, handle: "@ETH_Research", followers: 54100, value: 4800, engagement: "3.1%", age: "4y", verified: true, niche: "Ethereum / Research", status: "listed", trustScore: 86, trustLabel: "SUPREME" },
+  { id: 10, handle: "@L2DegenSzn", followers: 9700, value: 680, engagement: "4.8%", age: "1y", verified: false, niche: "Ethereum / L2s", status: "listed", trustScore: 71, trustLabel: "CREDIBLE" },
 ];
 
 const C = {
@@ -1886,7 +1890,7 @@ export default function HandleMarket() {
 
             <div style={{ display: "flex", gap: 10, marginBottom: 24, flexWrap: "wrap", justifyContent: "center" }}>
               <div style={{ display: "flex", gap: 4, background: "rgba(0, 0, 0, 0.5)", borderRadius: 10, padding: 3, border: "1px solid rgba(255, 255, 255, 0.06)" }}>
-                {[["all", "All"], ["defi", "DeFi"], ["solana", "Solana"], ["nft", "NFTs"], ["memecoin", "Memecoins"]].map(([val, label]) => (
+                {[["all", "All"], ["bitcoin", "Bitcoin"], ["eth", "Ethereum"], ["defi", "DeFi"], ["solana", "Solana"], ["nft", "NFTs"], ["memecoin", "Memecoins"]].map(([val, label]) => (
                   <button key={val} onClick={() => setFilterNiche(val)} style={{
                     padding: "6px 14px", borderRadius: 7, border: "none",
                     background: filterNiche === val ? "rgba(212, 255, 0, 0.12)" : "transparent",
@@ -3128,7 +3132,7 @@ export default function HandleMarket() {
                   <div style={{ marginBottom: 16 }}>
                     <label style={labelStyle}>Niche *</label>
                     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                      {["DeFi", "Solana", "NFTs", "Memecoin", "Bitcoin", "Trading", "Alpha", "Analytics"].map(n => (
+                      {["DeFi", "Solana", "NFTs", "Memecoin", "Bitcoin", "Ethereum", "Trading", "Alpha", "Analytics"].map(n => (
                         <button key={n} type="button" onClick={() => setListForm({ ...listForm, niche: n })} style={{
                           padding: "8px 14px", borderRadius: 8,
                           border: `1px solid ${listForm.niche === n ? C.primary : "rgba(255, 255, 255, 0.08)"}`,

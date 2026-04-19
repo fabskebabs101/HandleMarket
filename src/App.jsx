@@ -228,6 +228,277 @@ function ScoreBar({ label, score, color }) {
   );
 }
 
+// ─── Scroll-triggered reveal wrapper ───────────────────────────
+function Reveal({ children, delay = 0 }) {
+  const [visible, setVisible] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setVisible(true); },
+      { threshold: 0.12 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return (
+    <div ref={ref} style={{
+      opacity: visible ? 1 : 0,
+      transform: visible ? "translateY(0)" : "translateY(30px)",
+      transition: `opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${delay}ms, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${delay}ms`,
+    }}>{children}</div>
+  );
+}
+
+// ─── Animated count-up number ──────────────────────────────────
+function CountUp({ end, duration = 1500, prefix = "", suffix = "" }) {
+  const [value, setValue] = useState(0);
+  const [started, setStarted] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !started) {
+        setStarted(true);
+        const start = Date.now();
+        const tick = () => {
+          const elapsed = Date.now() - start;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          setValue(eased * end);
+          if (progress < 1) requestAnimationFrame(tick);
+        };
+        tick();
+      }
+    }, { threshold: 0.5 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [end, duration, started]);
+  const formatted = end >= 1000 ? `${(value / 1000).toFixed(value >= 1000 ? 1 : 0)}k` : Math.round(value).toLocaleString();
+  return <span ref={ref}>{prefix}{formatted}{suffix}</span>;
+}
+
+// ─── Cycling word animator ─────────────────────────────────────
+function CycleWord({ words, color }) {
+  const [index, setIndex] = useState(0);
+  const [fading, setFading] = useState(false);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFading(true);
+      setTimeout(() => {
+        setIndex(i => (i + 1) % words.length);
+        setFading(false);
+      }, 300);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, [words.length]);
+  return (
+    <span style={{
+      display: "inline-block",
+      color,
+      opacity: fading ? 0 : 1,
+      transform: fading ? "translateY(-10px)" : "translateY(0)",
+      transition: "opacity 0.3s ease-out, transform 0.3s ease-out",
+      minWidth: "auto",
+    }}>
+      {words[index]}
+    </span>
+  );
+}
+
+// ─── Animated Demo Card (the hero "watch it work" moment) ──────
+// Uses CT-flavored fictional handles so we don't fake real accounts' scores.
+const DEMO_ACCOUNTS = [
+  {
+    handle: "@CryptoDegen_", niche: "Solana · 18.4k followers", initial: "C",
+    score: 91, bars: [92, 88, 85, 94, 100],
+    flags: [
+      { text: "Healthy organic engagement", type: "green" },
+      { text: "Strong conversation ratio — real audience", type: "green" },
+      { text: "Verified account", type: "green" },
+    ],
+  },
+  {
+    handle: "@SolAlphaHunter", niche: "DeFi · 42.1k followers", initial: "S",
+    score: 84, bars: [88, 82, 78, 86, 100],
+    flags: [
+      { text: "Consistent long-term activity", type: "green" },
+      { text: "Verified account", type: "green" },
+    ],
+  },
+  {
+    handle: "@MemecoinMaxi", niche: "Memecoin · 7.8k followers", initial: "M",
+    score: 72, bars: [75, 70, 68, 80, 20],
+    flags: [
+      { text: "Healthy organic engagement", type: "green" },
+      { text: "Strong follower-to-following ratio", type: "green" },
+    ],
+  },
+  {
+    handle: "@OnChainWhale", niche: "Analytics · 31.2k followers", initial: "O",
+    score: 88, bars: [90, 86, 82, 92, 100],
+    flags: [
+      { text: "Healthy organic engagement", type: "green" },
+      { text: "Consistent long-term activity", type: "green" },
+      { text: "Verified account", type: "green" },
+    ],
+  },
+  {
+    handle: "@PumpBot2024", niche: "Crypto · 85.3k followers", initial: "P",
+    score: 22, bars: [15, 10, 18, 20, 20],
+    flags: [
+      { text: "Very low engagement — possible bot followers", type: "red" },
+      { text: "Rapid follower growth for account age", type: "red" },
+      { text: "Abnormally high posting frequency — possible bot", type: "red" },
+    ],
+  },
+];
+
+function DemoCard() {
+  // Pick one random demo account on mount — cycles between refreshes
+  const [account] = useState(() => DEMO_ACCOUNTS[Math.floor(Math.random() * DEMO_ACCOUNTS.length)]);
+  const [score, setScore] = useState(0);
+  const [bars, setBars] = useState([0, 0, 0, 0, 0]);
+  const [flags, setFlags] = useState([]);
+  const [started, setStarted] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !started) {
+        setStarted(true);
+        // Step 1: count up score
+        setTimeout(() => {
+          const start = Date.now();
+          const duration = 1400;
+          const target = account.score;
+          const tick = () => {
+            const progress = Math.min((Date.now() - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            setScore(Math.round(eased * target));
+            if (progress < 1) requestAnimationFrame(tick);
+          };
+          tick();
+        }, 200);
+        // Step 2: bars fill sequentially
+        account.bars.forEach((b, i) => {
+          setTimeout(() => {
+            setBars(prev => { const next = [...prev]; next[i] = b; return next; });
+          }, 600 + i * 220);
+        });
+        // Step 3: flags appear
+        account.flags.forEach((f, i) => {
+          setTimeout(() => {
+            setFlags(prev => [...prev, f]);
+          }, 2100 + i * 350);
+        });
+      }
+    }, { threshold: 0.4 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [started, account]);
+
+  const tierColor = score >= 85 ? "#10b981" : score >= 70 ? "#34d399" : score >= 55 ? "#fbbf24" : score >= 40 ? "#f97316" : "#ef4444";
+  const tierLabel = score >= 85 ? "SUPREME" : score >= 70 ? "CREDIBLE" : score >= 55 ? "NOTED" : score >= 40 ? "UNKNOWN" : score >= 25 ? "SUSPICIOUS" : "LIKELY BOT";
+
+  const barLabels = ["Follow Ratio", "Engagement", "Conversations", "Activity", "Verified"];
+  const barColors = ["#10b981", "#06b6d4", "#a855f7", "#f59e0b", "#ec4899"];
+
+  const isNegative = account.flags.some(f => f.type === "red");
+
+  return (
+    <div ref={ref} style={{
+      background: "rgba(18, 18, 18, 0.85)",
+      border: `1px solid ${tierColor}40`,
+      borderRadius: 16,
+      padding: 24,
+      textAlign: "left",
+      boxShadow: `0 0 40px ${tierColor}15`,
+      transition: "all 0.5s ease",
+    }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg, #333, #111)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900, color: "#fff" }}>{account.initial}</div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 14 }}>{account.handle}</div>
+            <div style={{ fontSize: 10, color: "#a3a3a3", fontFamily: "'JetBrains Mono', monospace" }}>{account.niche}</div>
+          </div>
+        </div>
+        {score > 0 && (
+          <div style={{
+            padding: "4px 10px", borderRadius: 8,
+            background: `${tierColor}15`, border: `1px solid ${tierColor}40`,
+            fontFamily: "'JetBrains Mono', monospace", fontSize: 10, fontWeight: 800,
+            color: tierColor, letterSpacing: 1.5,
+            animation: "fadeIn 0.4s ease-out",
+          }}>{tierLabel}</div>
+        )}
+      </div>
+
+      {/* Score display */}
+      <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 16 }}>
+        <span style={{ fontSize: 48, fontWeight: 900, color: tierColor, letterSpacing: -2, fontFamily: "'JetBrains Mono', monospace" }}>{score}</span>
+        <span style={{ fontSize: 14, color: "#525252", fontFamily: "'JetBrains Mono', monospace" }}>/ 100 Trust Score</span>
+      </div>
+
+      {/* Signal bars */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {bars.map((val, i) => (
+          <div key={i}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
+              <span style={{ fontSize: 10, color: "#a3a3a3", fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>{barLabels[i]}</span>
+              <span style={{ fontSize: 10, color: barColors[i], fontFamily: "'JetBrains Mono', monospace", fontWeight: 700 }}>{val}</span>
+            </div>
+            <div style={{ height: 4, background: "rgba(255, 255, 255, 0.05)", borderRadius: 2, overflow: "hidden" }}>
+              <div style={{
+                height: "100%",
+                width: `${val}%`,
+                background: `linear-gradient(90deg, ${barColors[i]}, ${barColors[i]}cc)`,
+                transition: "width 0.8s cubic-bezier(0.16, 1, 0.3, 1)",
+              }} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Flags */}
+      {flags.length > 0 && (
+        <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid rgba(255, 255, 255, 0.06)", display: "flex", flexDirection: "column", gap: 6 }}>
+          {flags.map((f, i) => (
+            <div key={i} style={{
+              padding: "8px 10px",
+              background: f.type === "red" ? "rgba(239, 68, 68, 0.06)" : "rgba(16, 185, 129, 0.06)",
+              border: f.type === "red" ? "1px solid rgba(239, 68, 68, 0.2)" : "1px solid rgba(16, 185, 129, 0.2)",
+              borderRadius: 6,
+              fontSize: 11,
+              color: f.type === "red" ? "#fca5a5" : "#6ee7b7",
+              fontFamily: "'JetBrains Mono', monospace",
+              display: "flex", alignItems: "center", gap: 8,
+              animation: "fadeIn 0.4s ease-out",
+            }}>
+              <span>{f.type === "red" ? "🚩" : "✅"}</span>
+              <span>{f.text}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Fictional disclaimer */}
+      {flags.length > 0 && (
+        <div style={{ marginTop: 10, fontSize: 9, color: "#525252", fontFamily: "'JetBrains Mono', monospace", textAlign: "center", letterSpacing: 1, textTransform: "uppercase" }}>
+          * Demo account — illustrative example
+        </div>
+      )}
+
+      <style>{`@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+    </div>
+  );
+}
+
 function GlowCard({ children, style, glow = false, onClick }) {
   const [hover, setHover] = useState(false);
   return (
@@ -295,7 +566,7 @@ const LEADERBOARD_DATA = {
   trending: [
     { rank: 1, handle: "@CryptoAlpha_", change: "+12", score: 94, followers: 45200, niche: "DeFi", growth: "+8.2%" },
     { rank: 2, handle: "@SOL_Trader99", change: "+8", score: 87, followers: 12800, niche: "Solana", growth: "+15.4%" },
-    { rank: 3, handle: "@0xMaxi", change: "+5", score: 91, followers: 67800, niche: "DeFi", growth: "+6.1%" },
+    { rank: 3, handle: "@0xTrenchKing", change: "+5", score: 91, followers: 67800, niche: "DeFi", growth: "+6.1%" },
     { rank: 4, handle: "@GMResearch", change: "+3", score: 89, followers: 34100, niche: "Research", growth: "+4.8%" },
     { rank: 5, handle: "@PumpWatch_", change: "+2", score: 82, followers: 18900, niche: "Memecoin", growth: "+11.2%" },
     { rank: 6, handle: "@OnChainMax", change: "−1", score: 85, followers: 31500, niche: "Analytics", growth: "+3.1%" },
@@ -319,7 +590,7 @@ const LEADERBOARD_DATA = {
 
 // ─── PHASE 2: Sale History + Seller Reputation ──────────────────
 const SALE_HISTORY = [
-  { id: 1, handle: "@CryptoAlpha_", price: 3800, prevPrice: 2400, soldAgo: "2d ago", buyer: "@0xMaxi", seller: "@OGTrader", sellerScore: 98, followers: 45200, trustScore: 87 },
+  { id: 1, handle: "@CryptoAlpha_", price: 3800, prevPrice: 2400, soldAgo: "2d ago", buyer: "@0xTrenchKing", seller: "@OGTrader", sellerScore: 98, followers: 45200, trustScore: 87 },
   { id: 2, handle: "@DeFiSniper", price: 2100, prevPrice: null, soldAgo: "5d ago", buyer: "@WhaleBuyer", seller: "@FlipKing", sellerScore: 94, followers: 28400, trustScore: 82 },
   { id: 3, handle: "@MemecoinMF", price: 680, prevPrice: 420, soldAgo: "1w ago", buyer: "@DegenHQ", seller: "@NewSeller23", sellerScore: 72, followers: 8900, trustScore: 65 },
   { id: 4, handle: "@SolanaGod_", price: 12400, prevPrice: 8200, soldAgo: "2w ago", buyer: "@Institutional", seller: "@OGTrader", sellerScore: 98, followers: 124000, trustScore: 91 },
@@ -357,7 +628,7 @@ const WALLET_DATA = {
 };
 
 const VOUCHES = [
-  { handle: "@0xMaxi", score: 94, vouchedAt: "3 weeks ago", weight: "high", reason: "Met IRL at Breakpoint" },
+  { handle: "@0xTrenchKing", score: 94, vouchedAt: "3 weeks ago", weight: "high", reason: "Met IRL at Breakpoint" },
   { handle: "@DegenHQ", score: 88, vouchedAt: "1 month ago", weight: "high", reason: "Long-time mutual" },
   { handle: "@SOL_Trader99", score: 82, vouchedAt: "2 months ago", weight: "medium", reason: "Verified trader" },
   { handle: "@OnChainMax", score: 85, vouchedAt: "2 months ago", weight: "high", reason: "Professional relationship" },
@@ -425,14 +696,14 @@ const ALERT_TYPES = [
 ];
 
 const WATCHLIST = [
-  { handle: "@0xMaxi", score: 94, alerts: ["follower-spike", "trust-drop"], lastAlert: "2h ago — followers +12%" },
+  { handle: "@0xTrenchKing", score: 94, alerts: ["follower-spike", "trust-drop"], lastAlert: "2h ago — followers +12%" },
   { handle: "@BigKOL", score: 88, alerts: ["listing", "engagement-drop"], lastAlert: "None in 7d" },
   { handle: "@CompetitorX", score: 76, alerts: ["follower-spike", "listing", "cluster"], lastAlert: "Yesterday — flagged in cluster-003" },
 ];
 
 
 export default function HandleMarket() {
-  const [tab, setTab] = useState("valuate");
+  const [tab, setTab] = useState("home");
   const [form, setForm] = useState({
     followers: "", avgLikes: "", avgRetweets: "", avgReplies: "",
     tweets: "", accountAgeDays: "", verified: false, cryptoNiche: true,
@@ -597,7 +868,12 @@ export default function HandleMarket() {
       {/* Header */}
       <div style={{ borderBottom: "1px solid rgba(212, 255, 0, 0.08)", padding: "16px 24px" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div
+            onClick={() => setTab("home")}
+            style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", transition: "opacity 0.2s" }}
+            onMouseEnter={e => e.currentTarget.style.opacity = "0.75"}
+            onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+          >
             <div style={{ width: 36, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 900, color: "#000" }}>HM</div>
             <div>
               <div style={{ fontWeight: 700, fontSize: 18, letterSpacing: -0.5 }}>HandleMarket</div>
@@ -629,7 +905,9 @@ export default function HandleMarket() {
               </div>
               <span>
                 {[
+                  ["home", "🏠 Home"],
                   ["valuate", "⚡ Valuate"],
+                  ["trust", "🛡️ Trust"],
                   ["marketplace", "🏪 Market"],
                   ["leaderboard", "🏆 Ranks"],
                   ["profile", "👤 Profile"],
@@ -667,7 +945,9 @@ export default function HandleMarket() {
                     }
                   `}</style>
                   {[
+                    ["home", "🏠", "Home", "Welcome + overview"],
                     ["valuate", "⚡", "Valuate", "Run account valuation"],
+                    ["trust", "🛡️", "Trust", "Trust Score guide"],
                     ["marketplace", "🏪", "Market", "Browse listings"],
                     ["leaderboard", "🏆", "Ranks", "CT leaderboards"],
                     ["profile", "👤", "Profile", "Public profile page"],
@@ -737,6 +1017,251 @@ export default function HandleMarket() {
       </div>
 
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px" }}>
+
+        {/* ─── HOME / LANDING TAB ───────────────────────────── */}
+        {tab === "home" && (
+          <div>
+            {/* LIVE TICKER */}
+            <div style={{
+              position: "relative",
+              marginBottom: 40,
+              padding: "12px 0",
+              borderTop: `1px solid ${C.border}`,
+              borderBottom: `1px solid ${C.border}`,
+              background: "rgba(0, 0, 0, 0.5)",
+              overflow: "hidden",
+              maskImage: "linear-gradient(90deg, transparent, black 8%, black 92%, transparent)",
+              WebkitMaskImage: "linear-gradient(90deg, transparent, black 8%, black 92%, transparent)",
+            }}>
+              <style>{`
+                @keyframes scrollTicker {
+                  from { transform: translateX(0); }
+                  to { transform: translateX(-50%); }
+                }
+                .ticker-track { animation: scrollTicker 60s linear infinite; }
+              `}</style>
+              <div className="ticker-track" style={{ display: "flex", gap: 32, whiteSpace: "nowrap", width: "max-content" }}>
+                {[...Array(2)].map((_, loopIdx) => (
+                  <div key={loopIdx} style={{ display: "flex", gap: 32 }}>
+                    {[
+                      { handle: "@CryptoAlpha_", val: 3800, score: 87, tier: "SUPREME", color: "#10b981" },
+                      { handle: "@SOL_Trader99", val: 950, score: 76, tier: "CREDIBLE", color: "#34d399" },
+                      { handle: "@0xTrenchKing", val: 6700, score: 91, tier: "SUPREME", color: "#10b981" },
+                      { handle: "@PumpWatch_", val: 1480, score: 68, tier: "NOTED", color: "#fbbf24" },
+                      { handle: "@FakeAlpha2024", val: null, score: 22, tier: "SUSPICIOUS", color: "#ef4444", flag: true },
+                      { handle: "@NFTWhaleWatch", val: 9200, score: 84, tier: "CREDIBLE", color: "#34d399" },
+                      { handle: "@DeFi_Degen", val: 420, score: 65, tier: "NOTED", color: "#fbbf24" },
+                      { handle: "@BotNetwork_", val: null, score: 18, tier: "LIKELY BOT", color: "#dc2626", flag: true },
+                      { handle: "@GMResearch", val: 4200, score: 88, tier: "SUPREME", color: "#10b981" },
+                      { handle: "@AirdropHunter", val: 1750, score: 54, tier: "UNKNOWN", color: "#f97316" },
+                      { handle: "@OnChainMax", val: 2600, score: 85, tier: "SUPREME", color: "#10b981" },
+                      { handle: "@BTCPurist", val: 5200, score: 82, tier: "CREDIBLE", color: "#34d399" },
+                    ].map((item, i) => (
+                      <div key={`${loopIdx}-${i}`} style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: "'JetBrains Mono', monospace", fontSize: 12 }}>
+                        <span style={{ color: C.textPrimary, fontWeight: 700 }}>{item.handle}</span>
+                        {item.val && <span style={{ color: C.primary, fontWeight: 800 }}>${item.val.toLocaleString()}</span>}
+                        <span style={{ color: item.color, fontWeight: 800, letterSpacing: 1 }}>{item.flag ? "🚩" : "·"} {item.tier} {item.score}</span>
+                        <span style={{ color: C.textMuted }}>·</span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* HERO */}
+            <div style={{ textAlign: "center", padding: "20px 20px 60px", position: "relative" }}>
+              {/* Badge */}
+              <Reveal>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 20, background: "rgba(212, 255, 0, 0.06)", border: "1px solid rgba(212, 255, 0, 0.2)", marginBottom: 24 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.primary, boxShadow: `0 0 10px ${C.primary}`, animation: "pulse 2s ease-in-out infinite" }} />
+                  <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }`}</style>
+                  <span style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700 }}>The CT Account Marketplace</span>
+                </div>
+              </Reveal>
+
+              {/* Headline with word cycle */}
+              <Reveal delay={100}>
+                <h1 style={{ fontSize: 64, fontWeight: 900, margin: 0, letterSpacing: -3, lineHeight: 1 }}>
+                  Buy. Sell.<br />
+                  <CycleWord words={["Verify", "Track", "Expose", "Trust", "Monitor"]} color={C.primary} /> CT accounts.
+                </h1>
+              </Reveal>
+              <Reveal delay={200}>
+                <p style={{ color: C.textSecondary, fontSize: 18, marginTop: 20, maxWidth: 560, margin: "20px auto 0", lineHeight: 1.5 }}>
+                  The first marketplace built for Crypto Twitter. Free valuations, trust scores, bot detection, and escrow-protected trades — all in one place.
+                </p>
+              </Reveal>
+
+              {/* CTAs */}
+              <Reveal delay={300}>
+                <div style={{ display: "flex", gap: 12, justifyContent: "center", marginTop: 32, flexWrap: "wrap" }}>
+                  <button
+                    onClick={() => setTab("valuate")}
+                    style={{
+                      padding: "14px 28px", borderRadius: 12, border: "none",
+                      background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+                      color: "#000", fontSize: 14, fontWeight: 900,
+                      fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+                      letterSpacing: 0.3, transition: "all 0.2s",
+                      boxShadow: "0 0 32px rgba(212, 255, 0, 0.25)",
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 40px rgba(212, 255, 0, 0.4)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 32px rgba(212, 255, 0, 0.25)"; }}
+                  >⚡ Get Free Valuation</button>
+                  <button
+                    onClick={() => setTab("marketplace")}
+                    style={{
+                      padding: "14px 28px", borderRadius: 12,
+                      border: "1px solid rgba(255, 255, 255, 0.15)",
+                      background: "rgba(0, 0, 0, 0.5)",
+                    color: C.textPrimary, fontSize: 14, fontWeight: 700,
+                    fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(212, 255, 0, 0.4)"; e.currentTarget.style.color = C.primary; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.15)"; e.currentTarget.style.color = C.textPrimary; }}
+                >🏪 Browse Marketplace</button>
+              </div>
+              </Reveal>
+
+              {/* LIVE DEMO CARD */}
+              <Reveal delay={500}>
+                <div style={{ marginTop: 48, maxWidth: 480, margin: "48px auto 0" }}>
+                  <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 12 }}>⚡ Live Trust Score Demo</div>
+                  <DemoCard />
+                </div>
+              </Reveal>
+
+              {/* Social proof bar — animated counters */}
+              <Reveal delay={200}>
+                <div style={{ display: "flex", justifyContent: "center", gap: 32, marginTop: 56, flexWrap: "wrap" }}>
+                  {[
+                    { val: 847, prefix: "$", suffix: "k", lbl: "Traded volume" },
+                    { val: 2400, prefix: "", suffix: "+", lbl: "Accounts valued" },
+                    { val: 96, prefix: "", suffix: "%", lbl: "Bot detection" },
+                    { val: 0, prefix: "", suffix: "%", lbl: "Dispute rate", static: true },
+                  ].map((s, i) => (
+                    <div key={s.lbl} style={{ textAlign: "center" }}>
+                      <div style={{ fontSize: 28, fontWeight: 900, color: C.primary, letterSpacing: -1, fontFamily: "'JetBrains Mono', monospace" }}>
+                        {s.static ? `${s.prefix}${s.val}${s.suffix}` : <CountUp end={s.val} prefix={s.prefix} suffix={s.suffix} duration={1800} />}
+                      </div>
+                      <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginTop: 2 }}>{s.lbl}</div>
+                    </div>
+                  ))}
+                </div>
+              </Reveal>
+            </div>
+
+            {/* HOW IT WORKS */}
+            <Reveal>
+              <div style={{ marginBottom: 60 }}>
+                <div style={{ textAlign: "center", marginBottom: 40 }}>
+                  <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8 }}>How It Works</div>
+                  <h2 style={{ fontSize: 36, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>Three steps. No bullshit.</h2>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
+                {[
+                  { num: "01", title: "Valuate", desc: "Plug in any CT handle. Get a real-time estimate based on engagement, reach, niche, and verification.", icon: "⚡" },
+                  { num: "02", title: "Verify", desc: "Our Trust Score exposes bot followers, engagement pods, and coordinated networks. Buy with confidence.", icon: "🛡️" },
+                  { num: "03", title: "Trade", desc: "List for sale or buy via escrow. Funds held until transfer confirmed. 2.5% fee only on completed sales.", icon: "💸" },
+                ].map((step, i) => (
+                  <GlowCard key={step.num} glow style={{ position: "relative", paddingTop: 32 }}>
+                    <div style={{ position: "absolute", top: 20, right: 20, fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, letterSpacing: 2 }}>/ {step.num}</div>
+                    <div style={{ fontSize: 40, marginBottom: 14 }}>{step.icon}</div>
+                    <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.5, marginBottom: 8 }}>{step.title}</div>
+                    <div style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.6 }}>{step.desc}</div>
+                  </GlowCard>
+                ))}
+              </div>
+              </div>
+            </Reveal>
+
+            {/* FEATURES GRID */}
+            <Reveal>
+              <div style={{ marginBottom: 60 }}>
+                <div style={{ textAlign: "center", marginBottom: 40 }}>
+                  <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8 }}>What's Inside</div>
+                  <h2 style={{ fontSize: 36, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>Built for <span style={{ color: C.primary }}>CT degens.</span></h2>
+                </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14 }}>
+                {[
+                  { icon: "🛡️", title: "Trust Score", desc: "0-100 authenticity rating. Exposes bot-inflated audiences and engagement pods.", tab: "trust" },
+                  { icon: "💎", title: "Wallet Binding", desc: "Prove you're a real CT trader with on-chain reputation from your Solana wallet.", tab: "wallet" },
+                  { icon: "🕸️", title: "CIB Detection", desc: "Catches coordinated pods, raid networks, and F4F rings before you get scammed.", tab: "cib" },
+                  { icon: "💸", title: "Public Sale Ledger", desc: "See what accounts actually sold for. Price anchored to real market data.", tab: "history" },
+                  { icon: "🏆", title: "CT Leaderboards", desc: "Trending, Rising, and Suspicious rankings updated hourly.", tab: "leaderboard" },
+                  { icon: "🔔", title: "Real-Time Alerts", desc: "Watch any account. Get notified the second something changes.", tab: "alerts" },
+                ].map(f => (
+                  <div key={f.title}
+                    onClick={() => setTab(f.tab)}
+                    style={{
+                      padding: "20px 22px", borderRadius: 14,
+                      background: "rgba(18, 18, 18, 0.7)",
+                      border: "1px solid rgba(255, 255, 255, 0.06)",
+                      cursor: "pointer", transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(212, 255, 0, 0.3)"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.background = "rgba(30, 30, 30, 0.9)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.06)"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.background = "rgba(18, 18, 18, 0.7)"; }}
+                  >
+                    <div style={{ fontSize: 28, marginBottom: 10 }}>{f.icon}</div>
+                    <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 4, letterSpacing: -0.3 }}>{f.title}</div>
+                    <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.5 }}>{f.desc}</div>
+                    <div style={{ fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", marginTop: 10, letterSpacing: 1, textTransform: "uppercase", fontWeight: 700 }}>Explore →</div>
+                  </div>
+                ))}
+              </div>
+              </div>
+            </Reveal>
+
+            {/* TRUST SIGNALS / WHY USE US */}
+            <Reveal>
+              <div style={{ marginBottom: 60 }}>
+                <GlowCard glow style={{ padding: "32px" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 24 }}>
+                    {[
+                      { icon: "🔒", title: "Escrow-Protected", desc: "Funds held until ownership transfers. Zero counterparty risk." },
+                      { icon: "✅", title: "Verified Sellers", desc: "Every seller builds a public reputation. See sales history, dispute rate, transfer speed." },
+                      { icon: "🎯", title: "Bot-Free Buying", desc: "Our algorithm scans every listing for fake followers and engagement manipulation." },
+                      { icon: "📈", title: "Tracked History", desc: "90-day account snapshots expose sudden growth spikes and red flags." },
+                    ].map(item => (
+                      <div key={item.title}>
+                        <div style={{ fontSize: 24, marginBottom: 8 }}>{item.icon}</div>
+                        <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 4 }}>{item.title}</div>
+                        <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.5 }}>{item.desc}</div>
+                      </div>
+                    ))}
+                  </div>
+                </GlowCard>
+              </div>
+            </Reveal>
+
+            {/* FINAL CTA */}
+            <Reveal>
+              <GlowCard glow style={{ textAlign: "center", padding: "48px 32px", background: `linear-gradient(135deg, rgba(212, 255, 0, 0.04), rgba(0, 0, 0, 0.5))` }}>
+                <div style={{ fontSize: 32, fontWeight: 900, letterSpacing: -1.5, marginBottom: 12 }}>
+                  Ready to know what your <span style={{ color: C.primary }}>account</span> is worth?
+                </div>
+                <div style={{ fontSize: 15, color: C.textSecondary, marginBottom: 28, maxWidth: 440, margin: "0 auto 28px" }}>
+                  Free valuations. No signup required. Takes 10 seconds.
+                </div>
+                <button
+                  onClick={() => setTab("valuate")}
+                  style={{
+                    padding: "16px 36px", borderRadius: 12, border: "none",
+                    background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+                    color: "#000", fontSize: 15, fontWeight: 900,
+                    fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+                    letterSpacing: 0.3, transition: "all 0.2s",
+                    boxShadow: "0 0 32px rgba(212, 255, 0, 0.25)",
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 40px rgba(212, 255, 0, 0.4)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 32px rgba(212, 255, 0, 0.25)"; }}
+                >⚡ Valuate My Account</button>
+              </GlowCard>
+            </Reveal>
+          </div>
+        )}
 
         {tab === "valuate" && (
           <div>
@@ -974,8 +1499,92 @@ export default function HandleMarket() {
                       </div>
                     )}
 
-                    <div style={{ marginTop: 18, padding: "12px 14px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 8, fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.5 }}>
-                      Trust Score analyzes authenticity using engagement patterns, follower ratios, and activity signals. Accounts scoring below 40 are flagged as likely bot-inflated.
+                    {/* Signal explanations */}
+                    <div style={{ marginTop: 20, paddingTop: 18, borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}>
+                      <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 12 }}>📖 What Each Signal Means</div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                        {[
+                          {
+                            label: "Follow Ratio",
+                            score: trustResult.breakdown.followRatio,
+                            meaning: trustResult.breakdown.followRatio >= 80 ? "Followers far outnumber following — organic growth pattern." : trustResult.breakdown.followRatio >= 50 ? "Balanced ratio — neither suspicious nor premium." : "Following count is close to or exceeds followers. Common F4F pattern.",
+                            color: "#10b981"
+                          },
+                          {
+                            label: "Engagement Quality",
+                            score: trustResult.breakdown.engagementQuality,
+                            meaning: trustResult.breakdown.engagementQuality >= 80 ? `${trustResult.followRatio}x ratio — real humans are engaging with content.` : trustResult.breakdown.engagementQuality >= 50 ? "Moderate engagement — audience is present but not highly active." : "Low engagement relative to follower count — heavy bot follower signal.",
+                            color: "#06b6d4"
+                          },
+                          {
+                            label: "Conversations",
+                            score: trustResult.breakdown.conversation,
+                            meaning: trustResult.breakdown.conversation >= 80 ? "Strong reply-to-like ratio indicates real discussion, not passive likes." : trustResult.breakdown.conversation >= 50 ? "Some conversation happening — audience cares enough to reply." : "Likes without replies — classic engagement pod or bot-liker pattern.",
+                            color: "#8b5cf6"
+                          },
+                          {
+                            label: "Activity Pattern",
+                            score: trustResult.breakdown.activity,
+                            meaning: trustResult.breakdown.activity >= 80 ? "Consistent long-term posting — established, real account." : trustResult.breakdown.activity >= 50 ? "Moderate activity — posting is irregular but present." : "Irregular or suspicious activity patterns detected.",
+                            color: "#f59e0b"
+                          },
+                          {
+                            label: "Verification",
+                            score: trustResult.breakdown.verification,
+                            meaning: trustResult.breakdown.verification >= 80 ? "Verified account — carries weight but doesn't override other signals." : "Unverified account — no X verification trust boost.",
+                            color: "#ec4899"
+                          },
+                        ].map(s => (
+                          <div key={s.label} style={{ padding: "10px 12px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                              <span style={{ fontSize: 11, color: s.color, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>{s.label}</span>
+                              <span style={{ fontSize: 11, color: s.color, fontFamily: "'JetBrains Mono', monospace", fontWeight: 800 }}>{s.score}/100</span>
+                            </div>
+                            <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.5 }}>{s.meaning}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Risk assessment */}
+                    <div style={{ marginTop: 18, padding: "16px 18px", background: trustResult.trustScore >= 70 ? "rgba(16, 185, 129, 0.06)" : trustResult.trustScore >= 40 ? "rgba(245, 158, 11, 0.06)" : "rgba(239, 68, 68, 0.06)", borderRadius: 10, border: `1px solid ${trustResult.trustScore >= 70 ? "rgba(16, 185, 129, 0.2)" : trustResult.trustScore >= 40 ? "rgba(245, 158, 11, 0.2)" : "rgba(239, 68, 68, 0.2)"}` }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                        <span style={{ fontSize: 18 }}>
+                          {trustResult.trustScore >= 85 ? "🏆" : trustResult.trustScore >= 70 ? "✅" : trustResult.trustScore >= 55 ? "📊" : trustResult.trustScore >= 40 ? "⚠️" : "🚫"}
+                        </span>
+                        <span style={{ fontSize: 13, fontWeight: 800, color: trustResult.labelColor, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>
+                          {trustResult.trustScore >= 85 ? "Premium Buy Recommendation" : trustResult.trustScore >= 70 ? "Safe to Buy" : trustResult.trustScore >= 55 ? "Proceed with Verification" : trustResult.trustScore >= 40 ? "High Risk — Verify Before Buying" : "Do Not Buy"}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.6 }}>
+                        {trustResult.trustScore >= 85 && "All authenticity signals check out. Low bot follower estimate. Strong engagement patterns. Ideal account to acquire or trust."}
+                        {trustResult.trustScore >= 70 && trustResult.trustScore < 85 && "Most signals look healthy. Double-check the weakest signal below, but this is generally a solid account worth the asking price."}
+                        {trustResult.trustScore >= 55 && trustResult.trustScore < 70 && "Mixed signals. We recommend running Deep Forensics (CIB tab) for a full tweet-level analysis before purchasing. Negotiate if price seems high."}
+                        {trustResult.trustScore >= 40 && trustResult.trustScore < 55 && "Multiple authenticity concerns. Only purchase if you've independently verified the account's real audience. Price should reflect the risk."}
+                        {trustResult.trustScore < 40 && "This account shows strong signs of manipulation or bot inflation. The follower count is likely misleading. Avoid purchasing or heavily discount the valuation."}
+                      </div>
+                    </div>
+
+                    {/* Next steps CTAs */}
+                    <div style={{ marginTop: 16, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                      <button onClick={() => setTab("cib")} style={{
+                        padding: "10px 12px", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.08)",
+                        background: "rgba(0, 0, 0, 0.5)", color: C.textSecondary,
+                        fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 600, cursor: "pointer",
+                        transition: "all 0.2s",
+                      }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(212, 255, 0, 0.3)"; e.currentTarget.style.color = C.primary; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.08)"; e.currentTarget.style.color = C.textSecondary; }}
+                      >🔬 Run Deep Forensics</button>
+                      <button onClick={() => setTab("trust")} style={{
+                        padding: "10px 12px", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.08)",
+                        background: "rgba(0, 0, 0, 0.5)", color: C.textSecondary,
+                        fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 600, cursor: "pointer",
+                        transition: "all 0.2s",
+                      }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(212, 255, 0, 0.3)"; e.currentTarget.style.color = C.primary; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.08)"; e.currentTarget.style.color = C.textSecondary; }}
+                      >📖 Learn More</button>
                     </div>
                   </GlowCard>
                 )}
@@ -1053,6 +1662,199 @@ export default function HandleMarket() {
                 </GlowCard>
               </div>
             )}
+          </div>
+        )}
+
+        {/* ─── TRUST SCORE TAB ─────────────────────────────── */}
+        {tab === "trust" && (
+          <div>
+            {/* Hero */}
+            <div style={{ textAlign: "center", marginBottom: 40 }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 20, background: "rgba(212, 255, 0, 0.06)", border: "1px solid rgba(212, 255, 0, 0.2)", marginBottom: 20 }}>
+                <span style={{ fontSize: 12 }}>🛡️</span>
+                <span style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700 }}>The Trust Score</span>
+              </div>
+              <h1 style={{ fontSize: 48, fontWeight: 900, margin: 0, letterSpacing: -2, lineHeight: 1.1 }}>
+                Don't buy <span style={{ color: C.primary }}>bot-inflated</span><br />garbage accounts.
+              </h1>
+              <p style={{ color: C.textSecondary, fontSize: 17, marginTop: 16, maxWidth: 560, margin: "16px auto 0", lineHeight: 1.5 }}>
+                Every CT account gets scored 0-100 on authenticity. We catch bot followers, engagement pods, F4F rings, and fake activity — before you get scammed.
+              </p>
+            </div>
+
+            {/* Tier System */}
+            <div style={{ marginBottom: 40 }}>
+              <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8, textAlign: "center" }}>Score Tiers</div>
+              <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: -1, textAlign: "center", marginBottom: 24 }}>From trash to <span style={{ color: C.primary }}>supreme.</span></h2>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {[
+                  { range: "85-100", label: "SUPREME", color: "#10b981", icon: "👑", desc: "Legit, established, zero red flags. Premium tier." },
+                  { range: "70-84", label: "CREDIBLE", color: "#34d399", icon: "✅", desc: "Solid authenticity signals. Safe buy." },
+                  { range: "55-69", label: "NOTED", color: "#fbbf24", icon: "📊", desc: "Decent account. Some signals worth verifying." },
+                  { range: "40-54", label: "UNKNOWN", color: "#f97316", icon: "❓", desc: "Mixed signals. Proceed with caution and verify." },
+                  { range: "25-39", label: "SUSPICIOUS", color: "#ef4444", icon: "⚠️", desc: "Multiple red flags detected. High risk." },
+                  { range: "0-24", label: "LIKELY BOT", color: "#dc2626", icon: "🚫", desc: "Heavy bot signals. Do not buy." },
+                ].map(tier => (
+                  <div key={tier.label} style={{
+                    padding: "16px 20px", borderRadius: 12,
+                    background: `${tier.color}06`,
+                    border: `1px solid ${tier.color}25`,
+                    display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap",
+                  }}>
+                    <div style={{ fontSize: 28 }}>{tier.icon}</div>
+                    <div style={{
+                      padding: "6px 12px", borderRadius: 8,
+                      background: `${tier.color}15`, border: `1px solid ${tier.color}40`,
+                      fontFamily: "'JetBrains Mono', monospace", fontSize: 12, fontWeight: 800,
+                      color: tier.color, letterSpacing: 1.5, minWidth: 110, textAlign: "center",
+                    }}>{tier.label}</div>
+                    <div style={{ fontSize: 13, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", minWidth: 70 }}>{tier.range}</div>
+                    <div style={{ fontSize: 13, color: C.textSecondary, flex: 1, minWidth: 200 }}>{tier.desc}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Signals Explained */}
+            <div style={{ marginBottom: 40 }}>
+              <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8, textAlign: "center" }}>The 5 Signals</div>
+              <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: -1, textAlign: "center", marginBottom: 24 }}>What we <span style={{ color: C.primary }}>actually measure.</span></h2>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 }}>
+                {[
+                  {
+                    icon: "⚖️", title: "Follow Ratio", weight: "20%",
+                    desc: "Real accounts have way more followers than they follow. Accounts following thousands with low follower counts are flagged as F4F (follow-for-follow) patterns.",
+                    flag: "🚩 Red flag: following > followers"
+                  },
+                  {
+                    icon: "💬", title: "Engagement Quality", weight: "30%",
+                    desc: "Bot-inflated accounts have massive follower counts but tiny engagement. This is the single biggest tell. We compare total engagement to follower count to catch fakes.",
+                    flag: "🚩 Red flag: <0.1% engagement rate"
+                  },
+                  {
+                    icon: "🗣️", title: "Conversations", weight: "15%",
+                    desc: "Real audiences reply. Bots and engagement pods only drop likes. We measure the ratio of replies to likes — genuine accounts have meaningful conversations.",
+                    flag: "🚩 Red flag: likes but no replies"
+                  },
+                  {
+                    icon: "📈", title: "Activity Pattern", weight: "15%",
+                    desc: "Brand new accounts with huge followings are suspicious — you can't grow 50k followers in a month organically. We flag rapid growth and bot-like posting frequencies.",
+                    flag: "🚩 Red flag: new account + big followers"
+                  },
+                  {
+                    icon: "✓", title: "Verification", weight: "10%",
+                    desc: "X verification (legacy blue, gold, or paid) is a trust boost but doesn't override other signals. A verified bot account is still a bot account.",
+                    flag: "✅ Bonus: verified status"
+                  },
+                  {
+                    icon: "🤖", title: "Bot Detection", weight: "10%",
+                    desc: "We estimate what % of followers are likely bots based on engagement gap and follow patterns. Accounts with >30% estimated bots are flagged.",
+                    flag: "🚩 Red flag: >30% bot estimate"
+                  },
+                ].map(signal => (
+                  <GlowCard key={signal.title} glow style={{ padding: "20px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+                      <div style={{ fontSize: 28 }}>{signal.icon}</div>
+                      <Pill text={`${signal.weight} weight`} color={C.primary} />
+                    </div>
+                    <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 8, letterSpacing: -0.3 }}>{signal.title}</div>
+                    <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.6, marginBottom: 12 }}>{signal.desc}</div>
+                    <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", padding: "8px 10px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 6, border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                      {signal.flag}
+                    </div>
+                  </GlowCard>
+                ))}
+              </div>
+            </div>
+
+            {/* How to use it */}
+            <GlowCard style={{ marginBottom: 40, padding: "32px" }}>
+              <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8 }}>For Buyers</div>
+              <h3 style={{ fontSize: 22, fontWeight: 900, marginBottom: 16, marginTop: 0, letterSpacing: -0.5 }}>How to read a Trust Score</h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {[
+                  { rule: "Never buy anything below 40. Full stop.", color: "#ef4444" },
+                  { rule: "40-55 range? Run Deep Forensics on it first (CIB tab) to see the full picture.", color: "#f97316" },
+                  { rule: "Check the 'Why This Score?' section — specific flags tell you WHY the number is what it is.", color: "#fbbf24" },
+                  { rule: "A 70+ with green flags for 'Healthy organic engagement' and 'Strong conversation ratio' is a solid buy.", color: "#10b981" },
+                  { rule: "Always check the 90-day timeline. Anomaly spikes = purchased followers. Clean lines = organic growth.", color: C.primary },
+                ].map((item, i) => (
+                  <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                    <div style={{ width: 24, height: 24, borderRadius: 6, background: `${item.color}15`, border: `1px solid ${item.color}40`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: item.color, fontFamily: "'JetBrains Mono', monospace", flexShrink: 0 }}>{i + 1}</div>
+                    <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.6, paddingTop: 2 }}>{item.rule}</div>
+                  </div>
+                ))}
+              </div>
+            </GlowCard>
+
+            {/* For Sellers */}
+            <GlowCard style={{ marginBottom: 40, padding: "32px" }}>
+              <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8 }}>For Sellers</div>
+              <h3 style={{ fontSize: 22, fontWeight: 900, marginBottom: 16, marginTop: 0, letterSpacing: -0.5 }}>Boost your score before listing</h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {[
+                  "Stop buying followers. It tanks your engagement rate and flags anomalies in the 90-day timeline.",
+                  "Engage genuinely — reply to comments, quote tweets, join conversations. Conversations signal is weighted 15%.",
+                  "Post consistently for 3+ months. Activity Pattern rewards long-term organic growth.",
+                  "Clean your follower list — remove obvious bot accounts. Lower bot % = higher trust score.",
+                  "Get vouched by other SUPREME accounts to compound your trust over time.",
+                ].map((rule, i) => (
+                  <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                    <div style={{ color: C.primary, fontSize: 18, fontWeight: 900, flexShrink: 0, lineHeight: 1.5 }}>→</div>
+                    <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.6 }}>{rule}</div>
+                  </div>
+                ))}
+              </div>
+            </GlowCard>
+
+            {/* Anti-gaming */}
+            <GlowCard glow style={{ marginBottom: 40, padding: "28px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
+                <div style={{ fontSize: 28 }}>🔒</div>
+                <div style={{ fontSize: 20, fontWeight: 900, letterSpacing: -0.5 }}>Can the score be gamed?</div>
+              </div>
+              <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.6, marginBottom: 16 }}>
+                Hard to. Here's why HandleMarket's scoring system holds up where others don't:
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14 }}>
+                {[
+                  { title: "Historical Tracking", desc: "Scores look at 90 days of data. Can't retroactively fake your history." },
+                  { title: "Multi-Signal Weighting", desc: "Gaming one signal (buying blue check) doesn't move the needle much." },
+                  { title: "Cluster Detection", desc: "Even if you pass individual checks, we catch pod/network membership." },
+                  { title: "Refresh Delay", desc: "Scores cache for 24h so last-minute score manipulation doesn't work." },
+                ].map(item => (
+                  <div key={item.title} style={{ padding: "12px 14px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                    <div style={{ fontSize: 12, fontWeight: 800, color: C.primary, marginBottom: 4, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8 }}>{item.title}</div>
+                    <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.5 }}>{item.desc}</div>
+                  </div>
+                ))}
+              </div>
+            </GlowCard>
+
+            {/* CTA */}
+            <GlowCard glow style={{ textAlign: "center", padding: "40px 32px", background: `linear-gradient(135deg, rgba(212, 255, 0, 0.04), rgba(0, 0, 0, 0.5))` }}>
+              <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: -1, marginBottom: 12 }}>
+                Check any <span style={{ color: C.primary }}>CT account's</span> trust score.
+              </div>
+              <div style={{ fontSize: 14, color: C.textSecondary, marginBottom: 24, maxWidth: 400, margin: "0 auto 24px" }}>
+                Free. No signup. Full analysis in 10 seconds.
+              </div>
+              <button
+                onClick={() => setTab("valuate")}
+                style={{
+                  padding: "14px 32px", borderRadius: 12, border: "none",
+                  background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+                  color: "#000", fontSize: 14, fontWeight: 900,
+                  fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+                  letterSpacing: 0.3, transition: "all 0.2s",
+                  boxShadow: "0 0 32px rgba(212, 255, 0, 0.25)",
+                }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 40px rgba(212, 255, 0, 0.4)"; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 32px rgba(212, 255, 0, 0.25)"; }}
+              >🛡️ Run Trust Analysis</button>
+            </GlowCard>
           </div>
         )}
 
@@ -1518,7 +2320,7 @@ export default function HandleMarket() {
               </div>
 
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {["@CryptoAlpha_", "@0xMaxi", "@DegenHQ", "@SOL_Trader99", "@OnChainMax", "+9 more"].map(h => (
+                {["@CryptoAlpha_", "@0xTrenchKing", "@DegenHQ", "@SOL_Trader99", "@OnChainMax", "+9 more"].map(h => (
                   <div key={h} style={{
                     padding: "8px 12px", background: "rgba(255, 255, 255, 0.05)",
                     border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: 8,

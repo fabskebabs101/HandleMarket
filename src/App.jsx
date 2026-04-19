@@ -450,6 +450,13 @@ export default function HandleMarket() {
   const [leaderboardTab, setLeaderboardTab] = useState("trending");
   const [historyData, setHistoryData] = useState(null);
   const [selectedCluster, setSelectedCluster] = useState(null);
+  const [selectedListing, setSelectedListing] = useState(null);
+  const [showListForm, setShowListForm] = useState(false);
+  const [listForm, setListForm] = useState({
+    handle: "", askingPrice: "", description: "", niche: "DeFi",
+    contactMethod: "telegram", contactHandle: "", negotiable: true,
+  });
+  const [listSubmitted, setListSubmitted] = useState(false);
   const [forensicsRun, setForensicsRun] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [hoveredTab, setHoveredTab] = useState(null);
@@ -1056,6 +1063,23 @@ export default function HandleMarket() {
                 CT Account <span style={{ color: C.primary }}>Marketplace</span>
               </h1>
               <p style={{ color: C.textSecondary, fontSize: 15, marginTop: 8 }}>Buy and sell verified Crypto Twitter accounts with escrow protection</p>
+
+              {/* Hero CTA — List Your Account */}
+              <button
+                onClick={() => setShowListForm(true)}
+                style={{
+                  marginTop: 20, padding: "14px 32px", borderRadius: 12, border: "none",
+                  background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+                  color: "#000", fontSize: 15, fontWeight: 800,
+                  fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+                  letterSpacing: 0.3, transition: "all 0.2s",
+                  boxShadow: "0 0 24px rgba(212, 255, 0, 0.2)",
+                }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 32px rgba(212, 255, 0, 0.35)"; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 24px rgba(212, 255, 0, 0.2)"; }}
+              >
+                + List Your Account
+              </button>
             </div>
 
             <div style={{ display: "flex", gap: 10, marginBottom: 24, flexWrap: "wrap", justifyContent: "center" }}>
@@ -1134,7 +1158,7 @@ export default function HandleMarket() {
                       <div style={{ fontSize: 24, fontWeight: 800, letterSpacing: -0.5, color: C.primary }}>${listing.value.toLocaleString()}</div>
                     </div>
                     {listing.status === "listed" && (
-                      <button style={{
+                      <button onClick={(e) => { e.stopPropagation(); setSelectedListing(listing); }} style={{
                         padding: "10px 20px", borderRadius: 10, border: `1px solid rgba(212, 255, 0, 0.25)`,
                         background: "rgba(255, 255, 255, 0.05)", color: C.primary,
                         fontFamily: "'JetBrains Mono', monospace", fontSize: 12, fontWeight: 600,
@@ -1970,6 +1994,456 @@ export default function HandleMarket() {
           </div>
         )}
       </div>
+
+      {/* ─── LISTING DETAIL MODAL ───────────────────────────── */}
+      {selectedListing && (() => {
+        const tColor = selectedListing.trustScore >= 85 ? "#10b981" : selectedListing.trustScore >= 70 ? "#34d399" : selectedListing.trustScore >= 55 ? "#fbbf24" : "#f97316";
+        // Calculate full trust analysis for this listing
+        const engRate = parseFloat(selectedListing.engagement);
+        const ageYears = parseInt(selectedListing.age) || 1;
+        const estimatedAvgLikes = Math.round(selectedListing.followers * (engRate / 100) * 0.75);
+        const estimatedReplies = Math.round(estimatedAvgLikes * 0.12);
+        const estimatedRetweets = Math.round(estimatedAvgLikes * 0.18);
+        const listingTrust = calculateTrustScore({
+          followers: selectedListing.followers,
+          following: Math.round(selectedListing.followers / 8),
+          avgLikes: estimatedAvgLikes,
+          avgRetweets: estimatedRetweets,
+          avgReplies: estimatedReplies,
+          tweets: ageYears * 365 * 0.8,
+          accountAgeDays: ageYears * 365,
+          verified: selectedListing.verified,
+          cryptoNiche: true,
+        });
+        // Also calculate valuation breakdown
+        const listingVal = estimateValue({
+          followers: selectedListing.followers,
+          avgLikes: estimatedAvgLikes,
+          avgRetweets: estimatedRetweets,
+          avgReplies: estimatedReplies,
+          tweets: ageYears * 365 * 0.8,
+          accountAgeDays: ageYears * 365,
+          verified: selectedListing.verified,
+          cryptoNiche: true,
+        });
+        return (
+          <div
+            onClick={() => setSelectedListing(null)}
+            style={{
+              position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.85)",
+              backdropFilter: "blur(8px)", zIndex: 100,
+              display: "flex", alignItems: "flex-start", justifyContent: "center",
+              padding: "40px 20px", overflowY: "auto",
+              animation: "fadeIn 0.2s ease-out",
+            }}
+          >
+            <style>{`@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }`}</style>
+            <div
+              onClick={e => e.stopPropagation()}
+              style={{
+                maxWidth: 720, width: "100%",
+                background: "rgba(10, 10, 10, 0.98)",
+                border: `1px solid ${C.borderHover}`,
+                borderRadius: 20, padding: 0,
+                boxShadow: "0 40px 100px rgba(0, 0, 0, 0.8), 0 0 60px rgba(212, 255, 0, 0.1)",
+                overflow: "hidden",
+              }}
+            >
+              {/* Header banner */}
+              <div style={{ padding: "24px 28px", borderBottom: `1px solid ${C.border}`, background: `linear-gradient(135deg, rgba(212, 255, 0, 0.04), transparent)`, display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                  <div style={{
+                    width: 56, height: 56, borderRadius: 14,
+                    background: `linear-gradient(135deg, hsl(0, 0%, ${25 + selectedListing.id * 4}%), hsl(0, 0%, ${12 + selectedListing.id * 2}%))`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 22, fontWeight: 900, color: "#fff",
+                  }}>{selectedListing.handle[1].toUpperCase()}</div>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                      <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5 }}>{selectedListing.handle}</span>
+                      {selectedListing.verified && <Pill text="✓ Verified" color={C.accent} />}
+                    </div>
+                    <div style={{ fontSize: 12, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 4 }}>{selectedListing.niche} · Tracked since 94d ago</div>
+                  </div>
+                </div>
+                <button onClick={() => setSelectedListing(null)} style={{
+                  width: 32, height: 32, borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.08)",
+                  background: "rgba(0, 0, 0, 0.5)", color: C.textSecondary,
+                  fontSize: 16, cursor: "pointer", fontFamily: "'Outfit', sans-serif",
+                }}>✕</button>
+              </div>
+
+              {/* Hero price + valuation comparison */}
+              <div style={{ padding: "28px", borderBottom: `1px solid ${C.border}`, background: `linear-gradient(180deg, rgba(212, 255, 0, 0.02), transparent)` }}>
+                <div style={{ textAlign: "center", marginBottom: 16 }}>
+                  <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 6 }}>Asking Price</div>
+                  <div style={{ fontSize: 56, fontWeight: 900, color: C.primary, letterSpacing: -2, fontFamily: "'JetBrains Mono', monospace" }}>${selectedListing.value.toLocaleString()}</div>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+                  <div style={{ padding: "10px 8px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 8, textAlign: "center", border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                    <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8 }}>HM Est. Value</div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: C.textPrimary, marginTop: 3, fontFamily: "'JetBrains Mono', monospace" }}>${listingVal.estimatedValue.toLocaleString()}</div>
+                  </div>
+                  <div style={{ padding: "10px 8px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 8, textAlign: "center", border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                    <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8 }}>Price vs Est.</div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: selectedListing.value > listingVal.estimatedValue * 1.1 ? "#ef4444" : selectedListing.value < listingVal.estimatedValue * 0.9 ? "#10b981" : C.textPrimary, marginTop: 3, fontFamily: "'JetBrains Mono', monospace" }}>
+                      {selectedListing.value > listingVal.estimatedValue ? "+" : ""}{Math.round((selectedListing.value - listingVal.estimatedValue) / listingVal.estimatedValue * 100)}%
+                    </div>
+                  </div>
+                  <div style={{ padding: "10px 8px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 8, textAlign: "center", border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                    <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8 }}>$/1k Followers</div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: C.textPrimary, marginTop: 3, fontFamily: "'JetBrains Mono', monospace" }}>${Math.round(selectedListing.value / selectedListing.followers * 1000)}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Account stats grid */}
+              <div style={{ padding: "24px 28px" }}>
+                <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 12 }}>📊 Account Stats</div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 24 }}>
+                  {[
+                    ["Followers", selectedListing.followers.toLocaleString()],
+                    ["Engagement", selectedListing.engagement],
+                    ["Age", selectedListing.age],
+                    ["Avg Likes", estimatedAvgLikes.toLocaleString()],
+                  ].map(([l, v]) => (
+                    <div key={l} style={{ padding: "12px 8px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 10, textAlign: "center", border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                      <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8 }}>{l}</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: C.textPrimary, marginTop: 4, fontFamily: "'JetBrains Mono', monospace" }}>{v}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Trust Score Hero */}
+                <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>🛡️ Trust Assessment</div>
+                <div style={{ padding: "18px 20px", background: `${tColor}08`, border: `1px solid ${tColor}30`, borderRadius: 12, marginBottom: 14 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                    <div>
+                      <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 }}>Trust Score</div>
+                      <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                        <span style={{ fontSize: 36, fontWeight: 900, color: tColor, letterSpacing: -1, fontFamily: "'JetBrains Mono', monospace" }}>{selectedListing.trustScore}</span>
+                        <span style={{ fontSize: 12, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>/ 100</span>
+                      </div>
+                    </div>
+                    <div style={{
+                      padding: "8px 14px", borderRadius: 10,
+                      background: `${tColor}15`, border: `1px solid ${tColor}40`,
+                      fontFamily: "'JetBrains Mono', monospace", fontSize: 12, fontWeight: 800,
+                      color: tColor, letterSpacing: 1.5,
+                    }}>{selectedListing.trustLabel}</div>
+                  </div>
+
+                  {/* Bot estimate */}
+                  <div style={{ padding: "10px 12px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 8, marginBottom: 12 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+                      <span style={{ fontSize: 10, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>Estimated Bot Followers</span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: listingTrust.estimatedBotPct > 30 ? "#ef4444" : listingTrust.estimatedBotPct > 15 ? "#f59e0b" : "#10b981", fontFamily: "'JetBrains Mono', monospace" }}>
+                        {listingTrust.estimatedBotPct}%
+                      </span>
+                    </div>
+                    <div style={{ height: 4, background: "rgba(255, 255, 255, 0.05)", borderRadius: 2, overflow: "hidden" }}>
+                      <div style={{
+                        height: "100%", width: `${listingTrust.estimatedBotPct}%`,
+                        background: `linear-gradient(90deg, ${listingTrust.estimatedBotPct > 30 ? "#ef4444" : listingTrust.estimatedBotPct > 15 ? "#f59e0b" : "#10b981"}, ${listingTrust.estimatedBotPct > 30 ? "#dc2626" : listingTrust.estimatedBotPct > 15 ? "#f97316" : "#059669"})`,
+                      }} />
+                    </div>
+                  </div>
+
+                  {/* Signal breakdown */}
+                  <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 8 }}>Authenticity Signals</div>
+                  <ScoreBar label="Follow Ratio" score={listingTrust.breakdown.followRatio} color="#10b981" />
+                  <ScoreBar label="Engagement Quality" score={listingTrust.breakdown.engagementQuality} color="#06b6d4" />
+                  <ScoreBar label="Conversations" score={listingTrust.breakdown.conversation} color="#a855f7" />
+                  <ScoreBar label="Activity Pattern" score={listingTrust.breakdown.activity} color="#f59e0b" />
+                  <ScoreBar label="Verification" score={listingTrust.breakdown.verification} color="#ec4899" />
+                </div>
+
+                {/* Why this score — flags */}
+                {(listingTrust.redFlags.length > 0 || listingTrust.greenFlags.length > 0) && (
+                  <div style={{ marginBottom: 20 }}>
+                    <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>🔍 Why This Score?</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                      {listingTrust.greenFlags.map((flag, i) => (
+                        <div key={`g-${i}`} style={{ padding: "10px 12px", background: "rgba(16, 185, 129, 0.06)", border: "1px solid rgba(16, 185, 129, 0.2)", borderRadius: 8, display: "flex", alignItems: "center", gap: 10 }}>
+                          <span style={{ fontSize: 14 }}>✅</span>
+                          <span style={{ fontSize: 12, color: "#6ee7b7", fontFamily: "'JetBrains Mono', monospace" }}>{flag}</span>
+                        </div>
+                      ))}
+                      {listingTrust.redFlags.map((flag, i) => (
+                        <div key={`r-${i}`} style={{ padding: "10px 12px", background: "rgba(239, 68, 68, 0.06)", border: "1px solid rgba(239, 68, 68, 0.2)", borderRadius: 8, display: "flex", alignItems: "center", gap: 10 }}>
+                          <span style={{ fontSize: 14 }}>🚩</span>
+                          <span style={{ fontSize: 12, color: "#fca5a5", fontFamily: "'JetBrains Mono', monospace" }}>{flag}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Valuation breakdown */}
+                <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>💰 Valuation Breakdown</div>
+                <div style={{ padding: "14px 16px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 10, marginBottom: 20, border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                  <div style={{ fontSize: 11, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", marginBottom: 10, lineHeight: 1.5 }}>Score out of 100 for each valuation signal:</div>
+                  <ScoreBar label="Followers Weight" score={listingVal.breakdown.followers} color={C.primary} />
+                  <ScoreBar label="Engagement Weight" score={listingVal.breakdown.engagement} color="#06b6d4" />
+                  <ScoreBar label="Account Age" score={listingVal.breakdown.accountAge} color="#a855f7" />
+                  <ScoreBar label="Tweet Volume" score={listingVal.breakdown.tweetVolume} color="#f59e0b" />
+                  <ScoreBar label="Verification" score={listingVal.breakdown.verification} color="#ec4899" />
+                  <ScoreBar label="CT Niche" score={listingVal.breakdown.nicheRelevance} color="#fb923c" />
+                  <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid rgba(255, 255, 255, 0.05)", fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.5 }}>
+                    💡 Estimated projected earnings: <strong style={{ color: C.textPrimary }}>~${listingVal.monthlyEarnings}/mo</strong> based on engagement and reach. Total valuation = projected earnings × {selectedListing.verified ? "18" : "12"} months × CT niche premium.
+                  </div>
+                </div>
+
+                {/* Seller info */}
+                <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>👤 Seller</div>
+                <div style={{ padding: "14px 16px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 10, marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between", border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg, #333, #111)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 900, color: "#fff" }}>OG</div>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 700 }}>@OGTrader</div>
+                      <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 1 }}>47 sales · 0% disputes · Avg transfer 4h</div>
+                    </div>
+                  </div>
+                  <Pill text="Score 98" color="#10b981" />
+                </div>
+
+                {/* Description */}
+                <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>📝 About This Account</div>
+                <div style={{ padding: "14px 16px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 10, marginBottom: 20, fontSize: 13, color: C.textSecondary, lineHeight: 1.6, border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                  Established {selectedListing.niche} account with strong organic engagement. Original email included in transfer. Clean history with no bans or warnings. Serious buyers only. Escrow required — no exceptions.
+                </div>
+
+                {/* What's included */}
+                <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>✅ What's Included</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 24 }}>
+                  {["Full account credentials + email access", "Linked phone number removal", "24h transfer window via escrow", "All listed stats verified by HandleMarket"].map(item => (
+                    <div key={item} style={{ fontSize: 12, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", display: "flex", gap: 8, alignItems: "center" }}>
+                      <span style={{ color: C.primary }}>✓</span>
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Action buttons */}
+                <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 10 }}>
+                  <button style={{
+                    padding: "14px 20px", borderRadius: 12, border: "none",
+                    background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+                    color: "#000", fontSize: 14, fontWeight: 900,
+                    fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+                    letterSpacing: 0.3, transition: "all 0.2s",
+                  }}
+                    onMouseEnter={e => e.currentTarget.style.transform = "translateY(-1px)"}
+                    onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
+                  >💰 Buy via Escrow</button>
+                  <button style={{
+                    padding: "14px 20px", borderRadius: 12, border: `1px solid ${C.primary}40`,
+                    background: "rgba(212, 255, 0, 0.06)", color: C.primary,
+                    fontFamily: "'JetBrains Mono', monospace", fontSize: 12, fontWeight: 700,
+                    cursor: "pointer",
+                  }}>💬 Make Offer</button>
+                </div>
+
+                <div style={{ marginTop: 14, padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 8, fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.5, textAlign: "center" }}>
+                  🔒 All transactions protected by HandleMarket escrow. Funds held until transfer verified.
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* ─── LIST YOUR ACCOUNT MODAL ────────────────────────── */}
+      {showListForm && (
+        <div
+          onClick={() => { if (!listSubmitted) setShowListForm(false); }}
+          style={{
+            position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.85)",
+            backdropFilter: "blur(8px)", zIndex: 100,
+            display: "flex", alignItems: "flex-start", justifyContent: "center",
+            padding: "40px 20px", overflowY: "auto",
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              maxWidth: 620, width: "100%",
+              background: "rgba(10, 10, 10, 0.98)",
+              border: `1px solid ${C.borderHover}`,
+              borderRadius: 20, padding: 0,
+              boxShadow: "0 40px 100px rgba(0, 0, 0, 0.8), 0 0 60px rgba(212, 255, 0, 0.1)",
+              overflow: "hidden",
+            }}
+          >
+            {!listSubmitted ? (
+              <>
+                <div style={{ padding: "24px 28px", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div>
+                    <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.5 }}>List Your CT Account</div>
+                    <div style={{ fontSize: 12, color: C.textMuted, marginTop: 4, fontFamily: "'JetBrains Mono', monospace" }}>Your listing goes live instantly · No fees until sale</div>
+                  </div>
+                  <button onClick={() => setShowListForm(false)} style={{
+                    width: 32, height: 32, borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.08)",
+                    background: "rgba(0, 0, 0, 0.5)", color: C.textSecondary,
+                    fontSize: 16, cursor: "pointer",
+                  }}>✕</button>
+                </div>
+
+                <div style={{ padding: "24px 28px" }}>
+                  {/* X Handle */}
+                  <div style={{ marginBottom: 16 }}>
+                    <label style={labelStyle}>X / Twitter Handle *</label>
+                    <div style={{ position: "relative" }}>
+                      <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: C.textMuted, fontSize: 14, fontFamily: "'JetBrains Mono', monospace" }}>@</span>
+                      <input
+                        style={{ ...inputStyle, paddingLeft: 32 }} type="text" placeholder="FabsKebabs101"
+                        value={listForm.handle}
+                        onChange={e => setListForm({ ...listForm, handle: e.target.value })}
+                        onFocus={e => e.target.style.borderColor = C.primary}
+                        onBlur={e => e.target.style.borderColor = "rgba(255, 255, 255, 0.12)"}
+                      />
+                    </div>
+                    <div style={{ fontSize: 10, color: C.textMuted, marginTop: 6, fontFamily: "'JetBrains Mono', monospace" }}>We'll verify ownership via DM before listing goes live</div>
+                  </div>
+
+                  {/* Asking Price */}
+                  <div style={{ marginBottom: 16 }}>
+                    <label style={labelStyle}>Asking Price (USD) *</label>
+                    <div style={{ position: "relative" }}>
+                      <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: C.textMuted, fontSize: 14, fontFamily: "'JetBrains Mono', monospace" }}>$</span>
+                      <input
+                        style={{ ...inputStyle, paddingLeft: 30 }} type="number" placeholder="3500"
+                        value={listForm.askingPrice}
+                        onChange={e => setListForm({ ...listForm, askingPrice: e.target.value })}
+                        onFocus={e => e.target.style.borderColor = C.primary}
+                        onBlur={e => e.target.style.borderColor = "rgba(255, 255, 255, 0.12)"}
+                      />
+                    </div>
+                    <div style={{ fontSize: 10, color: C.textMuted, marginTop: 6, fontFamily: "'JetBrains Mono', monospace" }}>💡 Unsure? Get a free valuation first in the Valuate tab</div>
+                  </div>
+
+                  {/* Niche */}
+                  <div style={{ marginBottom: 16 }}>
+                    <label style={labelStyle}>Niche *</label>
+                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                      {["DeFi", "Solana", "NFTs", "Memecoin", "Bitcoin", "Trading", "Alpha", "Analytics"].map(n => (
+                        <button key={n} type="button" onClick={() => setListForm({ ...listForm, niche: n })} style={{
+                          padding: "8px 14px", borderRadius: 8,
+                          border: `1px solid ${listForm.niche === n ? C.primary : "rgba(255, 255, 255, 0.08)"}`,
+                          background: listForm.niche === n ? "rgba(212, 255, 0, 0.12)" : "rgba(0, 0, 0, 0.5)",
+                          color: listForm.niche === n ? C.primary : C.textSecondary,
+                          fontSize: 11, fontWeight: 600, fontFamily: "'JetBrains Mono', monospace",
+                          cursor: "pointer", textTransform: "uppercase", letterSpacing: 0.5,
+                        }}>{n}</button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <div style={{ marginBottom: 16 }}>
+                    <label style={labelStyle}>Description</label>
+                    <textarea
+                      placeholder="Tell buyers what makes this account valuable. Posting history, engagement patterns, notable followers, etc."
+                      value={listForm.description}
+                      onChange={e => setListForm({ ...listForm, description: e.target.value })}
+                      onFocus={e => e.target.style.borderColor = C.primary}
+                      onBlur={e => e.target.style.borderColor = "rgba(255, 255, 255, 0.12)"}
+                      style={{
+                        ...inputStyle, minHeight: 90, resize: "vertical",
+                        fontFamily: "'Outfit', sans-serif",
+                      }}
+                    />
+                  </div>
+
+                  {/* Contact method */}
+                  <div style={{ marginBottom: 16 }}>
+                    <label style={labelStyle}>Preferred Contact Method</label>
+                    <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
+                      {[["telegram", "Telegram"], ["dm", "X DM"], ["email", "Email"]].map(([val, lbl]) => (
+                        <button key={val} type="button" onClick={() => setListForm({ ...listForm, contactMethod: val })} style={{
+                          padding: "8px 14px", borderRadius: 8,
+                          border: `1px solid ${listForm.contactMethod === val ? C.primary : "rgba(255, 255, 255, 0.08)"}`,
+                          background: listForm.contactMethod === val ? "rgba(212, 255, 0, 0.12)" : "rgba(0, 0, 0, 0.5)",
+                          color: listForm.contactMethod === val ? C.primary : C.textSecondary,
+                          fontSize: 11, fontWeight: 600, fontFamily: "'JetBrains Mono', monospace",
+                          cursor: "pointer", flex: 1,
+                        }}>{lbl}</button>
+                      ))}
+                    </div>
+                    <input
+                      style={inputStyle} type="text"
+                      placeholder={listForm.contactMethod === "telegram" ? "@YourTelegram" : listForm.contactMethod === "dm" ? "@YourXHandle" : "you@email.com"}
+                      value={listForm.contactHandle}
+                      onChange={e => setListForm({ ...listForm, contactHandle: e.target.value })}
+                      onFocus={e => e.target.style.borderColor = C.primary}
+                      onBlur={e => e.target.style.borderColor = "rgba(255, 255, 255, 0.12)"}
+                    />
+                  </div>
+
+                  {/* Negotiable */}
+                  <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, color: C.textSecondary, marginBottom: 20 }}>
+                    <input type="checkbox" checked={listForm.negotiable} onChange={e => setListForm({ ...listForm, negotiable: e.target.checked })} style={{ accentColor: C.primary }} />
+                    Price is negotiable — allow buyers to make offers
+                  </label>
+
+                  {/* Info box */}
+                  <div style={{ padding: "12px 14px", background: "rgba(212, 255, 0, 0.04)", borderRadius: 8, border: "1px solid rgba(212, 255, 0, 0.12)", marginBottom: 20, fontSize: 11, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.5 }}>
+                    🔒 HandleMarket takes 2.5% commission on completed sales. All transactions go through escrow. Your listing will be live within 5 minutes of ownership verification.
+                  </div>
+
+                  {/* Submit */}
+                  <button
+                    onClick={() => setListSubmitted(true)}
+                    disabled={!listForm.handle || !listForm.askingPrice}
+                    style={{
+                      width: "100%", padding: "14px 20px", borderRadius: 12, border: "none",
+                      background: (!listForm.handle || !listForm.askingPrice) ? "rgba(255, 255, 255, 0.05)" : `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+                      color: (!listForm.handle || !listForm.askingPrice) ? C.textMuted : "#000",
+                      fontSize: 14, fontWeight: 900,
+                      fontFamily: "'Outfit', sans-serif",
+                      cursor: (!listForm.handle || !listForm.askingPrice) ? "not-allowed" : "pointer",
+                      letterSpacing: 0.3,
+                    }}
+                  >🚀 Submit Listing</button>
+                </div>
+              </>
+            ) : (
+              <div style={{ padding: "48px 28px", textAlign: "center" }}>
+                <div style={{ fontSize: 56, marginBottom: 16 }}>🎉</div>
+                <div style={{ fontSize: 24, fontWeight: 900, marginBottom: 8 }}>Listing Submitted</div>
+                <div style={{ fontSize: 14, color: C.textSecondary, marginBottom: 24, maxWidth: 400, margin: "0 auto 24px" }}>
+                  We'll DM <span style={{ color: C.primary, fontFamily: "'JetBrains Mono', monospace" }}>@{listForm.handle}</span> within the next hour to verify account ownership. Once verified, your listing goes live instantly.
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 28 }}>
+                  {[
+                    ["Handle", `@${listForm.handle}`],
+                    ["Price", `$${parseInt(listForm.askingPrice).toLocaleString()}`],
+                    ["Niche", listForm.niche],
+                  ].map(([l, v]) => (
+                    <div key={l} style={{ padding: "12px 8px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                      <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8 }}>{l}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: C.textPrimary, marginTop: 3, fontFamily: "'JetBrains Mono', monospace" }}>{v}</div>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  onClick={() => {
+                    setShowListForm(false);
+                    setListSubmitted(false);
+                    setListForm({ handle: "", askingPrice: "", description: "", niche: "DeFi", contactMethod: "telegram", contactHandle: "", negotiable: true });
+                  }}
+                  style={{
+                    padding: "12px 32px", borderRadius: 12, border: "none",
+                    background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+                    color: "#000", fontSize: 13, fontWeight: 900,
+                    fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+                  }}
+                >Done</button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <div style={{ borderTop: "1px solid rgba(255, 255, 255, 0.05)", padding: "20px 24px", marginTop: 60, textAlign: "center" }}>
         <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>

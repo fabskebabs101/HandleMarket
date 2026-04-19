@@ -138,7 +138,7 @@ function calculateTrustScore({ followers, following, avgLikes, avgRetweets, avgR
   const verificationScore = verified ? 90 : 50;
   if (verified) greenFlags.push("Verified account");
 
-  // 7. CT niche relevance (real CT accounts have more trust in this marketplace)
+  // 7. CT niche relevance (real CT accounts carry more reputation weight)
   if (cryptoNiche) greenFlags.push("Active in crypto niche");
 
   // Weighted composite score
@@ -177,19 +177,6 @@ function calculateTrustScore({ followers, following, avgLikes, avgRetweets, avgR
     followRatio: followRatio.toFixed(2),
   };
 }
-
-const MOCK_LISTINGS = [
-  { id: 1, handle: "@CryptoAlpha_", followers: 45200, value: 3800, engagement: "3.2%", age: "3y", verified: true, niche: "DeFi / Alpha", status: "listed", trustScore: 87, trustLabel: "SUPREME" },
-  { id: 2, handle: "@SOL_Trader99", followers: 12800, value: 950, engagement: "4.1%", age: "2y", verified: false, niche: "Solana Trading", status: "listed", trustScore: 76, trustLabel: "CREDIBLE" },
-  { id: 3, handle: "@NFTWhaleWatch", followers: 88400, value: 9200, engagement: "2.8%", age: "4y", verified: true, niche: "NFTs / Whales", status: "sold", trustScore: 82, trustLabel: "CREDIBLE" },
-  { id: 4, handle: "@DeFi_Degen", followers: 6300, value: 420, engagement: "5.5%", age: "1y", verified: false, niche: "Memecoin / Degen", status: "listed", trustScore: 68, trustLabel: "NOTED" },
-  { id: 5, handle: "@OnChainMax", followers: 31500, value: 2600, engagement: "2.1%", age: "3y", verified: true, niche: "On-chain Analytics", status: "listed", trustScore: 79, trustLabel: "CREDIBLE" },
-  { id: 6, handle: "@AirdropHunterX", followers: 22100, value: 1750, engagement: "1.9%", age: "2y", verified: false, niche: "Airdrops", status: "listed", trustScore: 45, trustLabel: "UNKNOWN" },
-  { id: 7, handle: "@BitcoinMaxi21M", followers: 62400, value: 5400, engagement: "2.6%", age: "5y", verified: true, niche: "Bitcoin / Maxi", status: "listed", trustScore: 89, trustLabel: "SUPREME" },
-  { id: 8, handle: "@SatoshiStacker", followers: 18900, value: 1650, engagement: "3.4%", age: "3y", verified: false, niche: "Bitcoin / DCA", status: "listed", trustScore: 81, trustLabel: "CREDIBLE" },
-  { id: 9, handle: "@ETH_Research", followers: 54100, value: 4800, engagement: "3.1%", age: "4y", verified: true, niche: "Ethereum / Research", status: "listed", trustScore: 86, trustLabel: "SUPREME" },
-  { id: 10, handle: "@L2DegenSzn", followers: 9700, value: 680, engagement: "4.8%", age: "1y", verified: false, niche: "Ethereum / L2s", status: "listed", trustScore: 71, trustLabel: "CREDIBLE" },
-];
 
 const C = {
   // Single accent — electric lime. Hits hard against monochrome, feels CT-native without being the usual purple.
@@ -593,50 +580,108 @@ const LEADERBOARD_DATA = {
 };
 
 // ─── PHASE 2: Sale History + Seller Reputation ──────────────────
-const SALE_HISTORY = [
-  { id: 1, handle: "@CryptoAlpha_", price: 3800, prevPrice: 2400, soldAgo: "2d ago", buyer: "@0xTrenchKing", seller: "@OGTrader", sellerScore: 98, followers: 45200, trustScore: 87 },
-  { id: 2, handle: "@DeFiSniper", price: 2100, prevPrice: null, soldAgo: "5d ago", buyer: "@WhaleBuyer", seller: "@FlipKing", sellerScore: 94, followers: 28400, trustScore: 82 },
-  { id: 3, handle: "@MemecoinMF", price: 680, prevPrice: 420, soldAgo: "1w ago", buyer: "@DegenHQ", seller: "@NewSeller23", sellerScore: 72, followers: 8900, trustScore: 65 },
-  { id: 4, handle: "@SolanaGod_", price: 12400, prevPrice: 8200, soldAgo: "2w ago", buyer: "@Institutional", seller: "@OGTrader", sellerScore: 98, followers: 124000, trustScore: 91 },
-  { id: 5, handle: "@AlphaSignals", price: 4500, prevPrice: null, soldAgo: "3w ago", buyer: "@NewDegen420", seller: "@VerifiedPro", sellerScore: 89, followers: 52000, trustScore: 84 },
+// ─── PHASE 1: Handshake Jobs Board ──────────────────────────
+const MOCK_JOBS = [
+  {
+    id: "job-001",
+    title: "Shitpost campaign for memecoin launch",
+    category: "Shitposting",
+    poster: "@SolProject_", posterTrust: 84, posterVerified: true,
+    budget: 500, budgetCurrency: "USDC",
+    deadline: "72h",
+    postedAgo: "2h ago",
+    proposals: 7,
+    minTrustScore: 55,
+    status: "open",
+    description: "Need 10 high-effort shitposts over 3 days for our memecoin launch. Must be degen-coded, not cringe. Looking for proven shitposters with CT credibility.",
+    deliverables: ["10 original shitposts", "At least 3 with memes/images", "Post during peak CT hours (US/EU)"],
+    tags: ["memecoin", "solana", "shitpost"],
+  },
+  {
+    id: "job-002",
+    title: "Video editor for 30s reel — crypto explainer",
+    category: "Video Editing",
+    poster: "@DeFi_Founder", posterTrust: 91, posterVerified: true,
+    budget: 300, budgetCurrency: "USDC",
+    deadline: "5d",
+    postedAgo: "6h ago",
+    proposals: 12,
+    minTrustScore: 60,
+    status: "open",
+    description: "30-second vertical video explaining our L2 protocol. Raw footage provided. Need snappy cuts, captions, and crypto-native style.",
+    deliverables: ["30s vertical 9:16 video", "Captions & b-roll", "2 revisions included"],
+    tags: ["video", "defi", "content"],
+  },
+  {
+    id: "job-003",
+    title: "Thread writer — weekly alpha research",
+    category: "Content / Writing",
+    poster: "@AlphaResearch", posterTrust: 88, posterVerified: true,
+    budget: 800, budgetCurrency: "USDC",
+    deadline: "Ongoing",
+    postedAgo: "1d ago",
+    proposals: 23,
+    minTrustScore: 70,
+    status: "open",
+    description: "Weekly long-form threads on emerging protocols and narratives. Looking for a writer with existing CT presence (50k+ ideally). Payment per thread, 4 threads/mo.",
+    deliverables: ["Weekly 10-15 tweet thread", "Original research + sources", "Publish from your account"],
+    tags: ["research", "threads", "ongoing"],
+  },
+  {
+    id: "job-004",
+    title: "Solana smart contract dev — simple escrow mod",
+    category: "Development",
+    poster: "@BuildersDAO", posterTrust: 93, posterVerified: true,
+    budget: 2500, budgetCurrency: "USDC",
+    deadline: "2w",
+    postedAgo: "8h ago",
+    proposals: 4,
+    minTrustScore: 75,
+    status: "open",
+    description: "Need a Rust/Anchor dev to modify an existing escrow contract. Add time-locked releases. Existing code + tests provided. Deliverable: PR + deployed devnet program.",
+    deliverables: ["Modified Anchor program", "Unit tests", "Devnet deployment"],
+    tags: ["solana", "rust", "dev"],
+  },
+  {
+    id: "job-005",
+    title: "KOL raid — 50 engaged comments",
+    category: "KOL / Raids",
+    poster: "@NewLaunchCo", posterTrust: 62, posterVerified: false,
+    budget: 150, budgetCurrency: "USDC",
+    deadline: "24h",
+    postedAgo: "3h ago",
+    proposals: 31,
+    minTrustScore: 40,
+    status: "open",
+    description: "Need real, thoughtful comments (not generic emojis) on our announcement tweet. 50 comments, must be from accounts with trust score 40+.",
+    deliverables: ["50 engaged comments", "From trust-verified accounts", "Delivered within 24h"],
+    tags: ["raid", "engagement"],
+  },
+  {
+    id: "job-006",
+    title: "Meme designer — PFP collection launch",
+    category: "Design",
+    poster: "@NFTArtist_Dao", posterTrust: 79, posterVerified: true,
+    budget: 1200, budgetCurrency: "USDC",
+    deadline: "10d",
+    postedAgo: "2d ago",
+    proposals: 18,
+    minTrustScore: 65,
+    status: "in_progress",
+    description: "10 marketing memes for PFP drop. Degen-coded, shareable, original style.",
+    deliverables: ["10 meme assets", "Square + vertical formats", "Source files"],
+    tags: ["design", "nft", "memes"],
+  },
 ];
 
-const TOP_SELLERS = [
-  { handle: "@OGTrader", score: 98, totalSales: 47, totalVolume: 142300, disputeRate: "0%", avgTime: "4h", badges: ["pro", "fast", "clean"] },
-  { handle: "@VerifiedPro", score: 94, totalSales: 31, totalVolume: 89400, disputeRate: "0%", avgTime: "6h", badges: ["pro", "clean"] },
-  { handle: "@FlipKing", score: 91, totalSales: 28, totalVolume: 64200, disputeRate: "3.6%", avgTime: "8h", badges: ["pro"] },
-  { handle: "@WhaleBuyer", score: 88, totalSales: 19, totalVolume: 78900, disputeRate: "5.3%", avgTime: "12h", badges: ["trusted"] },
-];
-
-// ─── PHASE 3: Wallet Binding + Vouching Network ─────────────────
-const WALLET_DATA = {
-  address: "7xKXt...9m2pQ",
-  full: "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
-  walletAgeDays: 1247,
-  totalTxns: 8934,
-  chains: ["Solana"],
-  onChainScore: 92,
-  holdings: [
-    { symbol: "SOL", amount: "47.2", value: 9440, held: "2.1y" },
-    { symbol: "BONK", amount: "12.4M", value: 3120, held: "1.4y" },
-    { symbol: "WIF", amount: "843", value: 2180, held: "8mo" },
-    { symbol: "JUP", amount: "1.2k", value: 980, held: "1.2y" },
-  ],
-  protocols: ["Jupiter", "Raydium", "Drift", "Kamino", "MarginFi", "Tensor"],
-  notableActivity: [
-    { event: "Bought SOL at $8.50 (bear market bottom)", date: "Dec 2022", signal: "diamond" },
-    { event: "Held through FTX collapse", date: "Nov 2022", signal: "diamond" },
-    { event: "Top 5% Jupiter volume", date: "2024", signal: "og" },
-    { event: "Early BONK holder (pre-CEX listing)", date: "Jan 2023", signal: "og" },
-  ],
-};
-
-const VOUCHES = [
-  { handle: "@0xTrenchKing", score: 94, vouchedAt: "3 weeks ago", weight: "high", reason: "Met IRL at Breakpoint" },
-  { handle: "@DegenHQ", score: 88, vouchedAt: "1 month ago", weight: "high", reason: "Long-time mutual" },
-  { handle: "@SOL_Trader99", score: 82, vouchedAt: "2 months ago", weight: "medium", reason: "Verified trader" },
-  { handle: "@OnChainMax", score: 85, vouchedAt: "2 months ago", weight: "high", reason: "Professional relationship" },
-  { handle: "@CryptoAlpha_", score: 87, vouchedAt: "3 months ago", weight: "high", reason: "Known good actor" },
+const JOB_CATEGORIES = [
+  { id: "all", label: "All", icon: "🌐" },
+  { id: "Shitposting", label: "Shitposting", icon: "🤡" },
+  { id: "Content / Writing", label: "Writing", icon: "✍️" },
+  { id: "Video Editing", label: "Video", icon: "🎬" },
+  { id: "Design", label: "Design", icon: "🎨" },
+  { id: "Development", label: "Dev", icon: "💻" },
+  { id: "KOL / Raids", label: "KOL / Raids", icon: "📢" },
 ];
 
 // ─── PHASE 4: CIB Detection + Forensics + Alerts ────────────────
@@ -692,7 +737,7 @@ const FORENSICS_REPORT = {
 const ALERT_TYPES = [
   { id: "follower-spike", name: "Follower Spike", desc: "Alert when followers jump >10% in 24h", icon: "📈", premium: false },
   { id: "trust-drop", name: "Trust Score Drop", desc: "Alert when Trust Score drops by 10+ points", icon: "📉", premium: false },
-  { id: "listing", name: "Listed for Sale", desc: "Alert when watched account is listed on marketplace", icon: "🏷️", premium: false },
+  { id: "score-milestone", name: "Tier Change", desc: "Alert when Trust Score tier changes (e.g. NOTED → CREDIBLE)", icon: "🎯", premium: false },
   { id: "bot-flag", name: "Bot Activity Detected", desc: "Alert when CIB detection flags the account", icon: "🤖", premium: true },
   { id: "cluster", name: "Pod Membership", desc: "Alert when account joins a detected engagement pod", icon: "🕸️", premium: true },
   { id: "engagement-drop", name: "Engagement Collapse", desc: "Alert when engagement rate drops 50%+", icon: "⚠️", premium: true },
@@ -706,7 +751,7 @@ const WATCHLIST = [
 ];
 
 
-export default function HandleMarket() {
+export default function CTTrust() {
   const [tab, setTab] = useState("home");
   const [form, setForm] = useState({
     followers: "", avgLikes: "", avgRetweets: "", avgReplies: "",
@@ -715,24 +760,20 @@ export default function HandleMarket() {
   const [result, setResult] = useState(null);
   const [trustResult, setTrustResult] = useState(null);
   const [animateValue, setAnimateValue] = useState(0);
-  const [sortBy, setSortBy] = useState("value");
-  const [filterNiche, setFilterNiche] = useState("all");
-  const [mode, setMode] = useState("handle"); // "handle" or "manual"
+  const [leaderboardTab, setLeaderboardTab] = useState("trending");
   const [handle, setHandle] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [profileData, setProfileData] = useState(null);
-  const [leaderboardTab, setLeaderboardTab] = useState("trending");
   const [historyData, setHistoryData] = useState(null);
   const [selectedCluster, setSelectedCluster] = useState(null);
-  const [selectedListing, setSelectedListing] = useState(null);
-  const [showListForm, setShowListForm] = useState(false);
-  const [listForm, setListForm] = useState({
-    handle: "", askingPrice: "", description: "", niche: "DeFi",
-    contactMethod: "telegram", contactHandle: "", negotiable: true,
-  });
-  const [listSubmitted, setListSubmitted] = useState(false);
   const [forensicsRun, setForensicsRun] = useState(false);
+  const [jobsFilter, setJobsFilter] = useState("all");
+  const [waitlistEmail, setWaitlistEmail] = useState("");
+  const [waitlistSubmitted, setWaitlistSubmitted] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [showPostJob, setShowPostJob] = useState(false);
+  const [proposalText, setProposalText] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [hoveredTab, setHoveredTab] = useState(null);
   const resultRef = useRef(null);
@@ -826,10 +867,6 @@ export default function HandleMarket() {
     setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
   };
 
-  const sortedListings = [...MOCK_LISTINGS]
-    .filter(l => filterNiche === "all" || l.niche.toLowerCase().includes(filterNiche))
-    .sort((a, b) => sortBy === "value" ? b.value - a.value : b.followers - a.followers);
-
   const inputStyle = {
     width: "100%",
     padding: "12px 16px",
@@ -878,10 +915,10 @@ export default function HandleMarket() {
             onMouseEnter={e => e.currentTarget.style.opacity = "0.75"}
             onMouseLeave={e => e.currentTarget.style.opacity = "1"}
           >
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 900, color: "#000" }}>HM</div>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 900, color: "#000" }}>CT</div>
             <div>
-              <div style={{ fontWeight: 700, fontSize: 18, letterSpacing: -0.5 }}>HandleMarket</div>
-              <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1, textTransform: "uppercase" }}>Valuate · Trade · Profit</div>
+              <div style={{ fontWeight: 700, fontSize: 18, letterSpacing: -0.5 }}>CT Trust</div>
+              <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1, textTransform: "uppercase" }}>Score · Verify · Trust</div>
             </div>
           </div>
           {/* Hamburger Menu */}
@@ -910,13 +947,11 @@ export default function HandleMarket() {
               <span>
                 {[
                   ["home", "🏠 Home"],
-                  ["valuate", "⚡ Valuate"],
+                  ["valuate", "🔍 Analyze"],
+                  ["jobs", "💼 Jobs"],
                   ["trust", "🛡️ Trust"],
-                  ["marketplace", "🏪 Market"],
                   ["leaderboard", "🏆 Ranks"],
                   ["profile", "👤 Profile"],
-                  ["history", "💸 Sales"],
-                  ["wallet", "💎 Wallet"],
                   ["cib", "🕸️ CIB"],
                   ["alerts", "🔔 Alerts"],
                 ].find(([t]) => t === tab)?.[1] || "Menu"}
@@ -950,13 +985,11 @@ export default function HandleMarket() {
                   `}</style>
                   {[
                     ["home", "🏠", "Home", "Welcome + overview"],
-                    ["valuate", "⚡", "Valuate", "Run account valuation"],
+                    ["valuate", "🔍", "Analyze", "Full CT account analysis"],
+                    ["jobs", "💼", "Jobs", "Hire or get hired"],
                     ["trust", "🛡️", "Trust", "Trust Score guide"],
-                    ["marketplace", "🏪", "Market", "Browse listings"],
                     ["leaderboard", "🏆", "Ranks", "CT leaderboards"],
                     ["profile", "👤", "Profile", "Public profile page"],
-                    ["history", "💸", "Sales", "Transaction history"],
-                    ["wallet", "💎", "Wallet", "On-chain reputation"],
                     ["cib", "🕸️", "CIB", "Bot & pod detection"],
                     ["alerts", "🔔", "Alerts", "Real-time watchlist"],
                   ].map(([t, icon, label, desc]) => {
@@ -1025,7 +1058,7 @@ export default function HandleMarket() {
         {/* ─── HOME / LANDING TAB ───────────────────────────── */}
         {tab === "home" && (
           <div>
-            {/* LIVE TICKER */}
+            {/* LIVE JOBS TICKER */}
             <div style={{
               position: "relative",
               marginBottom: 40,
@@ -1042,32 +1075,38 @@ export default function HandleMarket() {
                   from { transform: translateX(0); }
                   to { transform: translateX(-50%); }
                 }
-                .ticker-track { animation: scrollTicker 60s linear infinite; }
+                .ticker-track { animation: scrollTicker 70s linear infinite; }
               `}</style>
-              <div className="ticker-track" style={{ display: "flex", gap: 32, whiteSpace: "nowrap", width: "max-content" }}>
+              <div className="ticker-track" style={{ display: "flex", gap: 28, whiteSpace: "nowrap", width: "max-content" }}>
                 {[...Array(2)].map((_, loopIdx) => (
-                  <div key={loopIdx} style={{ display: "flex", gap: 32 }}>
+                  <div key={loopIdx} style={{ display: "flex", gap: 28 }}>
                     {[
-                      { handle: "@CryptoAlpha_", val: 3800, score: 87, tier: "SUPREME", color: "#10b981" },
-                      { handle: "@SOL_Trader99", val: 950, score: 76, tier: "CREDIBLE", color: "#34d399" },
-                      { handle: "@0xTrenchKing", val: 6700, score: 91, tier: "SUPREME", color: "#10b981" },
-                      { handle: "@PumpWatch_", val: 1480, score: 68, tier: "NOTED", color: "#fbbf24" },
-                      { handle: "@FakeAlpha2024", val: null, score: 22, tier: "SUSPICIOUS", color: "#ef4444", flag: true },
-                      { handle: "@NFTWhaleWatch", val: 9200, score: 84, tier: "CREDIBLE", color: "#34d399" },
-                      { handle: "@DeFi_Degen", val: 420, score: 65, tier: "NOTED", color: "#fbbf24" },
-                      { handle: "@BotNetwork_", val: null, score: 18, tier: "LIKELY BOT", color: "#dc2626", flag: true },
-                      { handle: "@GMResearch", val: 4200, score: 88, tier: "SUPREME", color: "#10b981" },
-                      { handle: "@AirdropHunter", val: 1750, score: 54, tier: "UNKNOWN", color: "#f97316" },
-                      { handle: "@OnChainMax", val: 2600, score: 85, tier: "SUPREME", color: "#10b981" },
-                      { handle: "@BTCPurist", val: 5200, score: 82, tier: "CREDIBLE", color: "#34d399" },
-                    ].map((item, i) => (
-                      <div key={`${loopIdx}-${i}`} style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: "'JetBrains Mono', monospace", fontSize: 12 }}>
-                        <span style={{ color: C.textPrimary, fontWeight: 700 }}>{item.handle}</span>
-                        {item.val && <span style={{ color: C.primary, fontWeight: 800 }}>${item.val.toLocaleString()}</span>}
-                        <span style={{ color: item.color, fontWeight: 800, letterSpacing: 1 }}>{item.flag ? "🚩" : "·"} {item.tier} {item.score}</span>
-                        <span style={{ color: C.textMuted }}>·</span>
-                      </div>
-                    ))}
+                      { icon: "🤡", title: "Shitpost campaign · memecoin launch", budget: 500, deadline: "72h", trust: 55, status: "open" },
+                      { icon: "🎬", title: "Video editor · 30s crypto reel", budget: 300, deadline: "5d", trust: 60, status: "open" },
+                      { icon: "✍️", title: "Thread writer · weekly alpha", budget: 800, deadline: "Ongoing", trust: 70, status: "open" },
+                      { icon: "💻", title: "Solana dev · escrow contract mod", budget: 2500, deadline: "2w", trust: 75, status: "open" },
+                      { icon: "📢", title: "KOL raid · 50 engaged comments", budget: 150, deadline: "24h", trust: 40, status: "open" },
+                      { icon: "🎨", title: "Meme designer · PFP launch", budget: 1200, deadline: "10d", trust: 65, status: "progress" },
+                      { icon: "📝", title: "Copywriter · landing page", budget: 450, deadline: "7d", trust: 50, status: "open" },
+                      { icon: "🤝", title: "Community manager · DeFi DAO", budget: 1800, deadline: "Ongoing", trust: 65, status: "open" },
+                      { icon: "🎬", title: "Podcast editor · weekly show", budget: 600, deadline: "Ongoing", trust: 55, status: "open" },
+                      { icon: "🎨", title: "Logo + brand kit · NFT project", budget: 900, deadline: "10d", trust: 60, status: "open" },
+                    ].map((item, i) => {
+                      const statusColor = item.status === "open" ? "#10b981" : "#fbbf24";
+                      return (
+                        <div key={`${loopIdx}-${i}`} style={{ display: "flex", alignItems: "center", gap: 12, fontFamily: "'JetBrains Mono', monospace", fontSize: 12 }}>
+                          <span style={{ width: 5, height: 5, borderRadius: "50%", background: statusColor, boxShadow: `0 0 6px ${statusColor}` }} />
+                          <span style={{ fontSize: 13 }}>{item.icon}</span>
+                          <span style={{ color: C.textPrimary, fontWeight: 700 }}>{item.title}</span>
+                          <span style={{ color: C.primary, fontWeight: 800 }}>${item.budget.toLocaleString()} USDC</span>
+                          <span style={{ color: C.textMuted }}>·</span>
+                          <span style={{ color: C.textSecondary, fontSize: 11 }}>⏱ {item.deadline}</span>
+                          <span style={{ color: C.textMuted }}>·</span>
+                          <span style={{ color: "#fbbf24", fontSize: 11 }}>🛡️ {item.trust}+</span>
+                          <span style={{ color: C.textMuted, marginLeft: 8 }}>·</span>
+                        </div>
+                      );
+                    })}
                   </div>
                 ))}
               </div>
@@ -1080,20 +1119,20 @@ export default function HandleMarket() {
                 <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 20, background: "rgba(212, 255, 0, 0.06)", border: "1px solid rgba(212, 255, 0, 0.2)", marginBottom: 24 }}>
                   <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.primary, boxShadow: `0 0 10px ${C.primary}`, animation: "pulse 2s ease-in-out infinite" }} />
                   <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }`}</style>
-                  <span style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700 }}>The CT Account Marketplace</span>
+                  <span style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700 }}>CT's Missing Infrastructure</span>
                 </div>
               </Reveal>
 
-              {/* Headline with word cycle */}
+              {/* Headline */}
               <Reveal delay={100}>
                 <h1 style={{ fontSize: 64, fontWeight: 900, margin: 0, letterSpacing: -3, lineHeight: 1 }}>
-                  Buy. Sell.<br />
-                  <CycleWord words={["Verify", "Track", "Expose", "Trust", "Monitor"]} color={C.primary} /> CT accounts.
+                  Know who's real.<br />
+                  <span style={{ color: C.primary }}>Hire who's proven.</span>
                 </h1>
               </Reveal>
               <Reveal delay={200}>
                 <p style={{ color: C.textSecondary, fontSize: 18, marginTop: 20, maxWidth: 560, margin: "20px auto 0", lineHeight: 1.5 }}>
-                  The first marketplace built for Crypto Twitter. Free valuations, trust scores, bot detection, and escrow-protected trades — all in one place.
+                  The reputation layer for Crypto Twitter. Analyze any account — then use your trust score to hire proven talent or get hired via on-chain Handshakes.
                 </p>
               </Reveal>
 
@@ -1112,9 +1151,9 @@ export default function HandleMarket() {
                     }}
                     onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 40px rgba(212, 255, 0, 0.4)"; }}
                     onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 32px rgba(212, 255, 0, 0.25)"; }}
-                  >⚡ Get Free Valuation</button>
+                  >🔍 Analyze Any Account</button>
                   <button
-                    onClick={() => setTab("marketplace")}
+                    onClick={() => setTab("jobs")}
                     style={{
                       padding: "14px 28px", borderRadius: 12,
                       border: "1px solid rgba(255, 255, 255, 0.15)",
@@ -1125,7 +1164,7 @@ export default function HandleMarket() {
                   }}
                   onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(212, 255, 0, 0.4)"; e.currentTarget.style.color = C.primary; }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.15)"; e.currentTarget.style.color = C.textPrimary; }}
-                >🏪 Browse Marketplace</button>
+                >💼 Browse Open Jobs</button>
               </div>
               </Reveal>
 
@@ -1141,14 +1180,12 @@ export default function HandleMarket() {
               <Reveal delay={200}>
                 <div style={{ display: "flex", justifyContent: "center", gap: 32, marginTop: 56, flexWrap: "wrap" }}>
                   {[
-                    { val: 847, prefix: "$", suffix: "k", lbl: "Traded volume" },
-                    { val: 2400, prefix: "", suffix: "+", lbl: "Accounts valued" },
-                    { val: 96, prefix: "", suffix: "%", lbl: "Bot detection" },
-                    { val: 0, prefix: "", suffix: "%", lbl: "Dispute rate", static: true },
+                    { val: 96, prefix: "", suffix: "%", lbl: "Bot detection accuracy" },
+                    { val: 18, prefix: "", suffix: "k+", lbl: "Trust scores generated" },
                   ].map((s, i) => (
                     <div key={s.lbl} style={{ textAlign: "center" }}>
                       <div style={{ fontSize: 28, fontWeight: 900, color: C.primary, letterSpacing: -1, fontFamily: "'JetBrains Mono', monospace" }}>
-                        {s.static ? `${s.prefix}${s.val}${s.suffix}` : <CountUp end={s.val} prefix={s.prefix} suffix={s.suffix} duration={1800} />}
+                        {s.static ? s.display : <CountUp end={s.val} prefix={s.prefix} suffix={s.suffix} duration={1800} />}
                       </div>
                       <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginTop: 2 }}>{s.lbl}</div>
                     </div>
@@ -1166,9 +1203,9 @@ export default function HandleMarket() {
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
                 {[
-                  { num: "01", title: "Valuate", desc: "Plug in any CT handle. Get a real-time estimate based on engagement, reach, niche, and verification.", icon: "⚡" },
-                  { num: "02", title: "Verify", desc: "Our Trust Score exposes bot followers, engagement pods, and coordinated networks. Buy with confidence.", icon: "🛡️" },
-                  { num: "03", title: "Trade", desc: "List for sale or buy via escrow. Funds held until transfer confirmed. 2.5% fee only on completed sales.", icon: "💸" },
+                  { num: "01", title: "Analyze", desc: "Look up any CT account. Get trust score, bot detection, CIB analysis, and engagement forensics.", icon: "🔍" },
+                  { num: "02", title: "Build Reputation", desc: "Your trust score is your portable CT resume. Organic growth, real engagement, and CIB-clean history compound over time.", icon: "🛡️" },
+                  { num: "03", title: "Handshake", desc: "Hire proven accounts for CT work or get hired yourself. Public on-chain commitments make trust enforceable.", icon: "🤝" },
                 ].map((step, i) => (
                   <GlowCard key={step.num} glow style={{ position: "relative", paddingTop: 32 }}>
                     <div style={{ position: "absolute", top: 20, right: 20, fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, letterSpacing: 2 }}>/ {step.num}</div>
@@ -1181,19 +1218,18 @@ export default function HandleMarket() {
               </div>
             </Reveal>
 
-            {/* FEATURES GRID */}
+            {/* REPUTATION TOOLS */}
             <Reveal>
               <div style={{ marginBottom: 60 }}>
                 <div style={{ textAlign: "center", marginBottom: 40 }}>
-                  <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8 }}>What's Inside</div>
-                  <h2 style={{ fontSize: 36, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>Built for <span style={{ color: C.primary }}>CT degens.</span></h2>
+                  <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8 }}>Reputation Tools</div>
+                  <h2 style={{ fontSize: 36, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>CT's missing <span style={{ color: C.primary }}>infrastructure.</span></h2>
                 </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14 }}>
                 {[
                   { icon: "🛡️", title: "Trust Score", desc: "0-100 authenticity rating. Exposes bot-inflated audiences and engagement pods.", tab: "trust" },
-                  { icon: "💎", title: "Wallet Binding", desc: "Prove you're a real CT trader with on-chain reputation from your Solana wallet.", tab: "wallet" },
                   { icon: "🕸️", title: "CIB Detection", desc: "Catches coordinated pods, raid networks, and F4F rings before you get scammed.", tab: "cib" },
-                  { icon: "💸", title: "Public Sale Ledger", desc: "See what accounts actually sold for. Price anchored to real market data.", tab: "history" },
+                  { icon: "📊", title: "90-Day Tracking", desc: "Historical timeline exposes sudden growth spikes, bot purchases, and anomalies.", tab: "valuate" },
                   { icon: "🏆", title: "CT Leaderboards", desc: "Trending, Rising, and Suspicious rankings updated hourly.", tab: "leaderboard" },
                   { icon: "🔔", title: "Real-Time Alerts", desc: "Watch any account. Get notified the second something changes.", tab: "alerts" },
                 ].map(f => (
@@ -1204,10 +1240,16 @@ export default function HandleMarket() {
                       background: "rgba(18, 18, 18, 0.7)",
                       border: "1px solid rgba(255, 255, 255, 0.06)",
                       cursor: "pointer", transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+                      position: "relative",
                     }}
                     onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(212, 255, 0, 0.3)"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.background = "rgba(30, 30, 30, 0.9)"; }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.06)"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.background = "rgba(18, 18, 18, 0.7)"; }}
                   >
+                    {f.badge && (
+                      <div style={{ position: "absolute", top: 12, right: 12, padding: "2px 8px", borderRadius: 6, background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, color: "#000", fontSize: 9, fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>
+                        {f.badge}
+                      </div>
+                    )}
                     <div style={{ fontSize: 28, marginBottom: 10 }}>{f.icon}</div>
                     <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 4, letterSpacing: -0.3 }}>{f.title}</div>
                     <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.5 }}>{f.desc}</div>
@@ -1218,15 +1260,90 @@ export default function HandleMarket() {
               </div>
             </Reveal>
 
+            {/* JOBS FEATURED SECTION */}
+            <Reveal>
+              <div style={{ marginBottom: 60 }}>
+                <div style={{ textAlign: "center", marginBottom: 40 }}>
+                  <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8 }}>🤝 Handshake Jobs · NEW</div>
+                  <h2 style={{ fontSize: 36, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>Hire. <span style={{ color: C.primary }}>Get hired.</span> Trust-verified.</h2>
+                  <p style={{ color: C.textSecondary, fontSize: 15, marginTop: 12, maxWidth: 540, margin: "12px auto 0", lineHeight: 1.5 }}>
+                    The first CT-native jobs board. Companies hire proven accounts. Workers use their trust score as a portable resume. Public on-chain Handshakes enforce commitments.
+                  </p>
+                </div>
+
+                {/* Featured jobs block */}
+                <GlowCard glow style={{ padding: "28px", background: `linear-gradient(135deg, rgba(212, 255, 0, 0.04), rgba(0, 0, 0, 0.5))` }}>
+                  {/* Stats bar */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10, marginBottom: 24 }}>
+                    {[
+                      { label: "Open Jobs", val: "6", icon: "💼" },
+                      { label: "Total Budget", val: "$8.2k+", icon: "💰" },
+                      { label: "Avg. Trust Req.", val: "61", icon: "🛡️" },
+                      { label: "Disputes", val: "0", icon: "⚖️" },
+                    ].map(s => (
+                      <div key={s.label} style={{ padding: "12px 10px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 10, textAlign: "center", border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                        <div style={{ fontSize: 16, marginBottom: 4 }}>{s.icon}</div>
+                        <div style={{ fontSize: 18, fontWeight: 900, color: C.primary, fontFamily: "'JetBrains Mono', monospace", letterSpacing: -0.5 }}>{s.val}</div>
+                        <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1, marginTop: 2 }}>{s.label}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Two-sided benefits */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16, marginBottom: 24 }}>
+                    <div style={{ padding: "18px 20px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 12, border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                      <div style={{ fontSize: 24, marginBottom: 8 }}>💼</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 6 }}>For Hirers</div>
+                      <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.6, marginBottom: 10 }}>Post jobs with a minimum trust score gate. No more scammers. No more fake portfolios. Only proven accounts apply.</div>
+                      <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 4 }}>
+                        {["Set trust score requirement", "Review vetted proposals", "Sign public Handshake"].map(item => (
+                          <li key={item} style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", display: "flex", gap: 6, alignItems: "center" }}>
+                            <span style={{ color: C.primary }}>→</span> {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div style={{ padding: "18px 20px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 12, border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                      <div style={{ fontSize: 24, marginBottom: 8 }}>🤝</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 6 }}>For Workers</div>
+                      <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.6, marginBottom: 10 }}>Your trust score is your resume. Complete jobs, build reputation, earn in crypto. No Upwork cut. No middlemen.</div>
+                      <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 4 }}>
+                        {["Apply with your CT reputation", "Deliver work, earn USDC", "Reputation compounds over time"].map(item => (
+                          <li key={item} style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", display: "flex", gap: 6, alignItems: "center" }}>
+                            <span style={{ color: C.primary }}>→</span> {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Browse jobs CTA */}
+                  <button
+                    onClick={() => setTab("jobs")}
+                    style={{
+                      width: "100%", padding: "16px 24px", borderRadius: 12, border: "none",
+                      background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+                      color: "#000", fontSize: 14, fontWeight: 900,
+                      fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+                      letterSpacing: 0.3, transition: "all 0.2s",
+                      boxShadow: "0 0 32px rgba(212, 255, 0, 0.2)",
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 0 40px rgba(212, 255, 0, 0.35)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 32px rgba(212, 255, 0, 0.2)"; }}
+                  >💼 Browse Open Jobs →</button>
+                </GlowCard>
+              </div>
+            </Reveal>
+
             {/* TRUST SIGNALS / WHY USE US */}
             <Reveal>
               <div style={{ marginBottom: 60 }}>
                 <GlowCard glow style={{ padding: "32px" }}>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 24 }}>
                     {[
-                      { icon: "🔒", title: "Escrow-Protected", desc: "Funds held until ownership transfers. Zero counterparty risk." },
-                      { icon: "✅", title: "Verified Sellers", desc: "Every seller builds a public reputation. See sales history, dispute rate, transfer speed." },
-                      { icon: "🎯", title: "Bot-Free Buying", desc: "Our algorithm scans every listing for fake followers and engagement manipulation." },
+                      { icon: "🔍", title: "Independent Analysis", desc: "No paid placements. Every score is algorithmically generated from public data." },
+                      { icon: "🤖", title: "Bot Detection", desc: "Our algorithm exposes bot-inflated followings and fake engagement." },
+                      { icon: "📊", title: "Public Data Only", desc: "We only analyze what X makes public — no special access, no ToS violations." },
                       { icon: "📈", title: "Tracked History", desc: "90-day account snapshots expose sudden growth spikes and red flags." },
                     ].map(item => (
                       <div key={item.title}>
@@ -1244,24 +1361,39 @@ export default function HandleMarket() {
             <Reveal>
               <GlowCard glow style={{ textAlign: "center", padding: "48px 32px", background: `linear-gradient(135deg, rgba(212, 255, 0, 0.04), rgba(0, 0, 0, 0.5))` }}>
                 <div style={{ fontSize: 32, fontWeight: 900, letterSpacing: -1.5, marginBottom: 12 }}>
-                  Ready to know what your <span style={{ color: C.primary }}>account</span> is worth?
+                  Join the <span style={{ color: C.primary }}>reputation layer</span> of CT.
                 </div>
-                <div style={{ fontSize: 15, color: C.textSecondary, marginBottom: 28, maxWidth: 440, margin: "0 auto 28px" }}>
-                  Free valuations. No signup required. Takes 10 seconds.
+                <div style={{ fontSize: 15, color: C.textSecondary, marginBottom: 28, maxWidth: 480, margin: "0 auto 28px" }}>
+                  Free to use. No signup. Analyze any account, browse open jobs, or start building your trust score.
                 </div>
-                <button
-                  onClick={() => setTab("valuate")}
-                  style={{
-                    padding: "16px 36px", borderRadius: 12, border: "none",
-                    background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
-                    color: "#000", fontSize: 15, fontWeight: 900,
-                    fontFamily: "'Outfit', sans-serif", cursor: "pointer",
-                    letterSpacing: 0.3, transition: "all 0.2s",
-                    boxShadow: "0 0 32px rgba(212, 255, 0, 0.25)",
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 40px rgba(212, 255, 0, 0.4)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 32px rgba(212, 255, 0, 0.25)"; }}
-                >⚡ Valuate My Account</button>
+                <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+                  <button
+                    onClick={() => setTab("valuate")}
+                    style={{
+                      padding: "16px 32px", borderRadius: 12, border: "none",
+                      background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+                      color: "#000", fontSize: 14, fontWeight: 900,
+                      fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+                      letterSpacing: 0.3, transition: "all 0.2s",
+                      boxShadow: "0 0 32px rgba(212, 255, 0, 0.25)",
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 40px rgba(212, 255, 0, 0.4)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 32px rgba(212, 255, 0, 0.25)"; }}
+                  >🔍 Analyze Any Account</button>
+                  <button
+                    onClick={() => setTab("jobs")}
+                    style={{
+                      padding: "16px 32px", borderRadius: 12,
+                      border: `1px solid ${C.primary}40`,
+                      background: "rgba(212, 255, 0, 0.06)",
+                      color: C.primary, fontSize: 14, fontWeight: 800,
+                      fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+                      letterSpacing: 0.3, transition: "all 0.2s",
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(212, 255, 0, 0.12)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(212, 255, 0, 0.06)"; e.currentTarget.style.transform = "translateY(0)"; }}
+                  >💼 Browse Open Jobs</button>
+                </div>
               </GlowCard>
             </Reveal>
           </div>
@@ -1270,195 +1402,169 @@ export default function HandleMarket() {
         {tab === "valuate" && (
           <div>
             <div style={{ textAlign: "center", marginBottom: 40 }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 20, background: "rgba(212, 255, 0, 0.06)", border: "1px solid rgba(212, 255, 0, 0.2)", marginBottom: 20 }}>
+                <span style={{ fontSize: 12 }}>🔍</span>
+                <span style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700 }}>Full Account Analysis</span>
+              </div>
               <h1 style={{ fontSize: 42, fontWeight: 900, margin: 0, letterSpacing: -1.5, lineHeight: 1.1 }}>
-                How much is your <span style={{ color: C.primary }}>CT account</span> worth?
+                Verify any <span style={{ color: C.primary }}>CT account.</span>
               </h1>
-              <p style={{ color: C.textSecondary, fontSize: 16, marginTop: 12, fontWeight: 400 }}>
-                Get an instant valuation based on real engagement metrics
+              <p style={{ color: C.textSecondary, fontSize: 16, marginTop: 12, fontWeight: 400, maxWidth: 520, margin: "12px auto 0", lineHeight: 1.5 }}>
+                Trust score, bot detection, CIB analysis, 90-day tracking, engagement forensics, and red flag signals — all in one lookup.
               </p>
+
+              {/* What you'll see */}
+              <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: 20, flexWrap: "wrap" }}>
+                {[
+                  "🛡️ Trust Score",
+                  "🤖 Bot Detection",
+                  "🕸️ CIB Analysis",
+                  "📈 90-Day Timeline",
+                  "💬 Engagement Forensics",
+                  "🚩 Red Flags",
+                ].map(chip => (
+                  <div key={chip} style={{ padding: "5px 11px", borderRadius: 16, background: "rgba(255, 255, 255, 0.04)", border: "1px solid rgba(255, 255, 255, 0.08)", fontSize: 11, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace" }}>
+                    {chip}
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <GlowCard style={{ maxWidth: 650, margin: "0 auto 24px" }} glow>
-              {/* Mode toggle */}
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-                <div style={{ display: "flex", gap: 4, background: "rgba(0, 0, 0, 0.5)", borderRadius: 10, padding: 3, border: "1px solid rgba(255, 255, 255, 0.06)" }}>
-                  {[["handle", "🔍 Handle Lookup"], ["manual", "✏️ Manual"]].map(([val, label]) => (
-                    <button key={val} onClick={() => { setMode(val); setError(""); }} style={{
-                      padding: "6px 14px", borderRadius: 7, border: "none",
-                      background: mode === val ? "rgba(212, 255, 0, 0.12)" : "transparent",
-                      color: mode === val ? C.primary : C.textMuted,
-                      fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 600,
-                      cursor: "pointer", textTransform: "uppercase", letterSpacing: 0.5, transition: "all 0.2s",
-                    }}>{label}</button>
-                  ))}
-                </div>
-                {mode === "handle" && <Pill text="Live API" color={C.accent} />}
-                {mode === "manual" && <Pill text="Manual Entry" color={C.textMuted} />}
+            {/* COMING SOON + WAITLIST */}
+            <GlowCard glow style={{ maxWidth: 650, margin: "0 auto 24px", padding: "32px 28px", textAlign: "center", background: `linear-gradient(180deg, rgba(212, 255, 0, 0.04), rgba(0, 0, 0, 0.5))` }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 12px", borderRadius: 20, background: "rgba(245, 158, 11, 0.08)", border: "1px solid rgba(245, 158, 11, 0.25)", marginBottom: 16 }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#fbbf24", boxShadow: "0 0 8px #fbbf24", animation: "pulse 2s ease-in-out infinite" }} />
+                <span style={{ fontSize: 10, color: "#fbbf24", fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700 }}>API Temporarily Paused</span>
               </div>
 
-              {/* Handle lookup mode */}
-              {mode === "handle" && (
-                <div>
-                  <label style={labelStyle}>X / Twitter Handle</label>
-                  <div style={{ display: "flex", gap: 10 }}>
-                    <div style={{ position: "relative", flex: 1 }}>
-                      <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: C.textMuted, fontSize: 14, fontFamily: "'JetBrains Mono', monospace" }}>@</span>
-                      <input
-                        style={{ ...inputStyle, paddingLeft: 32 }}
-                        type="text"
-                        placeholder="FabsKebabs101"
-                        value={handle}
-                        onChange={e => setHandle(e.target.value)}
-                        onKeyDown={e => e.key === "Enter" && handleLookup()}
-                        onFocus={e => e.target.style.borderColor = C.primary}
-                        onBlur={e => e.target.style.borderColor = "rgba(255, 255, 255, 0.12)"}
-                      />
-                    </div>
-                    <button
-                      onClick={handleLookup}
-                      disabled={loading}
+              <div style={{ fontSize: 32, fontWeight: 900, letterSpacing: -1.5, marginBottom: 12 }}>
+                Live lookup <span style={{ color: C.primary }}>opens soon.</span>
+              </div>
+
+              <p style={{ color: C.textSecondary, fontSize: 14, maxWidth: 460, margin: "0 auto 24px", lineHeight: 1.6 }}>
+                We're polishing the Trust Score engine before turning on live lookups. Join the waitlist for early access — first 500 signups get priority when we open the floodgates.
+              </p>
+
+              {!waitlistSubmitted ? (
+                <>
+                  <div style={{ display: "flex", gap: 8, maxWidth: 400, margin: "0 auto 14px", flexWrap: "wrap" }}>
+                    <input
+                      type="email"
+                      placeholder="your@email.com"
+                      value={waitlistEmail}
+                      onChange={e => setWaitlistEmail(e.target.value)}
+                      onKeyDown={e => { if (e.key === "Enter" && waitlistEmail.includes("@")) setWaitlistSubmitted(true); }}
                       style={{
-                        padding: "12px 24px", borderRadius: 10, border: "none",
-                        background: loading ? "rgba(255, 255, 255, 0.1)" : `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
-                        color: loading ? C.textPrimary : "#000", fontSize: 13, fontWeight: 800,
-                        fontFamily: "'JetBrains Mono', monospace", cursor: loading ? "wait" : "pointer",
-                        transition: "all 0.2s", whiteSpace: "nowrap",
+                        flex: 1, minWidth: 200, padding: "13px 16px",
+                        background: "rgba(0, 0, 0, 0.9)",
+                        border: "1px solid rgba(255, 255, 255, 0.12)",
+                        borderRadius: 10, color: C.textPrimary,
+                        fontFamily: "'JetBrains Mono', monospace", fontSize: 13,
+                        outline: "none", transition: "border 0.2s",
                       }}
+                      onFocus={e => e.target.style.borderColor = C.primary}
+                      onBlur={e => e.target.style.borderColor = "rgba(255, 255, 255, 0.12)"}
+                    />
+                    <button
+                      onClick={() => { if (waitlistEmail.includes("@")) setWaitlistSubmitted(true); }}
+                      disabled={!waitlistEmail.includes("@")}
+                      style={{
+                        padding: "13px 22px", borderRadius: 10, border: "none",
+                        background: !waitlistEmail.includes("@") ? "rgba(255, 255, 255, 0.05)" : `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+                        color: !waitlistEmail.includes("@") ? C.textMuted : "#000",
+                        fontSize: 13, fontWeight: 900,
+                        fontFamily: "'Outfit', sans-serif",
+                        cursor: !waitlistEmail.includes("@") ? "not-allowed" : "pointer",
+                        letterSpacing: 0.3, transition: "all 0.2s",
+                      }}
+                    >🚀 Get Early Access</button>
+                  </div>
+                  <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>
+                    No spam. One email when we go live. Unsubscribe anytime.
+                  </div>
+                </>
+              ) : (
+                <div style={{ padding: "20px", background: "rgba(16, 185, 129, 0.06)", border: "1px solid rgba(16, 185, 129, 0.25)", borderRadius: 12, maxWidth: 400, margin: "0 auto" }}>
+                  <div style={{ fontSize: 28, marginBottom: 8 }}>✅</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: "#10b981", marginBottom: 6 }}>You're on the list, Fabs!</div>
+                  <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.5, fontFamily: "'JetBrains Mono', monospace" }}>
+                    We'll email <span style={{ color: C.primary }}>{waitlistEmail}</span> the second live lookups go live.
+                  </div>
+                </div>
+              )}
+
+              {/* What you can still do */}
+              <div style={{ marginTop: 32, paddingTop: 24, borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}>
+                <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 16 }}>Meanwhile, explore CT Trust</div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 8 }}>
+                  {[
+                    { icon: "🛡️", label: "Trust Score", tab: "trust" },
+                    { icon: "💼", label: "Browse Jobs", tab: "jobs" },
+                    { icon: "🕸️", label: "CIB Detection", tab: "cib" },
+                    { icon: "🏆", label: "Leaderboards", tab: "leaderboard" },
+                  ].map(link => (
+                    <button
+                      key={link.label}
+                      onClick={() => setTab(link.tab)}
+                      style={{
+                        padding: "10px 12px", borderRadius: 10,
+                        background: "rgba(0, 0, 0, 0.4)",
+                        border: "1px solid rgba(255, 255, 255, 0.06)",
+                        color: C.textSecondary,
+                        fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 600,
+                        cursor: "pointer", transition: "all 0.2s",
+                        display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = `${C.primary}40`; e.currentTarget.style.color = C.primary; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.06)"; e.currentTarget.style.color = C.textSecondary; }}
                     >
-                      {loading ? "⏳ Fetching..." : "⚡ Valuate"}
+                      <span>{link.icon}</span>
+                      <span>{link.label}</span>
                     </button>
-                  </div>
-
-                  {error && (
-                    <div style={{ marginTop: 12, padding: "10px 14px", background: "rgba(239, 68, 68, 0.08)", border: "1px solid rgba(239, 68, 68, 0.2)", borderRadius: 8 }}>
-                      <span style={{ fontSize: 12, color: "#ef4444", fontFamily: "'JetBrains Mono', monospace" }}>⚠ {error}</span>
-                    </div>
-                  )}
-
-                  {/* Show fetched profile data */}
-                  {profileData && result && (
-                    <div style={{ marginTop: 16, padding: "14px 16px", background: "rgba(255, 255, 255, 0.02)", borderRadius: 10, border: "1px solid rgba(212, 255, 0, 0.08)" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
-                        {profileData.profileImage && (
-                          <img src={profileData.profileImage} alt="" style={{ width: 40, height: 40, borderRadius: 10, border: `2px solid ${C.primary}30` }} />
-                        )}
-                        <div>
-                          <div style={{ fontWeight: 700, fontSize: 15 }}>{profileData.name} <span style={{ color: C.textMuted, fontWeight: 400 }}>@{profileData.handle}</span></div>
-                          {profileData.bio && <div style={{ fontSize: 12, color: C.textSecondary, marginTop: 2, maxWidth: 450, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{profileData.bio}</div>}
-                        </div>
-                      </div>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8 }}>
-                        {[
-                          ["Followers", profileData.followers?.toLocaleString()],
-                          ["Tweets", profileData.totalTweets?.toLocaleString()],
-                          ["Avg Likes", profileData.avgLikes?.toLocaleString()],
-                          ["Age", `${Math.round(profileData.accountAgeDays / 365)}y`],
-                        ].map(([label, val]) => (
-                          <div key={label} style={{ textAlign: "center", padding: "6px 4px", background: "rgba(0, 0, 0, 0.3)", borderRadius: 6 }}>
-                            <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8 }}>{label}</div>
-                            <div style={{ fontSize: 13, fontWeight: 700, color: C.textPrimary, marginTop: 1 }}>{val}</div>
-                          </div>
-                        ))}
-                      </div>
-                      <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                        {profileData.verified && <Pill text="✓ Verified" color={C.accent} />}
-                        {profileData.cryptoNiche && <Pill text="CT Niche" color={C.primary} />}
-                        <Pill text={`${profileData.recentTweetsSampled} tweets sampled`} color={C.textMuted} />
-                      </div>
-                    </div>
-                  )}
+                  ))}
                 </div>
-              )}
-
-              {/* Manual entry mode */}
-              {mode === "manual" && (
-                <div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-                    {[
-                      ["Followers", "followers", "e.g. 12500"],
-                      ["Total Tweets", "tweets", "e.g. 8400"],
-                      ["Avg Likes / Post", "avgLikes", "e.g. 85"],
-                      ["Avg Retweets / Post", "avgRetweets", "e.g. 20"],
-                      ["Avg Replies / Post", "avgReplies", "e.g. 12"],
-                      ["Account Age (days)", "accountAgeDays", "e.g. 1095"],
-                    ].map(([label, key, placeholder]) => (
-                      <div key={key}>
-                        <label style={labelStyle}>{label}</label>
-                        <input
-                          style={inputStyle} type="number" placeholder={placeholder}
-                          value={form[key]}
-                          onChange={e => setForm({ ...form, [key]: e.target.value })}
-                          onFocus={e => e.target.style.borderColor = C.primary}
-                          onBlur={e => e.target.style.borderColor = "rgba(255, 255, 255, 0.12)"}
-                        />
-                      </div>
-                    ))}
-                  </div>
-
-                  <div style={{ display: "flex", gap: 20, marginTop: 16 }}>
-                    <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 13, color: C.textSecondary }}>
-                      <input type="checkbox" checked={form.verified} onChange={e => setForm({ ...form, verified: e.target.checked })} style={{ accentColor: C.primary }} />
-                      Verified (Blue Check)
-                    </label>
-                    <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 13, color: C.textSecondary }}>
-                      <input type="checkbox" checked={form.cryptoNiche} onChange={e => setForm({ ...form, cryptoNiche: e.target.checked })} style={{ accentColor: C.primary }} />
-                      Crypto / CT Niche
-                    </label>
-                  </div>
-
-                  <button
-                    onClick={handleValuate}
-                    style={{
-                      width: "100%", marginTop: 20, padding: "14px 24px", borderRadius: 12, border: "none",
-                      background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
-                      color: "#000", fontSize: 15, fontWeight: 800,
-                      fontFamily: "'Outfit', sans-serif", cursor: "pointer",
-                      letterSpacing: 0.5, transition: "all 0.2s",
-                    }}
-                    onMouseEnter={e => e.target.style.transform = "translateY(-1px)"}
-                    onMouseLeave={e => e.target.style.transform = "translateY(0)"}
-                  >
-                    ⚡ Get Valuation
-                  </button>
-                </div>
-              )}
+              </div>
             </GlowCard>
 
             {result && (
               <div ref={resultRef} style={{ maxWidth: 650, margin: "0 auto" }}>
-                <GlowCard glow style={{ textAlign: "center", marginBottom: 20 }}>
-                  <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8 }}>Estimated Value</div>
-                  <div style={{ fontSize: 56, fontWeight: 900, letterSpacing: -2, color: C.primary }}>
-                    ${animateValue.toLocaleString()}
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "center", gap: 12, marginTop: 12, flexWrap: "wrap" }}>
-                    <Pill text={`Score: ${result.totalScore}/100`} color={C.primary} />
-                    <Pill text={`${result.engagementRate}% Engagement`} color={C.accent} />
-                    <Pill text={`~$${result.monthlyEarnings}/mo`} color={C.accentWarm} />
-                  </div>
-                </GlowCard>
+                {/* Hero: Trust Score (primary) + Valuation (secondary) */}
+                {trustResult && (
+                  <GlowCard glow style={{ marginBottom: 20, border: `1px solid ${trustResult.labelColor}40`, padding: "28px", textAlign: "center", background: `linear-gradient(180deg, ${trustResult.labelColor}06, transparent)` }}>
+                    <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8 }}>🛡️ Trust Score</div>
+                    <div style={{ display: "flex", alignItems: "baseline", justifyContent: "center", gap: 10, marginBottom: 10 }}>
+                      <span style={{ fontSize: 72, fontWeight: 900, color: trustResult.labelColor, letterSpacing: -3, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1 }}>{trustResult.trustScore}</span>
+                      <span style={{ fontSize: 18, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>/ 100</span>
+                    </div>
+                    <div style={{
+                      display: "inline-block", padding: "8px 18px", borderRadius: 10,
+                      background: `${trustResult.labelColor}15`, border: `1px solid ${trustResult.labelColor}40`,
+                      fontFamily: "'JetBrains Mono', monospace", fontSize: 13, fontWeight: 800,
+                      color: trustResult.labelColor, letterSpacing: 2, marginBottom: 20,
+                    }}>{trustResult.label}</div>
 
-                {/* Trust Score Section */}
+                    {/* Secondary stats row */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginTop: 4 }}>
+                      <div style={{ padding: "10px 8px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                        <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 3 }}>Followers</div>
+                        <div style={{ fontSize: 15, fontWeight: 800, color: C.textPrimary, fontFamily: "'JetBrains Mono', monospace" }}>{(form.followers || result.followers || 0).toLocaleString()}</div>
+                      </div>
+                      <div style={{ padding: "10px 8px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                        <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 3 }}>Engagement</div>
+                        <div style={{ fontSize: 15, fontWeight: 800, color: C.textPrimary, fontFamily: "'JetBrains Mono', monospace" }}>{result.engagementRate}%</div>
+                      </div>
+                      <div style={{ padding: "10px 8px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                        <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 3 }}>Bot Followers</div>
+                        <div style={{ fontSize: 15, fontWeight: 800, color: trustResult.estimatedBotPct > 30 ? "#ef4444" : trustResult.estimatedBotPct > 15 ? "#f59e0b" : "#10b981", fontFamily: "'JetBrains Mono', monospace" }}>~{trustResult.estimatedBotPct}%</div>
+                      </div>
+                    </div>
+                  </GlowCard>
+                )}
+
+                {/* Trust Score detail card */}
                 {trustResult && (
                   <GlowCard glow style={{ marginBottom: 20, border: `1px solid ${trustResult.labelColor}30` }}>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
-                      <div>
-                        <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 4 }}>🛡️ Trust Score</div>
-                        <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-                          <span style={{ fontSize: 42, fontWeight: 900, color: trustResult.labelColor, letterSpacing: -1 }}>{trustResult.trustScore}</span>
-                          <span style={{ fontSize: 14, color: C.textMuted }}>/ 100</span>
-                        </div>
-                      </div>
-                      <div style={{
-                        padding: "8px 16px", borderRadius: 10,
-                        background: `${trustResult.labelColor}15`,
-                        border: `1px solid ${trustResult.labelColor}40`,
-                        fontFamily: "'JetBrains Mono', monospace",
-                        fontSize: 13, fontWeight: 800,
-                        color: trustResult.labelColor,
-                        letterSpacing: 1.5,
-                      }}>{trustResult.label}</div>
-                    </div>
+                    <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 16 }}>Trust Breakdown</div>
 
                     {/* Bot follower estimate */}
                     <div style={{ padding: "14px 16px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 10, marginBottom: 16 }}>
@@ -1565,7 +1671,7 @@ export default function HandleMarket() {
                         {trustResult.trustScore >= 70 && trustResult.trustScore < 85 && "Most signals look healthy. Double-check the weakest signal below, but this is generally a solid account worth the asking price."}
                         {trustResult.trustScore >= 55 && trustResult.trustScore < 70 && "Mixed signals. We recommend running Deep Forensics (CIB tab) for a full tweet-level analysis before purchasing. Negotiate if price seems high."}
                         {trustResult.trustScore >= 40 && trustResult.trustScore < 55 && "Multiple authenticity concerns. Only purchase if you've independently verified the account's real audience. Price should reflect the risk."}
-                        {trustResult.trustScore < 40 && "This account shows strong signs of manipulation or bot inflation. The follower count is likely misleading. Avoid purchasing or heavily discount the valuation."}
+                        {trustResult.trustScore < 40 && "This account shows strong signs of manipulation or bot inflation. The follower count is likely misleading. Avoid engaging, trusting, or hiring this account without verification."}
                       </div>
                     </div>
 
@@ -1660,8 +1766,8 @@ export default function HandleMarket() {
                   <ScoreBar label="CT Niche" score={result.breakdown.nicheRelevance} color="#fb923c" />
 
                   <div style={{ marginTop: 20, padding: "14px 16px", background: "rgba(212, 255, 0, 0.05)", borderRadius: 10, border: "1px solid rgba(212, 255, 0, 0.12)" }}>
-                    <div style={{ fontSize: 12, color: C.primary, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600 }}>💡 Want to sell this account?</div>
-                    <div style={{ fontSize: 13, color: C.textSecondary, marginTop: 4 }}>List it on the marketplace tab to find buyers. Escrow protection included.</div>
+                    <div style={{ fontSize: 12, color: C.primary, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600 }}>💡 Flex your score</div>
+                    <div style={{ fontSize: 13, color: C.textSecondary, marginTop: 4 }}>Share your trust score on X to prove you're the real deal. Screenshot this card or tweet your result.</div>
                   </div>
                 </GlowCard>
               </div>
@@ -1820,7 +1926,7 @@ export default function HandleMarket() {
                 <div style={{ fontSize: 20, fontWeight: 900, letterSpacing: -0.5 }}>Can the score be gamed?</div>
               </div>
               <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.6, marginBottom: 16 }}>
-                Hard to. Here's why HandleMarket's scoring system holds up where others don't:
+                Hard to. Here's why CT Trust's scoring system holds up where others don't:
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14 }}>
                 {[
@@ -1862,141 +1968,6 @@ export default function HandleMarket() {
           </div>
         )}
 
-        {tab === "marketplace" && (
-          <div>
-            <div style={{ textAlign: "center", marginBottom: 32 }}>
-              <h1 style={{ fontSize: 38, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>
-                CT Account <span style={{ color: C.primary }}>Marketplace</span>
-              </h1>
-              <p style={{ color: C.textSecondary, fontSize: 15, marginTop: 8 }}>Buy and sell verified Crypto Twitter accounts with escrow protection</p>
-
-              {/* Hero CTA — List Your Account */}
-              <button
-                onClick={() => setShowListForm(true)}
-                style={{
-                  marginTop: 20, padding: "14px 32px", borderRadius: 12, border: "none",
-                  background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
-                  color: "#000", fontSize: 15, fontWeight: 800,
-                  fontFamily: "'Outfit', sans-serif", cursor: "pointer",
-                  letterSpacing: 0.3, transition: "all 0.2s",
-                  boxShadow: "0 0 24px rgba(212, 255, 0, 0.2)",
-                }}
-                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 32px rgba(212, 255, 0, 0.35)"; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 24px rgba(212, 255, 0, 0.2)"; }}
-              >
-                + List Your Account
-              </button>
-            </div>
-
-            <div style={{ display: "flex", gap: 10, marginBottom: 24, flexWrap: "wrap", justifyContent: "center" }}>
-              <div style={{ display: "flex", gap: 4, background: "rgba(0, 0, 0, 0.5)", borderRadius: 10, padding: 3, border: "1px solid rgba(255, 255, 255, 0.06)" }}>
-                {[["all", "All"], ["bitcoin", "Bitcoin"], ["eth", "Ethereum"], ["defi", "DeFi"], ["solana", "Solana"], ["nft", "NFTs"], ["memecoin", "Memecoins"]].map(([val, label]) => (
-                  <button key={val} onClick={() => setFilterNiche(val)} style={{
-                    padding: "6px 14px", borderRadius: 7, border: "none",
-                    background: filterNiche === val ? "rgba(212, 255, 0, 0.12)" : "transparent",
-                    color: filterNiche === val ? C.primary : C.textMuted,
-                    fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 600, cursor: "pointer", textTransform: "uppercase", letterSpacing: 0.5,
-                  }}>{label}</button>
-                ))}
-              </div>
-              <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{
-                padding: "6px 14px", borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.06)",
-                background: "rgba(0, 0, 0, 0.5)", color: C.textSecondary,
-                fontFamily: "'JetBrains Mono', monospace", fontSize: 11, cursor: "pointer",
-              }}>
-                <option value="value">Sort: Value ↓</option>
-                <option value="followers">Sort: Followers ↓</option>
-              </select>
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 16 }}>
-              {sortedListings.map(listing => (
-                <GlowCard key={listing.id} glow={listing.status === "listed"} style={{ position: "relative" }} onClick={() => {}}>
-                  {listing.status === "sold" && (
-                    <div style={{ position: "absolute", top: 16, right: 16 }}><Pill text="SOLD" color="#ef4444" /></div>
-                  )}
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-                    <div style={{
-                      width: 44, height: 44, borderRadius: 12,
-                      background: `linear-gradient(135deg, hsl(0, 0%, ${25 + listing.id * 4}%), hsl(0, 0%, ${12 + listing.id * 2}%))`,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 18, fontWeight: 800, color: "white",
-                    }}>
-                      {listing.handle[1].toUpperCase()}
-                    </div>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: 16, letterSpacing: -0.3 }}>{listing.handle}</div>
-                      <div style={{ fontSize: 12, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>{listing.niche}</div>
-                    </div>
-                  </div>
-
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 12 }}>
-                    {[["Followers", listing.followers.toLocaleString()], ["Engagement", listing.engagement], ["Age", listing.age]].map(([label, val]) => (
-                      <div key={label} style={{ padding: "8px 10px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 8, textAlign: "center" }}>
-                        <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8 }}>{label}</div>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: C.textPrimary, marginTop: 2 }}>{val}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Trust Score Bar */}
-                  {listing.trustScore && (() => {
-                    const tColor = listing.trustScore >= 85 ? "#10b981" : listing.trustScore >= 70 ? "#34d399" : listing.trustScore >= 55 ? "#fbbf24" : listing.trustScore >= 40 ? "#f97316" : "#ef4444";
-                    return (
-                      <div style={{ padding: "10px 12px", background: `${tColor}08`, border: `1px solid ${tColor}25`, borderRadius: 8, marginBottom: 16 }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                          <span style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>🛡️ Trust Score</span>
-                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <span style={{ fontSize: 9, color: tColor, fontFamily: "'JetBrains Mono', monospace", fontWeight: 800, letterSpacing: 1 }}>{listing.trustLabel}</span>
-                            <span style={{ fontSize: 13, fontWeight: 800, color: tColor, fontFamily: "'JetBrains Mono', monospace" }}>{listing.trustScore}</span>
-                          </div>
-                        </div>
-                        <div style={{ height: 4, background: "rgba(0, 0, 0, 0.5)", borderRadius: 2, overflow: "hidden" }}>
-                          <div style={{ height: "100%", width: `${listing.trustScore}%`, background: `linear-gradient(90deg, ${tColor}, ${tColor}cc)` }} />
-                        </div>
-                      </div>
-                    );
-                  })()}
-
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <div>
-                      <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>Asking Price</div>
-                      <div style={{ fontSize: 24, fontWeight: 800, letterSpacing: -0.5, color: C.primary }}>${listing.value.toLocaleString()}</div>
-                    </div>
-                    {listing.status === "listed" && (
-                      <button onClick={(e) => { e.stopPropagation(); setSelectedListing(listing); }} style={{
-                        padding: "10px 20px", borderRadius: 10, border: `1px solid rgba(212, 255, 0, 0.25)`,
-                        background: "rgba(255, 255, 255, 0.05)", color: C.primary,
-                        fontFamily: "'JetBrains Mono', monospace", fontSize: 12, fontWeight: 600,
-                        cursor: "pointer", transition: "all 0.2s",
-                      }}
-                        onMouseEnter={e => { e.target.style.background = "rgba(212, 255, 0, 0.12)"; }}
-                        onMouseLeave={e => { e.target.style.background = "rgba(255, 255, 255, 0.05)"; }}
-                      >View Details →</button>
-                    )}
-                  </div>
-
-                  {listing.verified && (
-                    <div style={{ position: "absolute", top: 16, right: listing.status === "sold" ? 76 : 16 }}>
-                      <Pill text="✓ Verified" color={C.accent} />
-                    </div>
-                  )}
-                </GlowCard>
-              ))}
-            </div>
-
-            <GlowCard glow style={{ textAlign: "center", marginTop: 32 }}>
-              <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 8 }}>Ready to sell your CT account?</div>
-              <div style={{ color: C.textSecondary, fontSize: 14, marginBottom: 20 }}>Get a free valuation first, then list it on the marketplace with escrow protection</div>
-              <button onClick={() => setTab("valuate")} style={{
-                padding: "12px 32px", borderRadius: 12, border: "none",
-                background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
-                color: "#000", fontSize: 14, fontWeight: 800,
-                fontFamily: "'Outfit', sans-serif", cursor: "pointer",
-              }}>⚡ Get Your Valuation</button>
-            </GlowCard>
-          </div>
-        )}
 
         {/* LEADERBOARD TAB */}
         {tab === "leaderboard" && (
@@ -2105,7 +2076,7 @@ export default function HandleMarket() {
               <h1 style={{ fontSize: 38, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>
                 Public <span style={{ color: C.primary }}>Profile</span>
               </h1>
-              <p style={{ color: C.textSecondary, fontSize: 15, marginTop: 8 }}>Every CT account gets a shareable profile at handlemarket.com/@username</p>
+              <p style={{ color: C.textSecondary, fontSize: 15, marginTop: 8 }}>Every CT account gets a shareable profile at cttrust.xyz/@username</p>
             </div>
 
             {/* Sample profile card */}
@@ -2138,11 +2109,10 @@ export default function HandleMarket() {
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 10, marginBottom: 20 }}>
                 {[
                   ["Trust Score", "91", "#10b981"],
-                  ["Est. Value", "$4,200", C.accent],
+                  ["Tier", "SUPREME", "#10b981"],
                   ["Followers", "18.4k", C.textPrimary],
                   ["Engagement", "3.8%", C.primary],
                   ["Bot Est.", "8%", "#10b981"],
-                  ["Vouches", "14", C.accentLight],
                 ].map(([label, val, clr]) => (
                   <div key={label} style={{ padding: "12px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 10, textAlign: "center", border: "1px solid rgba(255, 255, 255, 0.05)" }}>
                     <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>{label}</div>
@@ -2191,9 +2161,9 @@ export default function HandleMarket() {
                   {/* Top row — logo + branding */}
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <div style={{ width: 32, height: 32, borderRadius: 8, background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, color: "#000" }}>HM</div>
+                      <div style={{ width: 32, height: 32, borderRadius: 8, background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, color: "#000" }}>CT</div>
                       <div>
-                        <div style={{ fontWeight: 800, fontSize: 15, color: "#fff", letterSpacing: -0.3 }}>HandleMarket</div>
+                        <div style={{ fontWeight: 800, fontSize: 15, color: "#fff", letterSpacing: -0.3 }}>CT Trust</div>
                         <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1.5, textTransform: "uppercase" }}>Verified CT Account</div>
                       </div>
                     </div>
@@ -2251,18 +2221,37 @@ export default function HandleMarket() {
                       border: `1px solid ${C.primary}30`,
                       borderRadius: 12,
                     }}>
-                      <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 }}>💰 Est. Value</div>
-                      <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: -1, color: C.primary, fontFamily: "'JetBrains Mono', monospace" }}>$4,200</div>
+                      <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 }}>🏆 Tier</div>
+                      <div style={{ fontSize: 20, fontWeight: 900, letterSpacing: -0.5, color: "#10b981", fontFamily: "'JetBrains Mono', monospace", marginBottom: 2 }}>SUPREME</div>
+                      <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>Top 8% of CT</div>
+                    </div>
+                  </div>
+
+                  {/* Authenticity signals */}
+                  <div style={{ marginBottom: 18, padding: "14px 14px", background: "rgba(0, 0, 0, 0.3)", borderRadius: 12, border: "1px solid rgba(255, 255, 255, 0.06)" }}>
+                    <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>✅ Authenticity Verified</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                      {[
+                        { icon: "🤖", label: "Bot-free audience", detail: "Only 8% estimated bot followers" },
+                        { icon: "💬", label: "Real engagement", detail: "High reply-to-like ratio" },
+                        { icon: "📈", label: "Organic growth", detail: "No anomaly spikes in 90d" },
+                        { icon: "🛡️", label: "CIB-clean", detail: "Not part of any detected pod" },
+                      ].map(sig => (
+                        <div key={sig.label} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}>
+                          <span style={{ fontSize: 12 }}>{sig.icon}</span>
+                          <span style={{ color: "#fff", fontWeight: 700, minWidth: 140 }}>{sig.label}</span>
+                          <span style={{ color: C.textMuted, fontSize: 10 }}>{sig.detail}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
                   {/* Stats row */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8, marginBottom: 18 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 18 }}>
                     {[
                       ["Followers", "18.4k"],
                       ["Engagement", "3.8%"],
                       ["Bot Est.", "8%"],
-                      ["Vouches", "14"],
                     ].map(([label, val]) => (
                       <div key={label} style={{ padding: "8px 6px", background: "rgba(0, 0, 0, 0.25)", borderRadius: 8, textAlign: "center" }}>
                         <div style={{ fontSize: 8, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8 }}>{label}</div>
@@ -2277,7 +2266,7 @@ export default function HandleMarket() {
                     borderTop: "1px solid rgba(212, 255, 0, 0.12)",
                     display: "flex", justifyContent: "space-between", alignItems: "center",
                   }}>
-                    <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>handlemarket.com/@FabsKebabs101</div>
+                    <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>cttrust.xyz/@FabsKebabs101</div>
                     <div style={{ fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" }}>Verify Yours →</div>
                   </div>
                 </div>
@@ -2309,277 +2298,215 @@ export default function HandleMarket() {
               </div>
 
               <div style={{ marginTop: 14, padding: "10px 12px", background: "rgba(255, 255, 255, 0.03)", borderRadius: 8, fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.5 }}>
-                ℹ️ Share card is served as an OG image — when you paste your handlemarket.com/@handle link on X, this card auto-attaches as the preview.
+                ℹ️ Share card is served as an OG image — when you paste your cttrust.xyz/@handle link on X, this card auto-attaches as the preview.
               </div>
             </GlowCard>
 
-            {/* Vouches preview */}
+            {/* Handshake History */}
             <GlowCard>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>🤝 Vouches</div>
-                  <div style={{ fontSize: 12, color: C.textMuted, marginTop: 2 }}>14 CT accounts have vouched for this handle</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>🤝 Handshake History</div>
+                  <div style={{ fontSize: 12, color: C.textMuted, marginTop: 2 }}>Completed jobs build public reputation</div>
                 </div>
-                <Pill text="Coming soon" color={C.textMuted} />
+                <Pill text="Coming with Jobs V1" color={C.textMuted} />
               </div>
 
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {["@CryptoAlpha_", "@0xTrenchKing", "@DegenHQ", "@SOL_Trader99", "@OnChainMax", "+9 more"].map(h => (
-                  <div key={h} style={{
-                    padding: "8px 12px", background: "rgba(255, 255, 255, 0.05)",
-                    border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: 8,
-                    fontSize: 12, color: C.primary, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600,
-                  }}>{h}</div>
-                ))}
-              </div>
-            </GlowCard>
-          </div>
-        )}
-
-        {/* ─── PHASE 2: SALES HISTORY TAB ───────────────────── */}
-        {tab === "history" && (
-          <div>
-            <div style={{ textAlign: "center", marginBottom: 32 }}>
-              <h1 style={{ fontSize: 38, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>
-                Sale <span style={{ color: C.primary }}>History</span>
-              </h1>
-              <p style={{ color: C.textSecondary, fontSize: 15, marginTop: 8 }}>Public transaction ledger · Every sale verified via escrow</p>
-            </div>
-
-            {/* Market stats bar */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 10, marginBottom: 24 }}>
-              {[
-                ["Total Volume", "$847.2k", C.primary],
-                ["Sales (30d)", "182", C.accent],
-                ["Avg Sale", "$2,840", "#10b981"],
-                ["Median Markup", "+18%", C.accentLight],
-              ].map(([label, val, clr]) => (
-                <GlowCard key={label} style={{ padding: "16px", textAlign: "center" }}>
-                  <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>{label}</div>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: clr, marginTop: 4, fontFamily: "'JetBrains Mono', monospace" }}>{val}</div>
-                </GlowCard>
-              ))}
-            </div>
-
-            {/* Sales table */}
-            <GlowCard style={{ padding: 0, overflow: "hidden", marginBottom: 24 }}>
-              <div style={{ padding: "14px 20px", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div style={{ fontSize: 13, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>Recent Sales</div>
-                <Pill text="LIVE" color="#10b981" />
-              </div>
-              {SALE_HISTORY.map((sale, i) => (
-                <div key={sale.id} style={{
-                  padding: "16px 20px",
-                  borderBottom: i === SALE_HISTORY.length - 1 ? "none" : "1px solid rgba(212, 255, 0, 0.05)",
-                  display: "grid", gridTemplateColumns: "1fr auto", gap: 16, alignItems: "center",
-                  transition: "background 0.2s",
-                }}
-                  onMouseEnter={e => e.currentTarget.style.background = "rgba(255, 255, 255, 0.02)"}
-                  onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-                >
-                  <div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-                      <span style={{ fontSize: 16, fontWeight: 700 }}>{sale.handle}</span>
-                      <Pill text={`Trust ${sale.trustScore}`} color={sale.trustScore >= 85 ? "#10b981" : sale.trustScore >= 70 ? "#34d399" : "#fbbf24"} />
-                      <span style={{ fontSize: 12, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>{sale.followers.toLocaleString()} followers</span>
-                    </div>
-                    <div style={{ fontSize: 12, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace" }}>
-                      {sale.seller} → {sale.buyer} · {sale.soldAgo}
-                    </div>
-                  </div>
-                  <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 22, fontWeight: 800, color: C.primary, fontFamily: "'JetBrains Mono', monospace" }}>
-                      ${sale.price.toLocaleString()}
-                    </div>
-                    {sale.prevPrice && (
-                      <div style={{ fontSize: 10, color: sale.price > sale.prevPrice ? "#10b981" : "#ef4444", fontFamily: "'JetBrains Mono', monospace", marginTop: 2 }}>
-                        {sale.price > sale.prevPrice ? "▲" : "▼"} prev ${sale.prevPrice.toLocaleString()} ({((sale.price - sale.prevPrice) / sale.prevPrice * 100).toFixed(0)}%)
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </GlowCard>
-
-            {/* Top Sellers leaderboard */}
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1, marginBottom: 12 }}>🏅 Top Sellers</div>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
-              {TOP_SELLERS.map((seller, i) => (
-                <GlowCard key={seller.handle} glow style={{ position: "relative" }}>
-                  {i === 0 && <div style={{ position: "absolute", top: 14, right: 14 }}><Pill text="🥇 #1 SELLER" color="#fbbf24" /></div>}
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 12, background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900, color: "#000" }}>{seller.handle[1].toUpperCase()}</div>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: 15 }}>{seller.handle}</div>
-                      <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>{seller.totalSales} sales · ${(seller.totalVolume / 1000).toFixed(0)}k volume</div>
-                    </div>
-                  </div>
-
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", background: "rgba(16, 185, 129, 0.06)", border: "1px solid rgba(16, 185, 129, 0.2)", borderRadius: 8, marginBottom: 10 }}>
-                    <span style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>Seller Score</span>
-                    <span style={{ fontSize: 22, fontWeight: 900, color: "#10b981", fontFamily: "'JetBrains Mono', monospace" }}>{seller.score}</span>
-                  </div>
-
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 10 }}>
-                    <div style={{ padding: "6px 8px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 6, textAlign: "center" }}>
-                      <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>DISPUTE RATE</div>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: seller.disputeRate === "0%" ? "#10b981" : C.accentLight, fontFamily: "'JetBrains Mono', monospace" }}>{seller.disputeRate}</div>
-                    </div>
-                    <div style={{ padding: "6px 8px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 6, textAlign: "center" }}>
-                      <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>AVG TRANSFER</div>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: C.textPrimary, fontFamily: "'JetBrains Mono', monospace" }}>{seller.avgTime}</div>
-                    </div>
-                  </div>
-
-                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                    {seller.badges.map(b => (
-                      <span key={b} style={{
-                        padding: "3px 8px", borderRadius: 12, fontSize: 9, fontWeight: 700,
-                        fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8,
-                        background: b === "pro" ? `${C.primary}20` : b === "fast" ? `${C.accent}20` : "rgba(16, 185, 129, 0.15)",
-                        color: b === "pro" ? C.primary : b === "fast" ? C.accent : "#10b981",
-                        border: `1px solid ${b === "pro" ? C.primary + "40" : b === "fast" ? C.accent + "40" : "rgba(16, 185, 129, 0.3)"}`,
-                      }}>
-                        {b === "pro" ? "PRO" : b === "fast" ? "⚡ FAST" : "✓ CLEAN"}
-                      </span>
-                    ))}
-                  </div>
-                </GlowCard>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ─── PHASE 3: WALLET BINDING TAB ──────────────────── */}
-        {tab === "wallet" && (
-          <div>
-            <div style={{ textAlign: "center", marginBottom: 32 }}>
-              <h1 style={{ fontSize: 38, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>
-                Wallet <span style={{ color: C.primary }}>Reputation</span>
-              </h1>
-              <p style={{ color: C.textSecondary, fontSize: 15, marginTop: 8 }}>On-chain proof-of-existence · Real wallets, real history, real trust</p>
-            </div>
-
-            {/* Bound wallet hero */}
-            <GlowCard glow style={{ marginBottom: 20 }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ width: 52, height: 52, borderRadius: 14, background: `linear-gradient(135deg, #9945FF, #14F195)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 800, color: "#fff" }}>◎</div>
-                  <div>
-                    <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 2 }}>Bound Wallet</div>
-                    <div style={{ fontSize: 16, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace" }}>{WALLET_DATA.address}</div>
-                    <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 2 }}>Solana · Verified via signature</div>
-                  </div>
-                </div>
-                <div style={{ textAlign: "center", padding: "10px 18px", background: `linear-gradient(135deg, ${C.primary}15, ${C.accent}15)`, border: `1px solid ${C.primary}40`, borderRadius: 12 }}>
-                  <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>On-Chain Score</div>
-                  <div style={{ fontSize: 32, fontWeight: 900, color: C.primary, fontFamily: "'JetBrains Mono', monospace" }}>{WALLET_DATA.onChainScore}</div>
-                </div>
-              </div>
-
-              {/* Wallet stats */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 10 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10 }}>
                 {[
-                  ["Wallet Age", `${(WALLET_DATA.walletAgeDays / 365).toFixed(1)}y`, C.primary],
-                  ["Txn Count", WALLET_DATA.totalTxns.toLocaleString(), C.accent],
-                  ["Protocols", WALLET_DATA.protocols.length, "#10b981"],
-                  ["Holdings", `$${(WALLET_DATA.holdings.reduce((s, h) => s + h.value, 0) / 1000).toFixed(1)}k`, C.accentLight],
-                ].map(([label, val, clr]) => (
-                  <div key={label} style={{ padding: "12px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 10, textAlign: "center" }}>
-                    <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>{label}</div>
-                    <div style={{ fontSize: 18, fontWeight: 800, color: clr, marginTop: 4, fontFamily: "'JetBrains Mono', monospace" }}>{val}</div>
+                  { label: "Completed", val: "0", icon: "✅" },
+                  { label: "In Progress", val: "0", icon: "🔄" },
+                  { label: "Disputes", val: "0", icon: "⚠️" },
+                  { label: "Rating", val: "N/A", icon: "⭐" },
+                ].map(stat => (
+                  <div key={stat.label} style={{ padding: "12px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 10, textAlign: "center", border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                    <div style={{ fontSize: 18, marginBottom: 4 }}>{stat.icon}</div>
+                    <div style={{ fontSize: 18, fontWeight: 800, color: C.textPrimary, fontFamily: "'JetBrains Mono', monospace" }}>{stat.val}</div>
+                    <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1, marginTop: 2 }}>{stat.label}</div>
                   </div>
                 ))}
               </div>
             </GlowCard>
+          </div>
+        )}
 
-            {/* Holdings */}
-            <GlowCard style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>💎 Diamond Hands Holdings</div>
-              {WALLET_DATA.holdings.map((h, i) => (
-                <div key={h.symbol} style={{
-                  display: "grid", gridTemplateColumns: "40px 1fr auto auto", gap: 12, alignItems: "center",
-                  padding: "10px 0",
-                  borderBottom: i === WALLET_DATA.holdings.length - 1 ? "none" : "1px solid rgba(255, 255, 255, 0.03)",
-                }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${C.primary}30, ${C.accent}30)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: "#fff", fontFamily: "'JetBrains Mono', monospace" }}>{h.symbol}</div>
-                  <div>
-                    <div style={{ fontSize: 14, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace" }}>{h.amount} {h.symbol}</div>
-                    <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>Held {h.held}</div>
-                  </div>
-                  <div style={{ textAlign: "right", fontSize: 14, fontWeight: 700, color: "#10b981", fontFamily: "'JetBrains Mono', monospace" }}>${h.value.toLocaleString()}</div>
-                  <Pill text="💎 HODLER" color="#10b981" />
-                </div>
-              ))}
-            </GlowCard>
 
-            {/* Notable activity */}
-            <GlowCard style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>🏆 On-Chain Notable Activity</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {WALLET_DATA.notableActivity.map((act, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 10, border: `1px solid ${act.signal === "diamond" ? "rgba(16, 185, 129, 0.2)" : "rgba(212, 255, 0, 0.12)"}` }}>
-                    <span style={{ fontSize: 20 }}>{act.signal === "diamond" ? "💎" : "🏅"}</span>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600 }}>{act.event}</div>
-                      <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 2 }}>{act.date}</div>
-                    </div>
-                    <Pill text={act.signal === "diamond" ? "DIAMOND HANDS" : "OG"} color={act.signal === "diamond" ? "#10b981" : C.accent} />
+        {/* ─── JOBS / HANDSHAKE TAB ────────────────────────── */}
+        {tab === "jobs" && (
+          <div>
+            {/* Hero */}
+            <div style={{ textAlign: "center", marginBottom: 32 }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 20, background: "rgba(212, 255, 0, 0.06)", border: "1px solid rgba(212, 255, 0, 0.2)", marginBottom: 16 }}>
+                <span style={{ fontSize: 12 }}>🤝</span>
+                <span style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700 }}>Handshake · Beta</span>
+              </div>
+              <h1 style={{ fontSize: 42, fontWeight: 900, margin: 0, letterSpacing: -1.5, lineHeight: 1.1 }}>
+                Hire or get hired.<br />
+                <span style={{ color: C.primary }}>On CT. Trust-verified.</span>
+              </h1>
+              <p style={{ color: C.textSecondary, fontSize: 15, marginTop: 16, maxWidth: 560, margin: "16px auto 0", lineHeight: 1.5 }}>
+                Post jobs or apply to them. Trust Score gatekeeps scammers. Public on-chain handshakes make commitments real. Escrow coming in V2.
+              </p>
+
+              {/* How it works strip */}
+              <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: 24, flexWrap: "wrap" }}>
+                {[
+                  { icon: "📝", label: "Post or apply" },
+                  { icon: "🤝", label: "Sign handshake" },
+                  { icon: "✅", label: "Deliver work" },
+                  { icon: "⭐", label: "Build reputation" },
+                ].map(step => (
+                  <div key={step.label} style={{ padding: "6px 12px", borderRadius: 16, background: "rgba(255, 255, 255, 0.04)", border: "1px solid rgba(255, 255, 255, 0.08)", fontSize: 11, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", display: "flex", alignItems: "center", gap: 6 }}>
+                    <span>{step.icon}</span>
+                    <span>{step.label}</span>
                   </div>
                 ))}
               </div>
-            </GlowCard>
+            </div>
 
-            {/* Protocols used */}
-            <GlowCard style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>🔗 Active Protocols</div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {WALLET_DATA.protocols.map(p => (
-                  <div key={p} style={{
-                    padding: "8px 14px", background: `linear-gradient(135deg, ${C.primary}12, ${C.accent}12)`,
-                    border: `1px solid ${C.primary}30`, borderRadius: 10,
-                    fontSize: 13, fontWeight: 600, color: C.textPrimary, fontFamily: "'JetBrains Mono', monospace",
-                  }}>{p}</div>
-                ))}
-              </div>
-            </GlowCard>
-
-            {/* Vouches — Web of Trust */}
-            <GlowCard>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            {/* V1 Beta disclaimer */}
+            <GlowCard style={{ marginBottom: 24, padding: "16px 20px", background: "rgba(245, 158, 11, 0.04)", border: "1px solid rgba(245, 158, 11, 0.2)" }}>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                <span style={{ fontSize: 20 }}>⚠️</span>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>🤝 Web of Trust · Vouches</div>
-                  <div style={{ fontSize: 12, color: C.textMuted, marginTop: 2 }}>Vouches weighted by voucher's own Trust Score</div>
-                </div>
-                <button style={{
-                  padding: "8px 16px", borderRadius: 8, border: `1px solid ${C.primary}40`,
-                  background: `${C.primary}15`, color: C.primary,
-                  fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 600, cursor: "pointer",
-                }}>+ Vouch</button>
-              </div>
-
-              {VOUCHES.map((v, i) => (
-                <div key={v.handle} style={{
-                  display: "grid", gridTemplateColumns: "auto 1fr auto", gap: 12, alignItems: "center",
-                  padding: "12px 0",
-                  borderBottom: i === VOUCHES.length - 1 ? "none" : "1px solid rgba(255, 255, 255, 0.03)",
-                }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 10, background: `linear-gradient(135deg, hsl(0, 0%, ${25 + i * 5}%), hsl(0, 0%, ${12 + i * 3}%))`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 800, color: "#fff" }}>{v.handle[1].toUpperCase()}</div>
-                  <div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <span style={{ fontSize: 14, fontWeight: 700 }}>{v.handle}</span>
-                      <Pill text={`Score ${v.score}`} color={v.score >= 90 ? "#10b981" : "#34d399"} />
-                    </div>
-                    <div style={{ fontSize: 11, color: C.textMuted, marginTop: 2, fontFamily: "'JetBrains Mono', monospace" }}>"{v.reason}" · {v.vouchedAt}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#fbbf24", marginBottom: 4, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>V1 — Handshake Mode (No Custody)</div>
+                  <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.6 }}>
+                    CT Trust doesn't hold funds yet. V1 uses <strong style={{ color: C.primary }}>on-chain handshakes</strong> — both parties sign a public commitment. Trust scores + community reputation enforce delivery. Multisig escrow (V2) and smart contract escrow (V3) coming soon.
                   </div>
-                  <Pill text={v.weight === "high" ? "HIGH WEIGHT" : "MEDIUM"} color={v.weight === "high" ? C.accent : C.textMuted} />
                 </div>
-              ))}
+              </div>
+            </GlowCard>
 
-              <div style={{ marginTop: 16, padding: "12px 14px", background: "rgba(255, 255, 255, 0.03)", borderRadius: 8, fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.5 }}>
-                ℹ️ Vouchers stake their reputation. If a vouchee is later flagged as a bot, the voucher's Trust Score decays. Mutual vouches weighted less to prevent gaming.
+            {/* Top action bar */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                {JOB_CATEGORIES.map(cat => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setJobsFilter(cat.id)}
+                    style={{
+                      padding: "7px 14px", borderRadius: 10, border: "none",
+                      background: jobsFilter === cat.id ? "rgba(212, 255, 0, 0.12)" : "rgba(0, 0, 0, 0.5)",
+                      color: jobsFilter === cat.id ? C.primary : C.textMuted,
+                      fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 600,
+                      cursor: "pointer", letterSpacing: 0.5, transition: "all 0.2s",
+                      border: `1px solid ${jobsFilter === cat.id ? `${C.primary}40` : "rgba(255, 255, 255, 0.06)"}`,
+                      display: "flex", alignItems: "center", gap: 6,
+                    }}
+                  >
+                    <span>{cat.icon}</span>
+                    <span>{cat.label}</span>
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => setShowPostJob(true)}
+                style={{
+                  padding: "10px 20px", borderRadius: 10, border: "none",
+                  background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+                  color: "#000", fontSize: 12, fontWeight: 900,
+                  fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+                  letterSpacing: 0.3, transition: "all 0.2s",
+                  boxShadow: "0 0 20px rgba(212, 255, 0, 0.2)",
+                  whiteSpace: "nowrap",
+                }}
+                onMouseEnter={e => e.currentTarget.style.transform = "translateY(-1px)"}
+                onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
+              >+ Post a Job</button>
+            </div>
+
+            {/* Jobs grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 14, marginBottom: 40 }}>
+              {MOCK_JOBS
+                .filter(j => jobsFilter === "all" || j.category === jobsFilter)
+                .map(job => {
+                  const statusColor = job.status === "open" ? "#10b981" : job.status === "in_progress" ? "#fbbf24" : C.textMuted;
+                  const statusLabel = job.status === "open" ? "OPEN" : job.status === "in_progress" ? "IN PROGRESS" : "COMPLETED";
+                  const posterColor = job.posterTrust >= 85 ? "#10b981" : job.posterTrust >= 70 ? "#34d399" : job.posterTrust >= 55 ? "#fbbf24" : "#f97316";
+                  return (
+                    <div
+                      key={job.id}
+                      onClick={() => setSelectedJob(job)}
+                      style={{
+                        padding: 20, borderRadius: 14,
+                        background: "rgba(18, 18, 18, 0.7)",
+                        border: "1px solid rgba(255, 255, 255, 0.06)",
+                        cursor: "pointer", transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+                        display: "flex", flexDirection: "column", gap: 12,
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(212, 255, 0, 0.3)"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.background = "rgba(25, 25, 25, 0.9)"; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.06)"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.background = "rgba(18, 18, 18, 0.7)"; }}
+                    >
+                      {/* Top row: status + category */}
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                          <span style={{ width: 6, height: 6, borderRadius: "50%", background: statusColor, boxShadow: `0 0 8px ${statusColor}` }} />
+                          <span style={{ fontSize: 9, color: statusColor, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, letterSpacing: 1.5 }}>{statusLabel}</span>
+                        </div>
+                        <span style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>{job.postedAgo}</span>
+                      </div>
+
+                      {/* Title + budget */}
+                      <div>
+                        <div style={{ fontSize: 15, fontWeight: 800, lineHeight: 1.3, marginBottom: 8 }}>{job.title}</div>
+                        <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                          <span style={{ fontSize: 24, fontWeight: 900, color: C.primary, fontFamily: "'JetBrains Mono', monospace", letterSpacing: -0.5 }}>${job.budget.toLocaleString()}</span>
+                          <span style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>{job.budgetCurrency} · {job.deadline}</span>
+                        </div>
+                      </div>
+
+                      {/* Poster info */}
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 10px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <div style={{ width: 24, height: 24, borderRadius: 6, background: "linear-gradient(135deg, #333, #111)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 900, color: "#fff" }}>{job.poster[1].toUpperCase()}</div>
+                          <span style={{ fontSize: 12, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace" }}>{job.poster}</span>
+                          {job.posterVerified && <span style={{ fontSize: 11, color: C.accent }}>✓</span>}
+                        </div>
+                        <div style={{ padding: "3px 8px", borderRadius: 6, background: `${posterColor}15`, border: `1px solid ${posterColor}40`, fontFamily: "'JetBrains Mono', monospace", fontSize: 10, fontWeight: 800, color: posterColor }}>{job.posterTrust}</div>
+                      </div>
+
+                      {/* Bottom: proposals + min trust */}
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
+                        <span>📬 {job.proposals} proposals</span>
+                        <span>🛡️ Min trust: {job.minTrustScore}</span>
+                      </div>
+
+                      {/* Tags */}
+                      <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
+                        {job.tags.map(tag => (
+                          <span key={tag} style={{ padding: "3px 8px", borderRadius: 6, background: "rgba(212, 255, 0, 0.05)", border: "1px solid rgba(212, 255, 0, 0.15)", fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace" }}>#{tag}</span>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+
+            {/* Empty state message if no jobs match filter */}
+            {MOCK_JOBS.filter(j => jobsFilter === "all" || j.category === jobsFilter).length === 0 && (
+              <div style={{ textAlign: "center", padding: "40px 20px", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
+                No jobs in this category yet. Try "All" or <span style={{ color: C.primary, cursor: "pointer" }} onClick={() => setShowPostJob(true)}>post the first one →</span>
+              </div>
+            )}
+
+            {/* How Handshake Works card */}
+            <GlowCard glow style={{ marginBottom: 20, padding: "28px" }}>
+              <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 14 }}>🤝 How Handshake Works</div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14 }}>
+                {[
+                  { n: "1", title: "Post or Apply", desc: "Companies post jobs with budget, deadline, and minimum trust score. Applicants send proposals with their CT Trust credentials attached." },
+                  { n: "2", title: "Sign Handshake", desc: "Both parties sign a public commitment on Solana — free, gasless. Terms become tamper-proof and publicly verifiable." },
+                  { n: "3", title: "Work & Deliver", desc: "Worker delivers per the agreed deliverables. Buyer reviews. Both parties mark the handshake as complete." },
+                  { n: "4", title: "Reputation Compounds", desc: "Successful handshakes boost both parties' trust scores. Disputes get arbitrated publicly by the community." },
+                ].map(step => (
+                  <div key={step.n}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                      <div style={{ width: 24, height: 24, borderRadius: 7, background: "rgba(212, 255, 0, 0.1)", border: `1px solid ${C.primary}40`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: C.primary, fontFamily: "'JetBrains Mono', monospace" }}>{step.n}</div>
+                      <span style={{ fontSize: 13, fontWeight: 800 }}>{step.title}</span>
+                    </div>
+                    <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.5, marginLeft: 32 }}>{step.desc}</div>
+                  </div>
+                ))}
               </div>
             </GlowCard>
           </div>
@@ -2801,53 +2728,26 @@ export default function HandleMarket() {
         )}
       </div>
 
-      {/* ─── LISTING DETAIL MODAL ───────────────────────────── */}
-      {selectedListing && (() => {
-        const tColor = selectedListing.trustScore >= 85 ? "#10b981" : selectedListing.trustScore >= 70 ? "#34d399" : selectedListing.trustScore >= 55 ? "#fbbf24" : "#f97316";
-        // Calculate full trust analysis for this listing
-        const engRate = parseFloat(selectedListing.engagement);
-        const ageYears = parseInt(selectedListing.age) || 1;
-        const estimatedAvgLikes = Math.round(selectedListing.followers * (engRate / 100) * 0.75);
-        const estimatedReplies = Math.round(estimatedAvgLikes * 0.12);
-        const estimatedRetweets = Math.round(estimatedAvgLikes * 0.18);
-        const listingTrust = calculateTrustScore({
-          followers: selectedListing.followers,
-          following: Math.round(selectedListing.followers / 8),
-          avgLikes: estimatedAvgLikes,
-          avgRetweets: estimatedRetweets,
-          avgReplies: estimatedReplies,
-          tweets: ageYears * 365 * 0.8,
-          accountAgeDays: ageYears * 365,
-          verified: selectedListing.verified,
-          cryptoNiche: true,
-        });
-        // Also calculate valuation breakdown
-        const listingVal = estimateValue({
-          followers: selectedListing.followers,
-          avgLikes: estimatedAvgLikes,
-          avgRetweets: estimatedRetweets,
-          avgReplies: estimatedReplies,
-          tweets: ageYears * 365 * 0.8,
-          accountAgeDays: ageYears * 365,
-          verified: selectedListing.verified,
-          cryptoNiche: true,
-        });
+      {/* ─── JOB DETAIL MODAL ─────────────────────────────── */}
+      {selectedJob && (() => {
+        const posterColor = selectedJob.posterTrust >= 85 ? "#10b981" : selectedJob.posterTrust >= 70 ? "#34d399" : selectedJob.posterTrust >= 55 ? "#fbbf24" : "#f97316";
+        const statusColor = selectedJob.status === "open" ? "#10b981" : selectedJob.status === "in_progress" ? "#fbbf24" : C.textMuted;
+        const statusLabel = selectedJob.status === "open" ? "OPEN" : selectedJob.status === "in_progress" ? "IN PROGRESS" : "COMPLETED";
         return (
           <div
-            onClick={() => setSelectedListing(null)}
+            onClick={() => { setSelectedJob(null); setProposalText(""); }}
             style={{
               position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.85)",
               backdropFilter: "blur(8px)", zIndex: 100,
               display: "flex", alignItems: "flex-start", justifyContent: "center",
-              padding: "40px 20px", overflowY: "auto",
-              animation: "fadeIn 0.2s ease-out",
+              padding: "40px 20px", overflowY: "auto", animation: "fadeIn 0.2s ease-out",
             }}
           >
             <style>{`@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }`}</style>
             <div
               onClick={e => e.stopPropagation()}
               style={{
-                maxWidth: 720, width: "100%",
+                maxWidth: 680, width: "100%",
                 background: "rgba(10, 10, 10, 0.98)",
                 border: `1px solid ${C.borderHover}`,
                 borderRadius: 20, padding: 0,
@@ -2855,225 +2755,146 @@ export default function HandleMarket() {
                 overflow: "hidden",
               }}
             >
-              {/* Header banner */}
-              <div style={{ padding: "24px 28px", borderBottom: `1px solid ${C.border}`, background: `linear-gradient(135deg, rgba(212, 255, 0, 0.04), transparent)`, display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                  <div style={{
-                    width: 56, height: 56, borderRadius: 14,
-                    background: `linear-gradient(135deg, hsl(0, 0%, ${25 + selectedListing.id * 4}%), hsl(0, 0%, ${12 + selectedListing.id * 2}%))`,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 22, fontWeight: 900, color: "#fff",
-                  }}>{selectedListing.handle[1].toUpperCase()}</div>
-                  <div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                      <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5 }}>{selectedListing.handle}</span>
-                      {selectedListing.verified && <Pill text="✓ Verified" color={C.accent} />}
-                    </div>
-                    <div style={{ fontSize: 12, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 4 }}>{selectedListing.niche} · Tracked since 94d ago</div>
+              {/* Header */}
+              <div style={{ padding: "24px 28px", borderBottom: `1px solid ${C.border}`, background: `linear-gradient(135deg, rgba(212, 255, 0, 0.04), transparent)`, display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: statusColor, boxShadow: `0 0 8px ${statusColor}` }} />
+                    <span style={{ fontSize: 9, color: statusColor, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, letterSpacing: 1.5 }}>{statusLabel}</span>
+                    <span style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>· {selectedJob.category}</span>
                   </div>
+                  <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: -0.5, lineHeight: 1.2 }}>{selectedJob.title}</div>
+                  <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 6 }}>Posted {selectedJob.postedAgo} · {selectedJob.proposals} proposals</div>
                 </div>
-                <button onClick={() => setSelectedListing(null)} style={{
+                <button onClick={() => { setSelectedJob(null); setProposalText(""); }} style={{
                   width: 32, height: 32, borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.08)",
                   background: "rgba(0, 0, 0, 0.5)", color: C.textSecondary,
-                  fontSize: 16, cursor: "pointer", fontFamily: "'Outfit', sans-serif",
+                  fontSize: 16, cursor: "pointer", fontFamily: "'Outfit', sans-serif", flexShrink: 0,
                 }}>✕</button>
               </div>
 
-              {/* Hero price + valuation comparison */}
-              <div style={{ padding: "28px", borderBottom: `1px solid ${C.border}`, background: `linear-gradient(180deg, rgba(212, 255, 0, 0.02), transparent)` }}>
-                <div style={{ textAlign: "center", marginBottom: 16 }}>
-                  <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 6 }}>Asking Price</div>
-                  <div style={{ fontSize: 56, fontWeight: 900, color: C.primary, letterSpacing: -2, fontFamily: "'JetBrains Mono', monospace" }}>${selectedListing.value.toLocaleString()}</div>
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
-                  <div style={{ padding: "10px 8px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 8, textAlign: "center", border: "1px solid rgba(255, 255, 255, 0.04)" }}>
-                    <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8 }}>HM Est. Value</div>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: C.textPrimary, marginTop: 3, fontFamily: "'JetBrains Mono', monospace" }}>${listingVal.estimatedValue.toLocaleString()}</div>
-                  </div>
-                  <div style={{ padding: "10px 8px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 8, textAlign: "center", border: "1px solid rgba(255, 255, 255, 0.04)" }}>
-                    <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8 }}>Price vs Est.</div>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: selectedListing.value > listingVal.estimatedValue * 1.1 ? "#ef4444" : selectedListing.value < listingVal.estimatedValue * 0.9 ? "#10b981" : C.textPrimary, marginTop: 3, fontFamily: "'JetBrains Mono', monospace" }}>
-                      {selectedListing.value > listingVal.estimatedValue ? "+" : ""}{Math.round((selectedListing.value - listingVal.estimatedValue) / listingVal.estimatedValue * 100)}%
-                    </div>
-                  </div>
-                  <div style={{ padding: "10px 8px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 8, textAlign: "center", border: "1px solid rgba(255, 255, 255, 0.04)" }}>
-                    <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8 }}>$/1k Followers</div>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: C.textPrimary, marginTop: 3, fontFamily: "'JetBrains Mono', monospace" }}>${Math.round(selectedListing.value / selectedListing.followers * 1000)}</div>
-                  </div>
-                </div>
+              {/* Hero Budget */}
+              <div style={{ padding: "24px 28px", textAlign: "center", borderBottom: `1px solid ${C.border}` }}>
+                <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 6 }}>Budget</div>
+                <div style={{ fontSize: 52, fontWeight: 900, color: C.primary, letterSpacing: -2, fontFamily: "'JetBrains Mono', monospace" }}>${selectedJob.budget.toLocaleString()}</div>
+                <div style={{ fontSize: 12, color: C.textMuted, marginTop: 6, fontFamily: "'JetBrains Mono', monospace" }}>{selectedJob.budgetCurrency} · Deadline: {selectedJob.deadline}</div>
               </div>
 
-              {/* Account stats grid */}
               <div style={{ padding: "24px 28px" }}>
-                <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 12 }}>📊 Account Stats</div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 24 }}>
-                  {[
-                    ["Followers", selectedListing.followers.toLocaleString()],
-                    ["Engagement", selectedListing.engagement],
-                    ["Age", selectedListing.age],
-                    ["Avg Likes", estimatedAvgLikes.toLocaleString()],
-                  ].map(([l, v]) => (
-                    <div key={l} style={{ padding: "12px 8px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 10, textAlign: "center", border: "1px solid rgba(255, 255, 255, 0.04)" }}>
-                      <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8 }}>{l}</div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: C.textPrimary, marginTop: 4, fontFamily: "'JetBrains Mono', monospace" }}>{v}</div>
+                {/* Description */}
+                <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>📝 Description</div>
+                <div style={{ padding: "14px 16px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 10, marginBottom: 20, fontSize: 13, color: C.textSecondary, lineHeight: 1.6, border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                  {selectedJob.description}
+                </div>
+
+                {/* Deliverables */}
+                <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>✅ Deliverables</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 20 }}>
+                  {selectedJob.deliverables.map((item, i) => (
+                    <div key={i} style={{ padding: "10px 12px", background: "rgba(16, 185, 129, 0.04)", border: "1px solid rgba(16, 185, 129, 0.15)", borderRadius: 8, display: "flex", alignItems: "center", gap: 10 }}>
+                      <span style={{ color: "#10b981", fontWeight: 900 }}>✓</span>
+                      <span style={{ fontSize: 12, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace" }}>{item}</span>
                     </div>
                   ))}
                 </div>
 
-                {/* Trust Score Hero */}
-                <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>🛡️ Trust Assessment</div>
-                <div style={{ padding: "18px 20px", background: `${tColor}08`, border: `1px solid ${tColor}30`, borderRadius: 12, marginBottom: 14 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                    <div>
-                      <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 }}>Trust Score</div>
-                      <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-                        <span style={{ fontSize: 36, fontWeight: 900, color: tColor, letterSpacing: -1, fontFamily: "'JetBrains Mono', monospace" }}>{selectedListing.trustScore}</span>
-                        <span style={{ fontSize: 12, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>/ 100</span>
-                      </div>
-                    </div>
-                    <div style={{
-                      padding: "8px 14px", borderRadius: 10,
-                      background: `${tColor}15`, border: `1px solid ${tColor}40`,
-                      fontFamily: "'JetBrains Mono', monospace", fontSize: 12, fontWeight: 800,
-                      color: tColor, letterSpacing: 1.5,
-                    }}>{selectedListing.trustLabel}</div>
-                  </div>
-
-                  {/* Bot estimate */}
-                  <div style={{ padding: "10px 12px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 8, marginBottom: 12 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-                      <span style={{ fontSize: 10, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>Estimated Bot Followers</span>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: listingTrust.estimatedBotPct > 30 ? "#ef4444" : listingTrust.estimatedBotPct > 15 ? "#f59e0b" : "#10b981", fontFamily: "'JetBrains Mono', monospace" }}>
-                        {listingTrust.estimatedBotPct}%
-                      </span>
-                    </div>
-                    <div style={{ height: 4, background: "rgba(255, 255, 255, 0.05)", borderRadius: 2, overflow: "hidden" }}>
-                      <div style={{
-                        height: "100%", width: `${listingTrust.estimatedBotPct}%`,
-                        background: `linear-gradient(90deg, ${listingTrust.estimatedBotPct > 30 ? "#ef4444" : listingTrust.estimatedBotPct > 15 ? "#f59e0b" : "#10b981"}, ${listingTrust.estimatedBotPct > 30 ? "#dc2626" : listingTrust.estimatedBotPct > 15 ? "#f97316" : "#059669"})`,
-                      }} />
-                    </div>
-                  </div>
-
-                  {/* Signal breakdown */}
-                  <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 8 }}>Authenticity Signals</div>
-                  <ScoreBar label="Follow Ratio" score={listingTrust.breakdown.followRatio} color="#10b981" />
-                  <ScoreBar label="Engagement Quality" score={listingTrust.breakdown.engagementQuality} color="#06b6d4" />
-                  <ScoreBar label="Conversations" score={listingTrust.breakdown.conversation} color="#a855f7" />
-                  <ScoreBar label="Activity Pattern" score={listingTrust.breakdown.activity} color="#f59e0b" />
-                  <ScoreBar label="Verification" score={listingTrust.breakdown.verification} color="#ec4899" />
+                {/* Requirements */}
+                <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>🛡️ Requirements</div>
+                <div style={{ padding: "12px 14px", background: "rgba(212, 255, 0, 0.04)", border: "1px solid rgba(212, 255, 0, 0.15)", borderRadius: 8, fontSize: 12, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", marginBottom: 20, lineHeight: 1.6 }}>
+                  Applicants must have a CT Trust Score of <strong style={{ color: C.primary }}>{selectedJob.minTrustScore}+</strong> to submit a proposal.
                 </div>
 
-                {/* Why this score — flags */}
-                {(listingTrust.redFlags.length > 0 || listingTrust.greenFlags.length > 0) && (
-                  <div style={{ marginBottom: 20 }}>
-                    <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>🔍 Why This Score?</div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                      {listingTrust.greenFlags.map((flag, i) => (
-                        <div key={`g-${i}`} style={{ padding: "10px 12px", background: "rgba(16, 185, 129, 0.06)", border: "1px solid rgba(16, 185, 129, 0.2)", borderRadius: 8, display: "flex", alignItems: "center", gap: 10 }}>
-                          <span style={{ fontSize: 14 }}>✅</span>
-                          <span style={{ fontSize: 12, color: "#6ee7b7", fontFamily: "'JetBrains Mono', monospace" }}>{flag}</span>
-                        </div>
-                      ))}
-                      {listingTrust.redFlags.map((flag, i) => (
-                        <div key={`r-${i}`} style={{ padding: "10px 12px", background: "rgba(239, 68, 68, 0.06)", border: "1px solid rgba(239, 68, 68, 0.2)", borderRadius: 8, display: "flex", alignItems: "center", gap: 10 }}>
-                          <span style={{ fontSize: 14 }}>🚩</span>
-                          <span style={{ fontSize: 12, color: "#fca5a5", fontFamily: "'JetBrains Mono', monospace" }}>{flag}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Valuation breakdown */}
-                <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>💰 Valuation Breakdown</div>
-                <div style={{ padding: "14px 16px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 10, marginBottom: 20, border: "1px solid rgba(255, 255, 255, 0.04)" }}>
-                  <div style={{ fontSize: 11, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", marginBottom: 10, lineHeight: 1.5 }}>Score out of 100 for each valuation signal:</div>
-                  <ScoreBar label="Followers Weight" score={listingVal.breakdown.followers} color={C.primary} />
-                  <ScoreBar label="Engagement Weight" score={listingVal.breakdown.engagement} color="#06b6d4" />
-                  <ScoreBar label="Account Age" score={listingVal.breakdown.accountAge} color="#a855f7" />
-                  <ScoreBar label="Tweet Volume" score={listingVal.breakdown.tweetVolume} color="#f59e0b" />
-                  <ScoreBar label="Verification" score={listingVal.breakdown.verification} color="#ec4899" />
-                  <ScoreBar label="CT Niche" score={listingVal.breakdown.nicheRelevance} color="#fb923c" />
-                  <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid rgba(255, 255, 255, 0.05)", fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.5 }}>
-                    💡 Estimated projected earnings: <strong style={{ color: C.textPrimary }}>~${listingVal.monthlyEarnings}/mo</strong> based on engagement and reach. Total valuation = projected earnings × {selectedListing.verified ? "18" : "12"} months × CT niche premium.
-                  </div>
-                </div>
-
-                {/* Seller info */}
-                <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>👤 Seller</div>
+                {/* Job Poster */}
+                <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>👤 Posted By</div>
                 <div style={{ padding: "14px 16px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 10, marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between", border: "1px solid rgba(255, 255, 255, 0.04)" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg, #333, #111)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 900, color: "#fff" }}>OG</div>
+                    <div style={{ width: 36, height: 36, borderRadius: 9, background: "linear-gradient(135deg, #333, #111)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, color: "#fff" }}>{selectedJob.poster[1].toUpperCase()}</div>
                     <div>
-                      <div style={{ fontSize: 13, fontWeight: 700 }}>@OGTrader</div>
-                      <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 1 }}>47 sales · 0% disputes · Avg transfer 4h</div>
+                      <div style={{ fontSize: 14, fontWeight: 700, display: "flex", alignItems: "center", gap: 6 }}>
+                        {selectedJob.poster}
+                        {selectedJob.posterVerified && <span style={{ fontSize: 12, color: C.accent }}>✓</span>}
+                      </div>
+                      <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 2 }}>3 jobs posted · 2 completed · 0 disputes</div>
                     </div>
                   </div>
-                  <Pill text="Score 98" color="#10b981" />
+                  <div style={{ textAlign: "center" }}>
+                    <div style={{ padding: "4px 10px", borderRadius: 8, background: `${posterColor}15`, border: `1px solid ${posterColor}40`, fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 800, color: posterColor }}>Trust {selectedJob.posterTrust}</div>
+                  </div>
                 </div>
 
-                {/* Description */}
-                <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>📝 About This Account</div>
-                <div style={{ padding: "14px 16px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 10, marginBottom: 20, fontSize: 13, color: C.textSecondary, lineHeight: 1.6, border: "1px solid rgba(255, 255, 255, 0.04)" }}>
-                  Established {selectedListing.niche} account with strong organic engagement. Original email included in transfer. Clean history with no bans or warnings. Serious buyers only. Escrow required — no exceptions.
-                </div>
-
-                {/* What's included */}
-                <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>✅ What's Included</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 24 }}>
-                  {["Full account credentials + email access", "Linked phone number removal", "24h transfer window via escrow", "All listed stats verified by HandleMarket"].map(item => (
-                    <div key={item} style={{ fontSize: 12, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", display: "flex", gap: 8, alignItems: "center" }}>
-                      <span style={{ color: C.primary }}>✓</span>
-                      <span>{item}</span>
-                    </div>
+                {/* Tags */}
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 24 }}>
+                  {selectedJob.tags.map(tag => (
+                    <span key={tag} style={{ padding: "4px 10px", borderRadius: 6, background: "rgba(212, 255, 0, 0.05)", border: "1px solid rgba(212, 255, 0, 0.15)", fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace" }}>#{tag}</span>
                   ))}
                 </div>
 
-                {/* Action buttons */}
-                <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 10 }}>
-                  <button style={{
-                    padding: "14px 20px", borderRadius: 12, border: "none",
-                    background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
-                    color: "#000", fontSize: 14, fontWeight: 900,
-                    fontFamily: "'Outfit', sans-serif", cursor: "pointer",
-                    letterSpacing: 0.3, transition: "all 0.2s",
-                  }}
-                    onMouseEnter={e => e.currentTarget.style.transform = "translateY(-1px)"}
-                    onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
-                  >💰 Buy via Escrow</button>
-                  <button style={{
-                    padding: "14px 20px", borderRadius: 12, border: `1px solid ${C.primary}40`,
-                    background: "rgba(212, 255, 0, 0.06)", color: C.primary,
-                    fontFamily: "'JetBrains Mono', monospace", fontSize: 12, fontWeight: 700,
-                    cursor: "pointer",
-                  }}>💬 Make Offer</button>
-                </div>
+                {/* Submit Proposal */}
+                {selectedJob.status === "open" && (
+                  <>
+                    <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>📬 Submit Proposal</div>
+                    <textarea
+                      value={proposalText}
+                      onChange={e => setProposalText(e.target.value)}
+                      placeholder="Why are you right for this job? Include relevant work, timelines, and what makes you trustworthy. Your CT Trust Score will be auto-attached."
+                      style={{
+                        width: "100%", minHeight: 100, padding: "12px 14px",
+                        background: "rgba(0, 0, 0, 0.9)",
+                        border: "1px solid rgba(255, 255, 255, 0.12)",
+                        borderRadius: 10, color: C.textPrimary,
+                        fontFamily: "'JetBrains Mono', monospace", fontSize: 12,
+                        resize: "vertical", outline: "none", marginBottom: 12,
+                        transition: "border 0.2s",
+                      }}
+                      onFocus={e => e.target.style.borderColor = C.primary}
+                      onBlur={e => e.target.style.borderColor = "rgba(255, 255, 255, 0.12)"}
+                    />
+                    <button
+                      disabled={!proposalText.trim()}
+                      style={{
+                        width: "100%", padding: "14px 20px", borderRadius: 12, border: "none",
+                        background: !proposalText.trim() ? "rgba(255, 255, 255, 0.05)" : `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+                        color: !proposalText.trim() ? C.textMuted : "#000",
+                        fontSize: 14, fontWeight: 900,
+                        fontFamily: "'Outfit', sans-serif",
+                        cursor: !proposalText.trim() ? "not-allowed" : "pointer",
+                        letterSpacing: 0.3, transition: "all 0.2s",
+                      }}
+                    >🤝 Sign Handshake & Submit</button>
 
-                <div style={{ marginTop: 14, padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 8, fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.5, textAlign: "center" }}>
-                  🔒 All transactions protected by HandleMarket escrow. Funds held until transfer verified.
-                </div>
+                    <div style={{ marginTop: 14, padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 8, fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.5, textAlign: "center" }}>
+                      🤝 Submitting creates a free on-chain commitment. If selected, both parties sign a public handshake. Trust scores enforce delivery.
+                    </div>
+                  </>
+                )}
+
+                {selectedJob.status === "in_progress" && (
+                  <div style={{ padding: "16px 18px", background: "rgba(251, 191, 36, 0.06)", border: "1px solid rgba(251, 191, 36, 0.2)", borderRadius: 10, textAlign: "center" }}>
+                    <div style={{ fontSize: 13, color: "#fbbf24", fontWeight: 800, marginBottom: 4 }}>Already in progress</div>
+                    <div style={{ fontSize: 11, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.5 }}>This job has an active handshake. Check back when it's complete to see the outcome.</div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         );
       })()}
 
-      {/* ─── LIST YOUR ACCOUNT MODAL ────────────────────────── */}
-      {showListForm && (
+      {/* ─── POST A JOB MODAL ─────────────────────────────── */}
+      {showPostJob && (
         <div
-          onClick={() => { if (!listSubmitted) setShowListForm(false); }}
+          onClick={() => setShowPostJob(false)}
           style={{
             position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.85)",
             backdropFilter: "blur(8px)", zIndex: 100,
             display: "flex", alignItems: "flex-start", justifyContent: "center",
-            padding: "40px 20px", overflowY: "auto",
+            padding: "40px 20px", overflowY: "auto", animation: "fadeIn 0.2s ease-out",
           }}
         >
           <div
             onClick={e => e.stopPropagation()}
             style={{
-              maxWidth: 620, width: "100%",
+              maxWidth: 600, width: "100%",
               background: "rgba(10, 10, 10, 0.98)",
               border: `1px solid ${C.borderHover}`,
               borderRadius: 20, padding: 0,
@@ -3081,179 +2902,79 @@ export default function HandleMarket() {
               overflow: "hidden",
             }}
           >
-            {!listSubmitted ? (
-              <>
-                <div style={{ padding: "24px 28px", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div>
-                    <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.5 }}>List Your CT Account</div>
-                    <div style={{ fontSize: 12, color: C.textMuted, marginTop: 4, fontFamily: "'JetBrains Mono', monospace" }}>Your listing goes live instantly · No fees until sale</div>
-                  </div>
-                  <button onClick={() => setShowListForm(false)} style={{
-                    width: 32, height: 32, borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.08)",
-                    background: "rgba(0, 0, 0, 0.5)", color: C.textSecondary,
-                    fontSize: 16, cursor: "pointer",
-                  }}>✕</button>
+            <div style={{ padding: "24px 28px", borderBottom: `1px solid ${C.border}`, background: `linear-gradient(135deg, rgba(212, 255, 0, 0.04), transparent)`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <div style={{ fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>💼 New Job · Handshake Mode</div>
+                <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5 }}>Post a job on CT Trust</div>
+              </div>
+              <button onClick={() => setShowPostJob(false)} style={{
+                width: 32, height: 32, borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.08)",
+                background: "rgba(0, 0, 0, 0.5)", color: C.textSecondary,
+                fontSize: 16, cursor: "pointer", flexShrink: 0,
+              }}>✕</button>
+            </div>
+
+            <div style={{ padding: "24px 28px" }}>
+              {/* Coming Soon treatment */}
+              <div style={{ textAlign: "center", padding: "40px 20px" }}>
+                <div style={{ fontSize: 48, marginBottom: 16 }}>🚧</div>
+                <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 8, letterSpacing: -0.5 }}>Job posting opens soon</div>
+                <div style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.6, maxWidth: 400, margin: "0 auto 24px" }}>
+                  We're polishing the post flow before opening it up. In the meantime, you can browse open jobs and see how Handshake works.
                 </div>
 
-                <div style={{ padding: "24px 28px" }}>
-                  {/* X Handle */}
-                  <div style={{ marginBottom: 16 }}>
-                    <label style={labelStyle}>X / Twitter Handle *</label>
-                    <div style={{ position: "relative" }}>
-                      <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: C.textMuted, fontSize: 14, fontFamily: "'JetBrains Mono', monospace" }}>@</span>
-                      <input
-                        style={{ ...inputStyle, paddingLeft: 32 }} type="text" placeholder="FabsKebabs101"
-                        value={listForm.handle}
-                        onChange={e => setListForm({ ...listForm, handle: e.target.value })}
-                        onFocus={e => e.target.style.borderColor = C.primary}
-                        onBlur={e => e.target.style.borderColor = "rgba(255, 255, 255, 0.12)"}
-                      />
-                    </div>
-                    <div style={{ fontSize: 10, color: C.textMuted, marginTop: 6, fontFamily: "'JetBrains Mono', monospace" }}>We'll verify ownership via DM before listing goes live</div>
-                  </div>
-
-                  {/* Asking Price */}
-                  <div style={{ marginBottom: 16 }}>
-                    <label style={labelStyle}>Asking Price (USD) *</label>
-                    <div style={{ position: "relative" }}>
-                      <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: C.textMuted, fontSize: 14, fontFamily: "'JetBrains Mono', monospace" }}>$</span>
-                      <input
-                        style={{ ...inputStyle, paddingLeft: 30 }} type="number" placeholder="3500"
-                        value={listForm.askingPrice}
-                        onChange={e => setListForm({ ...listForm, askingPrice: e.target.value })}
-                        onFocus={e => e.target.style.borderColor = C.primary}
-                        onBlur={e => e.target.style.borderColor = "rgba(255, 255, 255, 0.12)"}
-                      />
-                    </div>
-                    <div style={{ fontSize: 10, color: C.textMuted, marginTop: 6, fontFamily: "'JetBrains Mono', monospace" }}>💡 Unsure? Get a free valuation first in the Valuate tab</div>
-                  </div>
-
-                  {/* Niche */}
-                  <div style={{ marginBottom: 16 }}>
-                    <label style={labelStyle}>Niche *</label>
-                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                      {["DeFi", "Solana", "NFTs", "Memecoin", "Bitcoin", "Ethereum", "Trading", "Alpha", "Analytics"].map(n => (
-                        <button key={n} type="button" onClick={() => setListForm({ ...listForm, niche: n })} style={{
-                          padding: "8px 14px", borderRadius: 8,
-                          border: `1px solid ${listForm.niche === n ? C.primary : "rgba(255, 255, 255, 0.08)"}`,
-                          background: listForm.niche === n ? "rgba(212, 255, 0, 0.12)" : "rgba(0, 0, 0, 0.5)",
-                          color: listForm.niche === n ? C.primary : C.textSecondary,
-                          fontSize: 11, fontWeight: 600, fontFamily: "'JetBrains Mono', monospace",
-                          cursor: "pointer", textTransform: "uppercase", letterSpacing: 0.5,
-                        }}>{n}</button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  <div style={{ marginBottom: 16 }}>
-                    <label style={labelStyle}>Description</label>
-                    <textarea
-                      placeholder="Tell buyers what makes this account valuable. Posting history, engagement patterns, notable followers, etc."
-                      value={listForm.description}
-                      onChange={e => setListForm({ ...listForm, description: e.target.value })}
-                      onFocus={e => e.target.style.borderColor = C.primary}
-                      onBlur={e => e.target.style.borderColor = "rgba(255, 255, 255, 0.12)"}
-                      style={{
-                        ...inputStyle, minHeight: 90, resize: "vertical",
-                        fontFamily: "'Outfit', sans-serif",
-                      }}
-                    />
-                  </div>
-
-                  {/* Contact method */}
-                  <div style={{ marginBottom: 16 }}>
-                    <label style={labelStyle}>Preferred Contact Method</label>
-                    <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
-                      {[["telegram", "Telegram"], ["dm", "X DM"], ["email", "Email"]].map(([val, lbl]) => (
-                        <button key={val} type="button" onClick={() => setListForm({ ...listForm, contactMethod: val })} style={{
-                          padding: "8px 14px", borderRadius: 8,
-                          border: `1px solid ${listForm.contactMethod === val ? C.primary : "rgba(255, 255, 255, 0.08)"}`,
-                          background: listForm.contactMethod === val ? "rgba(212, 255, 0, 0.12)" : "rgba(0, 0, 0, 0.5)",
-                          color: listForm.contactMethod === val ? C.primary : C.textSecondary,
-                          fontSize: 11, fontWeight: 600, fontFamily: "'JetBrains Mono', monospace",
-                          cursor: "pointer", flex: 1,
-                        }}>{lbl}</button>
-                      ))}
-                    </div>
-                    <input
-                      style={inputStyle} type="text"
-                      placeholder={listForm.contactMethod === "telegram" ? "@YourTelegram" : listForm.contactMethod === "dm" ? "@YourXHandle" : "you@email.com"}
-                      value={listForm.contactHandle}
-                      onChange={e => setListForm({ ...listForm, contactHandle: e.target.value })}
-                      onFocus={e => e.target.style.borderColor = C.primary}
-                      onBlur={e => e.target.style.borderColor = "rgba(255, 255, 255, 0.12)"}
-                    />
-                  </div>
-
-                  {/* Negotiable */}
-                  <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, color: C.textSecondary, marginBottom: 20 }}>
-                    <input type="checkbox" checked={listForm.negotiable} onChange={e => setListForm({ ...listForm, negotiable: e.target.checked })} style={{ accentColor: C.primary }} />
-                    Price is negotiable — allow buyers to make offers
-                  </label>
-
-                  {/* Info box */}
-                  <div style={{ padding: "12px 14px", background: "rgba(212, 255, 0, 0.04)", borderRadius: 8, border: "1px solid rgba(212, 255, 0, 0.12)", marginBottom: 20, fontSize: 11, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.5 }}>
-                    🔒 HandleMarket takes 2.5% commission on completed sales. All transactions go through escrow. Your listing will be live within 5 minutes of ownership verification.
-                  </div>
-
-                  {/* Submit */}
-                  <button
-                    onClick={() => setListSubmitted(true)}
-                    disabled={!listForm.handle || !listForm.askingPrice}
+                {/* Waitlist placeholder */}
+                <div style={{ display: "flex", gap: 8, maxWidth: 360, margin: "0 auto", flexWrap: "wrap" }}>
+                  <input
+                    type="email"
+                    placeholder="your@email.com"
                     style={{
-                      width: "100%", padding: "14px 20px", borderRadius: 12, border: "none",
-                      background: (!listForm.handle || !listForm.askingPrice) ? "rgba(255, 255, 255, 0.05)" : `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
-                      color: (!listForm.handle || !listForm.askingPrice) ? C.textMuted : "#000",
-                      fontSize: 14, fontWeight: 900,
-                      fontFamily: "'Outfit', sans-serif",
-                      cursor: (!listForm.handle || !listForm.askingPrice) ? "not-allowed" : "pointer",
-                      letterSpacing: 0.3,
+                      flex: 1, minWidth: 180, padding: "12px 14px",
+                      background: "rgba(0, 0, 0, 0.9)",
+                      border: "1px solid rgba(255, 255, 255, 0.12)",
+                      borderRadius: 10, color: C.textPrimary,
+                      fontFamily: "'JetBrains Mono', monospace", fontSize: 12,
+                      outline: "none",
                     }}
-                  >🚀 Submit Listing</button>
+                  />
+                  <button style={{
+                    padding: "12px 18px", borderRadius: 10, border: "none",
+                    background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+                    color: "#000", fontSize: 12, fontWeight: 900,
+                    fontFamily: "'Outfit', sans-serif", cursor: "pointer", letterSpacing: 0.3,
+                  }}>Notify Me</button>
                 </div>
-              </>
-            ) : (
-              <div style={{ padding: "48px 28px", textAlign: "center" }}>
-                <div style={{ fontSize: 56, marginBottom: 16 }}>🎉</div>
-                <div style={{ fontSize: 24, fontWeight: 900, marginBottom: 8 }}>Listing Submitted</div>
-                <div style={{ fontSize: 14, color: C.textSecondary, marginBottom: 24, maxWidth: 400, margin: "0 auto 24px" }}>
-                  We'll DM <span style={{ color: C.primary, fontFamily: "'JetBrains Mono', monospace" }}>@{listForm.handle}</span> within the next hour to verify account ownership. Once verified, your listing goes live instantly.
+                <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 16, letterSpacing: 1 }}>
+                  First 100 to signup get priority access + free featured listing
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 28 }}>
+              </div>
+
+              {/* What to expect */}
+              <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}>
+                <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 12 }}>What you'll be able to do</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {[
-                    ["Handle", `@${listForm.handle}`],
-                    ["Price", `$${parseInt(listForm.askingPrice).toLocaleString()}`],
-                    ["Niche", listForm.niche],
-                  ].map(([l, v]) => (
-                    <div key={l} style={{ padding: "12px 8px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.04)" }}>
-                      <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8 }}>{l}</div>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: C.textPrimary, marginTop: 3, fontFamily: "'JetBrains Mono', monospace" }}>{v}</div>
+                    "Post jobs with budget, deadline, and deliverables",
+                    "Set minimum Trust Score gate to filter applicants",
+                    "Review proposals with attached reputation data",
+                    "Sign public on-chain handshake with selected worker",
+                    "Release reputation rewards when work is completed",
+                  ].map((item, i) => (
+                    <div key={i} style={{ display: "flex", gap: 10, alignItems: "center", fontSize: 12, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace" }}>
+                      <span style={{ color: C.primary, fontWeight: 900 }}>→</span>
+                      <span>{item}</span>
                     </div>
                   ))}
                 </div>
-                <button
-                  onClick={() => {
-                    setShowListForm(false);
-                    setListSubmitted(false);
-                    setListForm({ handle: "", askingPrice: "", description: "", niche: "DeFi", contactMethod: "telegram", contactHandle: "", negotiable: true });
-                  }}
-                  style={{
-                    padding: "12px 32px", borderRadius: 12, border: "none",
-                    background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
-                    color: "#000", fontSize: 13, fontWeight: 900,
-                    fontFamily: "'Outfit', sans-serif", cursor: "pointer",
-                  }}
-                >Done</button>
               </div>
-            )}
+            </div>
           </div>
         </div>
       )}
 
       <div style={{ borderTop: "1px solid rgba(255, 255, 255, 0.05)", padding: "20px 24px", marginTop: 60, textAlign: "center" }}>
         <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
-          HandleMarket © 2026 · Valuations are estimates based on public metrics · Not financial advice
+          CT Trust © 2026 · Trust scores are estimates based on public metrics · Not financial advice
         </div>
       </div>
     </div>

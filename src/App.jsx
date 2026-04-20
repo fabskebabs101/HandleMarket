@@ -582,8 +582,9 @@ const LEADERBOARD_DATA = {
 // ─── PHASE 2: Sale History + Seller Reputation ──────────────────
 // ─── PHASE 1: Handshake Jobs Board ──────────────────────────
 const MOCK_JOBS = [
+  // ─── CT / KOL JOBS ───────────────────────────────────
   {
-    id: "job-001",
+    id: "job-001", jobType: "ct",
     title: "Shitpost campaign for memecoin launch",
     category: "Shitposting",
     poster: "@SolProject_", posterTrust: 84, posterVerified: true,
@@ -598,24 +599,9 @@ const MOCK_JOBS = [
     tags: ["memecoin", "solana", "shitpost"],
   },
   {
-    id: "job-002",
-    title: "Video editor for 30s reel — crypto explainer",
-    category: "Video Editing",
-    poster: "@DeFi_Founder", posterTrust: 91, posterVerified: true,
-    budget: 300, budgetCurrency: "USDC",
-    deadline: "5d",
-    postedAgo: "6h ago",
-    proposals: 12,
-    minTrustScore: 60,
-    status: "open",
-    description: "30-second vertical video explaining our L2 protocol. Raw footage provided. Need snappy cuts, captions, and crypto-native style.",
-    deliverables: ["30s vertical 9:16 video", "Captions & b-roll", "2 revisions included"],
-    tags: ["video", "defi", "content"],
-  },
-  {
-    id: "job-003",
+    id: "job-003", jobType: "ct",
     title: "Thread writer — weekly alpha research",
-    category: "Content / Writing",
+    category: "Thread Writing",
     poster: "@AlphaResearch", posterTrust: 88, posterVerified: true,
     budget: 800, budgetCurrency: "USDC",
     deadline: "Ongoing",
@@ -628,22 +614,7 @@ const MOCK_JOBS = [
     tags: ["research", "threads", "ongoing"],
   },
   {
-    id: "job-004",
-    title: "Solana smart contract dev — simple escrow mod",
-    category: "Development",
-    poster: "@BuildersDAO", posterTrust: 93, posterVerified: true,
-    budget: 2500, budgetCurrency: "USDC",
-    deadline: "2w",
-    postedAgo: "8h ago",
-    proposals: 4,
-    minTrustScore: 75,
-    status: "open",
-    description: "Need a Rust/Anchor dev to modify an existing escrow contract. Add time-locked releases. Existing code + tests provided. Deliverable: PR + deployed devnet program.",
-    deliverables: ["Modified Anchor program", "Unit tests", "Devnet deployment"],
-    tags: ["solana", "rust", "dev"],
-  },
-  {
-    id: "job-005",
+    id: "job-005", jobType: "ct",
     title: "KOL raid — 50 engaged comments",
     category: "KOL / Raids",
     poster: "@NewLaunchCo", posterTrust: 62, posterVerified: false,
@@ -658,30 +629,199 @@ const MOCK_JOBS = [
     tags: ["raid", "engagement"],
   },
   {
-    id: "job-006",
-    title: "Meme designer — PFP collection launch",
+    id: "job-007", jobType: "ct",
+    title: "Space host for weekly founder AMAs",
+    category: "Spaces / AMAs",
+    poster: "@L1Launch", posterTrust: 87, posterVerified: true,
+    budget: 400, budgetCurrency: "USDC",
+    deadline: "Ongoing",
+    postedAgo: "5h ago",
+    proposals: 9,
+    minTrustScore: 70,
+    status: "open",
+    description: "Looking for a high-signal CT host to run weekly Spaces with project founders. Must have 20k+ followers and strong vocal presence.",
+    deliverables: ["1 hosted Space per week", "Guest prep + questions", "Promo tweet beforehand"],
+    tags: ["spaces", "host", "ama"],
+  },
+  {
+    id: "job-008", jobType: "ct",
+    title: "Meme battle content for memecoin",
+    category: "Meme Warfare",
+    poster: "@DegenMemecoin", posterTrust: 71, posterVerified: false,
+    budget: 250, budgetCurrency: "USDC",
+    deadline: "48h",
+    postedAgo: "12h ago",
+    proposals: 15,
+    minTrustScore: 50,
+    status: "open",
+    description: "Need rapid-fire meme content for ongoing meme war against a rival. 20 memes over 48h, must be sharp and on-narrative.",
+    deliverables: ["20 meme assets", "Original captions", "Posted from your account"],
+    tags: ["memes", "warfare", "memecoin"],
+  },
+
+  // ─── CRYPTO WORK JOBS ───────────────────────────────────
+  {
+    id: "job-004", jobType: "crypto",
+    title: "Solana smart contract dev — escrow modification",
+    category: "Development",
+    poster: "@BuildersDAO", posterTrust: 93, posterVerified: true,
+    budget: 2500, budgetCurrency: "USDC",
+    deadline: "2w",
+    postedAgo: "8h ago",
+    proposals: 4,
+    minTrustScore: 40,
+    status: "open",
+    description: "Need a Rust/Anchor dev to modify an existing escrow contract. Add time-locked releases. Existing code + tests provided. Deliverable: PR + deployed devnet program.",
+    deliverables: ["Modified Anchor program", "Unit tests", "Devnet deployment"],
+    tags: ["solana", "rust", "anchor"],
+    requiresPortfolio: true,
+  },
+  {
+    id: "job-002", jobType: "crypto",
+    title: "Video editor for 30s reel — crypto explainer",
+    category: "Video Editing",
+    poster: "@DeFi_Founder", posterTrust: 91, posterVerified: true,
+    budget: 300, budgetCurrency: "USDC",
+    deadline: "5d",
+    postedAgo: "6h ago",
+    proposals: 12,
+    minTrustScore: 30,
+    status: "open",
+    description: "30-second vertical video explaining our L2 protocol. Raw footage provided. Need snappy cuts, captions, and crypto-native style.",
+    deliverables: ["30s vertical 9:16 video", "Captions & b-roll", "2 revisions included"],
+    tags: ["video", "explainer"],
+    requiresPortfolio: true,
+  },
+  {
+    id: "job-006", jobType: "crypto",
+    title: "NFT PFP collection design — 10 pieces",
     category: "Design",
     poster: "@NFTArtist_Dao", posterTrust: 79, posterVerified: true,
     budget: 1200, budgetCurrency: "USDC",
     deadline: "10d",
     postedAgo: "2d ago",
     proposals: 18,
-    minTrustScore: 65,
+    minTrustScore: 30,
     status: "in_progress",
     description: "10 marketing memes for PFP drop. Degen-coded, shareable, original style.",
     deliverables: ["10 meme assets", "Square + vertical formats", "Source files"],
-    tags: ["design", "nft", "memes"],
+    tags: ["design", "nft", "art"],
+    requiresPortfolio: true,
+  },
+  {
+    id: "job-009", jobType: "crypto",
+    title: "Smart contract audit — ERC-20 + staking",
+    category: "Audits",
+    poster: "@DeFiProtocol", posterTrust: 92, posterVerified: true,
+    budget: 5000, budgetCurrency: "USDC",
+    deadline: "3w",
+    postedAgo: "1d ago",
+    proposals: 3,
+    minTrustScore: 40,
+    status: "open",
+    description: "Pre-launch audit of ERC-20 token + staking contract on Base. ~800 LOC. Looking for auditor with prior work on comparable contracts. Report + remediations required.",
+    deliverables: ["Written audit report", "Severity-graded findings", "Remediation review pass"],
+    tags: ["audit", "evm", "security"],
+    requiresPortfolio: true,
+  },
+  {
+    id: "job-010", jobType: "crypto",
+    title: "Frontend dev — React + Wagmi dashboard",
+    category: "Development",
+    poster: "@YieldProtocol", posterTrust: 85, posterVerified: true,
+    budget: 1800, budgetCurrency: "USDC",
+    deadline: "2w",
+    postedAgo: "14h ago",
+    proposals: 8,
+    minTrustScore: 30,
+    status: "open",
+    description: "Build analytics dashboard for our yield protocol. React + Wagmi/Viem + Tailwind. Figma provided. Must integrate with existing backend API.",
+    deliverables: ["Responsive dashboard", "Wallet connection", "Data visualization"],
+    tags: ["react", "wagmi", "frontend"],
+    requiresPortfolio: true,
+  },
+  {
+    id: "job-011", jobType: "crypto",
+    title: "Whitepaper writer — L2 rollup protocol",
+    category: "Technical Writing",
+    poster: "@L2Research", posterTrust: 89, posterVerified: true,
+    budget: 1500, budgetCurrency: "USDC",
+    deadline: "3w",
+    postedAgo: "2d ago",
+    proposals: 6,
+    minTrustScore: 40,
+    status: "open",
+    description: "Write technical whitepaper for novel L2 rollup. Must understand ZK proofs, rollup architecture, and tokenomics. Previous whitepaper work required.",
+    deliverables: ["25-40 page whitepaper", "Architecture diagrams", "2 revision rounds"],
+    tags: ["whitepaper", "technical", "l2"],
+    requiresPortfolio: true,
+  },
+  {
+    id: "job-012", jobType: "crypto",
+    title: "Community manager — Discord + Telegram",
+    category: "Community",
+    poster: "@MemecoinProject", posterTrust: 74, posterVerified: false,
+    budget: 1000, budgetCurrency: "USDC",
+    deadline: "Ongoing",
+    postedAgo: "3d ago",
+    proposals: 22,
+    minTrustScore: 35,
+    status: "open",
+    description: "Part-time CM for Discord (5k members) + Telegram (3k). Handle mod, run events, escalate FUD. Monthly retainer.",
+    deliverables: ["Daily presence", "Weekly events", "FUD reports"],
+    tags: ["community", "discord", "telegram"],
+  },
+  {
+    id: "job-013", jobType: "crypto",
+    title: "Logo + brand kit — DePIN project",
+    category: "Design",
+    poster: "@DePINFounder", posterTrust: 81, posterVerified: true,
+    budget: 900, budgetCurrency: "USDC",
+    deadline: "10d",
+    postedAgo: "16h ago",
+    proposals: 14,
+    minTrustScore: 30,
+    status: "open",
+    description: "Complete brand identity: logo, color system, typography, basic style guide. Modern, technical, trustworthy aesthetic.",
+    deliverables: ["Logo (vector)", "Brand guidelines PDF", "Social media kit"],
+    tags: ["branding", "logo", "identity"],
+    requiresPortfolio: true,
+  },
+  {
+    id: "job-014", jobType: "crypto",
+    title: "Technical blog writer — DeFi primitives",
+    category: "Technical Writing",
+    poster: "@DeFiResearchCo", posterTrust: 86, posterVerified: true,
+    budget: 600, budgetCurrency: "USDC",
+    deadline: "Ongoing",
+    postedAgo: "1d ago",
+    proposals: 11,
+    minTrustScore: 30,
+    status: "open",
+    description: "2 deep-dive articles per month on DeFi primitives (AMMs, lending, CDPs). 1500-2500 words each, technical but accessible.",
+    deliverables: ["2 articles/month", "Original research", "Edits included"],
+    tags: ["writing", "defi", "content"],
+    requiresPortfolio: true,
   },
 ];
 
-const JOB_CATEGORIES = [
-  { id: "all", label: "All", icon: "🌐" },
+const JOB_CATEGORIES_CT = [
+  { id: "all", label: "All CT Jobs", icon: "🌐" },
   { id: "Shitposting", label: "Shitposting", icon: "🤡" },
-  { id: "Content / Writing", label: "Writing", icon: "✍️" },
-  { id: "Video Editing", label: "Video", icon: "🎬" },
-  { id: "Design", label: "Design", icon: "🎨" },
+  { id: "Thread Writing", label: "Threads", icon: "🧵" },
+  { id: "KOL / Raids", label: "Raids", icon: "📢" },
+  { id: "Spaces / AMAs", label: "Spaces", icon: "🎙️" },
+  { id: "Meme Warfare", label: "Memes", icon: "⚔️" },
+];
+
+const JOB_CATEGORIES_CRYPTO = [
+  { id: "all", label: "All Crypto Work", icon: "🌐" },
   { id: "Development", label: "Dev", icon: "💻" },
-  { id: "KOL / Raids", label: "KOL / Raids", icon: "📢" },
+  { id: "Design", label: "Design", icon: "🎨" },
+  { id: "Audits", label: "Audits", icon: "🔐" },
+  { id: "Technical Writing", label: "Writing", icon: "✍️" },
+  { id: "Video Editing", label: "Video", icon: "🎬" },
+  { id: "Community", label: "Community", icon: "💬" },
 ];
 
 // ─── PHASE 4: CIB Detection + Forensics + Alerts ────────────────
@@ -769,6 +909,7 @@ export default function CTTrust() {
   const [selectedCluster, setSelectedCluster] = useState(null);
   const [forensicsRun, setForensicsRun] = useState(false);
   const [jobsFilter, setJobsFilter] = useState("all");
+  const [jobsType, setJobsType] = useState("crypto"); // "ct" or "crypto" — default to crypto work
   const [waitlistEmail, setWaitlistEmail] = useState("");
   const [waitlistSubmitted, setWaitlistSubmitted] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
@@ -1081,22 +1222,31 @@ export default function CTTrust() {
                 {[...Array(2)].map((_, loopIdx) => (
                   <div key={loopIdx} style={{ display: "flex", gap: 28 }}>
                     {[
-                      { icon: "🤡", title: "Shitpost campaign · memecoin launch", budget: 500, deadline: "72h", trust: 55, status: "open" },
-                      { icon: "🎬", title: "Video editor · 30s crypto reel", budget: 300, deadline: "5d", trust: 60, status: "open" },
-                      { icon: "✍️", title: "Thread writer · weekly alpha", budget: 800, deadline: "Ongoing", trust: 70, status: "open" },
-                      { icon: "💻", title: "Solana dev · escrow contract mod", budget: 2500, deadline: "2w", trust: 75, status: "open" },
-                      { icon: "📢", title: "KOL raid · 50 engaged comments", budget: 150, deadline: "24h", trust: 40, status: "open" },
-                      { icon: "🎨", title: "Meme designer · PFP launch", budget: 1200, deadline: "10d", trust: 65, status: "progress" },
-                      { icon: "📝", title: "Copywriter · landing page", budget: 450, deadline: "7d", trust: 50, status: "open" },
-                      { icon: "🤝", title: "Community manager · DeFi DAO", budget: 1800, deadline: "Ongoing", trust: 65, status: "open" },
-                      { icon: "🎬", title: "Podcast editor · weekly show", budget: 600, deadline: "Ongoing", trust: 55, status: "open" },
-                      { icon: "🎨", title: "Logo + brand kit · NFT project", budget: 900, deadline: "10d", trust: 60, status: "open" },
+                      // Crypto Work
+                      { icon: "💻", title: "Solana dev · Anchor escrow mod", budget: 2500, deadline: "2w", trust: 40, status: "open", type: "crypto" },
+                      { icon: "🔐", title: "Smart contract audit · ERC-20 + staking", budget: 5000, deadline: "3w", trust: 40, status: "open", type: "crypto" },
+                      { icon: "⚛️", title: "Frontend dev · React + Wagmi dashboard", budget: 1800, deadline: "2w", trust: 30, status: "open", type: "crypto" },
+                      { icon: "🎬", title: "Video editor · 30s crypto explainer", budget: 300, deadline: "5d", trust: 30, status: "open", type: "crypto" },
+                      { icon: "📄", title: "Whitepaper writer · L2 rollup", budget: 1500, deadline: "3w", trust: 40, status: "open", type: "crypto" },
+                      { icon: "🖼️", title: "NFT PFP design · 10 pieces", budget: 1200, deadline: "10d", trust: 30, status: "progress", type: "crypto" },
+                      { icon: "💬", title: "Community manager · Discord + TG", budget: 1000, deadline: "Ongoing", trust: 35, status: "open", type: "crypto" },
+                      { icon: "🎨", title: "Logo + brand kit · DePIN project", budget: 900, deadline: "10d", trust: 30, status: "open", type: "crypto" },
+                      { icon: "✍️", title: "Technical blog writer · DeFi primitives", budget: 600, deadline: "Ongoing", trust: 30, status: "open", type: "crypto" },
+                      // CT / KOL
+                      { icon: "🤡", title: "Shitpost campaign · memecoin launch", budget: 500, deadline: "72h", trust: 55, status: "open", type: "ct" },
+                      { icon: "🧵", title: "Thread writer · weekly alpha", budget: 800, deadline: "Ongoing", trust: 70, status: "open", type: "ct" },
+                      { icon: "📢", title: "KOL raid · 50 engaged comments", budget: 150, deadline: "24h", trust: 40, status: "open", type: "ct" },
+                      { icon: "🎙️", title: "Space host · weekly founder AMAs", budget: 400, deadline: "Ongoing", trust: 70, status: "open", type: "ct" },
+                      { icon: "⚔️", title: "Meme warfare · 48h campaign", budget: 250, deadline: "48h", trust: 50, status: "open", type: "ct" },
                     ].map((item, i) => {
                       const statusColor = item.status === "open" ? "#10b981" : "#fbbf24";
+                      const typeColor = item.type === "crypto" ? "#60a5fa" : "#c084fc";
+                      const typeLabel = item.type === "crypto" ? "CRYPTO" : "CT";
                       return (
                         <div key={`${loopIdx}-${i}`} style={{ display: "flex", alignItems: "center", gap: 12, fontFamily: "'JetBrains Mono', monospace", fontSize: 12 }}>
                           <span style={{ width: 5, height: 5, borderRadius: "50%", background: statusColor, boxShadow: `0 0 6px ${statusColor}` }} />
                           <span style={{ fontSize: 13 }}>{item.icon}</span>
+                          <span style={{ padding: "2px 6px", borderRadius: 4, background: `${typeColor}15`, color: typeColor, fontSize: 9, fontWeight: 800, letterSpacing: 0.8 }}>{typeLabel}</span>
                           <span style={{ color: C.textPrimary, fontWeight: 700 }}>{item.title}</span>
                           <span style={{ color: C.primary, fontWeight: 800 }}>${item.budget.toLocaleString()} USDC</span>
                           <span style={{ color: C.textMuted }}>·</span>
@@ -1119,20 +1269,20 @@ export default function CTTrust() {
                 <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 20, background: "rgba(212, 255, 0, 0.06)", border: "1px solid rgba(212, 255, 0, 0.2)", marginBottom: 24 }}>
                   <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.primary, boxShadow: `0 0 10px ${C.primary}`, animation: "pulse 2s ease-in-out infinite" }} />
                   <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }`}</style>
-                  <span style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700 }}>CT's Missing Infrastructure</span>
+                  <span style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700 }}>The Crypto Work Marketplace</span>
                 </div>
               </Reveal>
 
               {/* Headline */}
               <Reveal delay={100}>
                 <h1 style={{ fontSize: 64, fontWeight: 900, margin: 0, letterSpacing: -3, lineHeight: 1 }}>
-                  Know who's real.<br />
-                  <span style={{ color: C.primary }}>Hire who's proven.</span>
+                  Hire crypto's best.<br />
+                  <span style={{ color: C.primary }}>Without the scams.</span>
                 </h1>
               </Reveal>
               <Reveal delay={200}>
                 <p style={{ color: C.textSecondary, fontSize: 18, marginTop: 20, maxWidth: 560, margin: "20px auto 0", lineHeight: 1.5 }}>
-                  The reputation layer for Crypto Twitter. Analyze any account — then use your trust score to hire proven talent or get hired via on-chain Handshakes.
+                  Dev, design, audits, writing — or shitposts, raids, and Spaces. Every applicant comes with a CT Trust Score attached. No middleman. No 20% Fiverr cut. Get paid in USDC.
                 </p>
               </Reveal>
 
@@ -1140,7 +1290,7 @@ export default function CTTrust() {
               <Reveal delay={300}>
                 <div style={{ display: "flex", gap: 12, justifyContent: "center", marginTop: 32, flexWrap: "wrap" }}>
                   <button
-                    onClick={() => setTab("valuate")}
+                    onClick={() => setTab("jobs")}
                     style={{
                       padding: "14px 28px", borderRadius: 12, border: "none",
                       background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
@@ -1151,9 +1301,9 @@ export default function CTTrust() {
                     }}
                     onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 40px rgba(212, 255, 0, 0.4)"; }}
                     onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 32px rgba(212, 255, 0, 0.25)"; }}
-                  >🔍 Analyze Any Account</button>
+                  >💼 Browse Open Jobs</button>
                   <button
-                    onClick={() => setTab("jobs")}
+                    onClick={() => setTab("valuate")}
                     style={{
                       padding: "14px 28px", borderRadius: 12,
                       border: "1px solid rgba(255, 255, 255, 0.15)",
@@ -1164,7 +1314,7 @@ export default function CTTrust() {
                   }}
                   onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(212, 255, 0, 0.4)"; e.currentTarget.style.color = C.primary; }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.15)"; e.currentTarget.style.color = C.textPrimary; }}
-                >💼 Browse Open Jobs</button>
+                >🔍 Analyze Any Account</button>
               </div>
               </Reveal>
 
@@ -1203,9 +1353,9 @@ export default function CTTrust() {
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
                 {[
-                  { num: "01", title: "Analyze", desc: "Look up any CT account. Get trust score, bot detection, CIB analysis, and engagement forensics.", icon: "🔍" },
-                  { num: "02", title: "Build Reputation", desc: "Your trust score is your portable CT resume. Organic growth, real engagement, and CIB-clean history compound over time.", icon: "🛡️" },
-                  { num: "03", title: "Handshake", desc: "Hire proven accounts for CT work or get hired yourself. Public on-chain commitments make trust enforceable.", icon: "🤝" },
+                  { num: "01", title: "Post or Apply", desc: "Post a job with budget, deadline, and minimum trust score. Or browse jobs and apply with your reputation attached.", icon: "📝" },
+                  { num: "02", title: "Handshake", desc: "Both parties sign a public on-chain commitment. Trust scores + community reputation enforce delivery. No middleman taking a cut.", icon: "🤝" },
+                  { num: "03", title: "Get Paid in USDC", desc: "Work delivered, buyer approves, funds released. Reputation compounds for both sides. Pure crypto-native workflow.", icon: "💸" },
                 ].map((step, i) => (
                   <GlowCard key={step.num} glow style={{ position: "relative", paddingTop: 32 }}>
                     <div style={{ position: "absolute", top: 20, right: 20, fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, letterSpacing: 2 }}>/ {step.num}</div>
@@ -1222,8 +1372,11 @@ export default function CTTrust() {
             <Reveal>
               <div style={{ marginBottom: 60 }}>
                 <div style={{ textAlign: "center", marginBottom: 40 }}>
-                  <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8 }}>Reputation Tools</div>
-                  <h2 style={{ fontSize: 36, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>CT's missing <span style={{ color: C.primary }}>infrastructure.</span></h2>
+                  <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8 }}>Reputation Engine</div>
+                  <h2 style={{ fontSize: 36, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>The tools that <span style={{ color: C.primary }}>power</span> trust.</h2>
+                  <p style={{ color: C.textSecondary, fontSize: 14, marginTop: 12, maxWidth: 520, margin: "12px auto 0", lineHeight: 1.5 }}>
+                    Every Handshake is backed by real signals. Explore the reputation infrastructure that makes the marketplace work.
+                  </p>
                 </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14 }}>
                 {[
@@ -1265,72 +1418,107 @@ export default function CTTrust() {
               <div style={{ marginBottom: 60 }}>
                 <div style={{ textAlign: "center", marginBottom: 40 }}>
                   <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8 }}>🤝 Handshake Jobs · NEW</div>
-                  <h2 style={{ fontSize: 36, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>Hire. <span style={{ color: C.primary }}>Get hired.</span> Trust-verified.</h2>
-                  <p style={{ color: C.textSecondary, fontSize: 15, marginTop: 12, maxWidth: 540, margin: "12px auto 0", lineHeight: 1.5 }}>
-                    The first CT-native jobs board. Companies hire proven accounts. Workers use their trust score as a portable resume. Public on-chain Handshakes enforce commitments.
+                  <h2 style={{ fontSize: 36, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>Two sides of <span style={{ color: C.primary }}>crypto work.</span></h2>
+                  <p style={{ color: C.textSecondary, fontSize: 15, marginTop: 12, maxWidth: 560, margin: "12px auto 0", lineHeight: 1.5 }}>
+                    Whether you're building a protocol or running a memecoin launch, there's a version of crypto work here for you. Trust-verified. Paid in USDC. No middlemen.
                   </p>
                 </div>
 
-                {/* Featured jobs block */}
-                <GlowCard glow style={{ padding: "28px", background: `linear-gradient(135deg, rgba(212, 255, 0, 0.04), rgba(0, 0, 0, 0.5))` }}>
-                  {/* Stats bar */}
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10, marginBottom: 24 }}>
+                {/* Two-category split */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 16, marginBottom: 24 }}>
+                  {/* CRYPTO WORK SIDE */}
+                  <GlowCard glow style={{ padding: "24px", background: `linear-gradient(135deg, rgba(212, 255, 0, 0.04), rgba(0, 0, 0, 0.5))` }}>
+                    <div style={{ fontSize: 32, marginBottom: 8 }}>💼</div>
+                    <div style={{ fontSize: 20, fontWeight: 900, marginBottom: 6, letterSpacing: -0.5 }}>Crypto Work</div>
+                    <div style={{ fontSize: 12, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 14 }}>Dev · Design · Audits · Writing</div>
+                    <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.6, marginBottom: 16 }}>
+                      Hire real professionals for real crypto work. Solana devs, smart contract auditors, designers, whitepaper writers, community managers. Portfolio-based. Scam-free.
+                    </div>
+                    {/* Sample job mini-cards */}
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
+                      {[
+                        { icon: "💻", title: "Solana dev · Anchor escrow", budget: "$2.5k" },
+                        { icon: "🔐", title: "Smart contract audit", budget: "$5k" },
+                        { icon: "🎨", title: "Logo + brand kit · DePIN", budget: "$900" },
+                      ].map(j => (
+                        <div key={j.title} style={{ padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "space-between", border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <span style={{ fontSize: 14 }}>{j.icon}</span>
+                            <span style={{ fontSize: 12, color: C.textPrimary, fontFamily: "'JetBrains Mono', monospace" }}>{j.title}</span>
+                          </div>
+                          <span style={{ fontSize: 12, color: C.primary, fontFamily: "'JetBrains Mono', monospace", fontWeight: 800 }}>{j.budget}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => { setTab("jobs"); setJobsType("crypto"); }}
+                      style={{
+                        width: "100%", padding: "12px 20px", borderRadius: 10, border: "none",
+                        background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+                        color: "#000", fontSize: 13, fontWeight: 900,
+                        fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+                        letterSpacing: 0.3, transition: "all 0.2s",
+                      }}
+                    >💼 Browse Crypto Work →</button>
+                  </GlowCard>
+
+                  {/* CT / KOL SIDE */}
+                  <GlowCard glow style={{ padding: "24px", background: `linear-gradient(135deg, rgba(52, 211, 153, 0.04), rgba(0, 0, 0, 0.5))` }}>
+                    <div style={{ fontSize: 32, marginBottom: 8 }}>🎭</div>
+                    <div style={{ fontSize: 20, fontWeight: 900, marginBottom: 6, letterSpacing: -0.5 }}>CT / KOL Jobs</div>
+                    <div style={{ fontSize: 12, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 14 }}>Shitposts · Threads · Raids · Spaces</div>
+                    <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.6, marginBottom: 16 }}>
+                      Hire CT natives who actually move narratives. KOLs, shitposters, thread writers, meme warriors. Trust Score = your reputation. High-trust accounts get booked first.
+                    </div>
+                    {/* Sample job mini-cards */}
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
+                      {[
+                        { icon: "🧵", title: "Thread writer · weekly alpha", budget: "$800" },
+                        { icon: "🤡", title: "Shitpost campaign · memecoin", budget: "$500" },
+                        { icon: "🎙️", title: "Space host · weekly AMAs", budget: "$400" },
+                      ].map(j => (
+                        <div key={j.title} style={{ padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "space-between", border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <span style={{ fontSize: 14 }}>{j.icon}</span>
+                            <span style={{ fontSize: 12, color: C.textPrimary, fontFamily: "'JetBrains Mono', monospace" }}>{j.title}</span>
+                          </div>
+                          <span style={{ fontSize: 12, color: C.primary, fontFamily: "'JetBrains Mono', monospace", fontWeight: 800 }}>{j.budget}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => { setTab("jobs"); setJobsType("ct"); }}
+                      style={{
+                        width: "100%", padding: "12px 20px", borderRadius: 10,
+                        border: `1px solid ${C.primary}40`,
+                        background: "rgba(212, 255, 0, 0.06)",
+                        color: C.primary, fontSize: 13, fontWeight: 900,
+                        fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+                        letterSpacing: 0.3, transition: "all 0.2s",
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.background = "rgba(212, 255, 0, 0.12)"; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = "rgba(212, 255, 0, 0.06)"; }}
+                    >🎭 Browse CT Jobs →</button>
+                  </GlowCard>
+                </div>
+
+                {/* Stats strip */}
+                <GlowCard style={{ padding: "20px 24px", background: "rgba(0, 0, 0, 0.5)" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 12 }}>
                     {[
-                      { label: "Open Jobs", val: "6", icon: "💼" },
-                      { label: "Total Budget", val: "$8.2k+", icon: "💰" },
-                      { label: "Avg. Trust Req.", val: "61", icon: "🛡️" },
+                      { label: "Open Jobs", val: "13", icon: "💼" },
+                      { label: "Total Budget", val: "$17k+", icon: "💰" },
+                      { label: "vs Fiverr Cut", val: "0%", icon: "✂️" },
+                      { label: "Paid in", val: "USDC", icon: "💸" },
                       { label: "Disputes", val: "0", icon: "⚖️" },
                     ].map(s => (
-                      <div key={s.label} style={{ padding: "12px 10px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 10, textAlign: "center", border: "1px solid rgba(255, 255, 255, 0.04)" }}>
-                        <div style={{ fontSize: 16, marginBottom: 4 }}>{s.icon}</div>
+                      <div key={s.label} style={{ textAlign: "center" }}>
+                        <div style={{ fontSize: 18, marginBottom: 4 }}>{s.icon}</div>
                         <div style={{ fontSize: 18, fontWeight: 900, color: C.primary, fontFamily: "'JetBrains Mono', monospace", letterSpacing: -0.5 }}>{s.val}</div>
                         <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1, marginTop: 2 }}>{s.label}</div>
                       </div>
                     ))}
                   </div>
-
-                  {/* Two-sided benefits */}
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16, marginBottom: 24 }}>
-                    <div style={{ padding: "18px 20px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 12, border: "1px solid rgba(255, 255, 255, 0.04)" }}>
-                      <div style={{ fontSize: 24, marginBottom: 8 }}>💼</div>
-                      <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 6 }}>For Hirers</div>
-                      <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.6, marginBottom: 10 }}>Post jobs with a minimum trust score gate. No more scammers. No more fake portfolios. Only proven accounts apply.</div>
-                      <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 4 }}>
-                        {["Set trust score requirement", "Review vetted proposals", "Sign public Handshake"].map(item => (
-                          <li key={item} style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", display: "flex", gap: 6, alignItems: "center" }}>
-                            <span style={{ color: C.primary }}>→</span> {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div style={{ padding: "18px 20px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 12, border: "1px solid rgba(255, 255, 255, 0.04)" }}>
-                      <div style={{ fontSize: 24, marginBottom: 8 }}>🤝</div>
-                      <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 6 }}>For Workers</div>
-                      <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.6, marginBottom: 10 }}>Your trust score is your resume. Complete jobs, build reputation, earn in crypto. No Upwork cut. No middlemen.</div>
-                      <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 4 }}>
-                        {["Apply with your CT reputation", "Deliver work, earn USDC", "Reputation compounds over time"].map(item => (
-                          <li key={item} style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", display: "flex", gap: 6, alignItems: "center" }}>
-                            <span style={{ color: C.primary }}>→</span> {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-
-                  {/* Browse jobs CTA */}
-                  <button
-                    onClick={() => setTab("jobs")}
-                    style={{
-                      width: "100%", padding: "16px 24px", borderRadius: 12, border: "none",
-                      background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
-                      color: "#000", fontSize: 14, fontWeight: 900,
-                      fontFamily: "'Outfit', sans-serif", cursor: "pointer",
-                      letterSpacing: 0.3, transition: "all 0.2s",
-                      boxShadow: "0 0 32px rgba(212, 255, 0, 0.2)",
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 0 40px rgba(212, 255, 0, 0.35)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 32px rgba(212, 255, 0, 0.2)"; }}
-                  >💼 Browse Open Jobs →</button>
                 </GlowCard>
               </div>
             </Reveal>
@@ -1361,14 +1549,14 @@ export default function CTTrust() {
             <Reveal>
               <GlowCard glow style={{ textAlign: "center", padding: "48px 32px", background: `linear-gradient(135deg, rgba(212, 255, 0, 0.04), rgba(0, 0, 0, 0.5))` }}>
                 <div style={{ fontSize: 32, fontWeight: 900, letterSpacing: -1.5, marginBottom: 12 }}>
-                  Join the <span style={{ color: C.primary }}>reputation layer</span> of CT.
+                  Join <span style={{ color: C.primary }}>crypto's work marketplace.</span>
                 </div>
-                <div style={{ fontSize: 15, color: C.textSecondary, marginBottom: 28, maxWidth: 480, margin: "0 auto 28px" }}>
-                  Free to use. No signup. Analyze any account, browse open jobs, or start building your trust score.
+                <div style={{ fontSize: 15, color: C.textSecondary, marginBottom: 28, maxWidth: 500, margin: "0 auto 28px" }}>
+                  13+ open jobs. Zero middleman fees. Paid in USDC. Reputation-first hiring. Ship the way crypto was meant to work.
                 </div>
                 <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
                   <button
-                    onClick={() => setTab("valuate")}
+                    onClick={() => setTab("jobs")}
                     style={{
                       padding: "16px 32px", borderRadius: 12, border: "none",
                       background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
@@ -1379,9 +1567,9 @@ export default function CTTrust() {
                     }}
                     onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 40px rgba(212, 255, 0, 0.4)"; }}
                     onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 32px rgba(212, 255, 0, 0.25)"; }}
-                  >🔍 Analyze Any Account</button>
+                  >💼 Browse Open Jobs</button>
                   <button
-                    onClick={() => setTab("jobs")}
+                    onClick={() => setTab("valuate")}
                     style={{
                       padding: "16px 32px", borderRadius: 12,
                       border: `1px solid ${C.primary}40`,
@@ -1392,7 +1580,7 @@ export default function CTTrust() {
                     }}
                     onMouseEnter={e => { e.currentTarget.style.background = "rgba(212, 255, 0, 0.12)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
                     onMouseLeave={e => { e.currentTarget.style.background = "rgba(212, 255, 0, 0.06)"; e.currentTarget.style.transform = "translateY(0)"; }}
-                  >💼 Browse Open Jobs</button>
+                  >🔍 Analyze Any Account</button>
                 </div>
               </GlowCard>
             </Reveal>
@@ -2341,11 +2529,11 @@ export default function CTTrust() {
                 <span style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700 }}>Handshake · Beta</span>
               </div>
               <h1 style={{ fontSize: 42, fontWeight: 900, margin: 0, letterSpacing: -1.5, lineHeight: 1.1 }}>
-                Hire or get hired.<br />
-                <span style={{ color: C.primary }}>On CT. Trust-verified.</span>
+                Hire crypto's best.<br />
+                <span style={{ color: C.primary }}>Without the scams.</span>
               </h1>
-              <p style={{ color: C.textSecondary, fontSize: 15, marginTop: 16, maxWidth: 560, margin: "16px auto 0", lineHeight: 1.5 }}>
-                Post jobs or apply to them. Trust Score gatekeeps scammers. Public on-chain handshakes make commitments real. Escrow coming in V2.
+              <p style={{ color: C.textSecondary, fontSize: 15, marginTop: 16, maxWidth: 580, margin: "16px auto 0", lineHeight: 1.5 }}>
+                The crypto work marketplace. Hire devs, designers, auditors, and writers — or KOLs, shitposters, and Spaces hosts. Trust-verified. Public on-chain handshakes. Escrow V2 soon.
               </p>
 
               {/* How it works strip */}
@@ -2360,6 +2548,33 @@ export default function CTTrust() {
                     <span>{step.icon}</span>
                     <span>{step.label}</span>
                   </div>
+                ))}
+              </div>
+            </div>
+
+            {/* SUB-TAB TOGGLE */}
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}>
+              <div style={{ display: "flex", gap: 4, background: "rgba(0, 0, 0, 0.5)", borderRadius: 14, padding: 4, border: "1px solid rgba(255, 255, 255, 0.06)" }}>
+                {[
+                  { id: "crypto", label: "💼 Crypto Work", desc: "Dev, design, audits, writing" },
+                  { id: "ct", label: "🎭 CT / KOL Jobs", desc: "Shitposts, threads, raids, spaces" },
+                ].map(st => (
+                  <button
+                    key={st.id}
+                    onClick={() => { setJobsType(st.id); setJobsFilter("all"); }}
+                    style={{
+                      padding: "10px 20px", borderRadius: 10, border: "none",
+                      background: jobsType === st.id ? `linear-gradient(135deg, ${C.primary}15, ${C.accent}15)` : "transparent",
+                      color: jobsType === st.id ? C.primary : C.textMuted,
+                      fontFamily: "'Outfit', sans-serif", fontSize: 13, fontWeight: 800,
+                      cursor: "pointer", letterSpacing: 0.3, transition: "all 0.2s",
+                      border: `1px solid ${jobsType === st.id ? `${C.primary}40` : "transparent"}`,
+                      textAlign: "left",
+                    }}
+                  >
+                    <div>{st.label}</div>
+                    <div style={{ fontSize: 10, fontFamily: "'JetBrains Mono', monospace", color: C.textMuted, marginTop: 2, fontWeight: 500, letterSpacing: 0.5 }}>{st.desc}</div>
+                  </button>
                 ))}
               </div>
             </div>
@@ -2380,12 +2595,12 @@ export default function CTTrust() {
             {/* Top action bar */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                {JOB_CATEGORIES.map(cat => (
+                {(jobsType === "ct" ? JOB_CATEGORIES_CT : JOB_CATEGORIES_CRYPTO).map(cat => (
                   <button
                     key={cat.id}
                     onClick={() => setJobsFilter(cat.id)}
                     style={{
-                      padding: "7px 14px", borderRadius: 10, border: "none",
+                      padding: "7px 14px", borderRadius: 10,
                       background: jobsFilter === cat.id ? "rgba(212, 255, 0, 0.12)" : "rgba(0, 0, 0, 0.5)",
                       color: jobsFilter === cat.id ? C.primary : C.textMuted,
                       fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 600,
@@ -2418,7 +2633,7 @@ export default function CTTrust() {
             {/* Jobs grid */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 14, marginBottom: 40 }}>
               {MOCK_JOBS
-                .filter(j => jobsFilter === "all" || j.category === jobsFilter)
+                .filter(j => j.jobType === jobsType && (jobsFilter === "all" || j.category === jobsFilter))
                 .map(job => {
                   const statusColor = job.status === "open" ? "#10b981" : job.status === "in_progress" ? "#fbbf24" : C.textMuted;
                   const statusLabel = job.status === "open" ? "OPEN" : job.status === "in_progress" ? "IN PROGRESS" : "COMPLETED";
@@ -2483,7 +2698,7 @@ export default function CTTrust() {
             </div>
 
             {/* Empty state message if no jobs match filter */}
-            {MOCK_JOBS.filter(j => jobsFilter === "all" || j.category === jobsFilter).length === 0 && (
+            {MOCK_JOBS.filter(j => j.jobType === jobsType && (jobsFilter === "all" || j.category === jobsFilter)).length === 0 && (
               <div style={{ textAlign: "center", padding: "40px 20px", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
                 No jobs in this category yet. Try "All" or <span style={{ color: C.primary, cursor: "pointer" }} onClick={() => setShowPostJob(true)}>post the first one →</span>
               </div>

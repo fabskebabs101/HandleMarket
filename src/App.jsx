@@ -1776,7 +1776,7 @@ export default function Web3Gigs() {
               ) : (
                 <div style={{ padding: "20px", background: "rgba(16, 185, 129, 0.06)", border: "1px solid rgba(16, 185, 129, 0.25)", borderRadius: 12, maxWidth: 400, margin: "0 auto" }}>
                   <div style={{ fontSize: 28, marginBottom: 8 }}>✅</div>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: "#10b981", marginBottom: 6 }}>You're on the list, Fabs!</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: "#10b981", marginBottom: 6 }}>You're on the list!</div>
                   <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.5, fontFamily: "'JetBrains Mono', monospace" }}>
                     We'll email <span style={{ color: C.primary }}>{waitlistEmail}</span> the second live lookups go live.
                   </div>
@@ -2381,12 +2381,12 @@ export default function Web3Gigs() {
                 }}>F</div>
                 <div style={{ flex: 1, minWidth: 200 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                    <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5 }}>Fabs Kebabs</div>
+                    <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5 }}>Example Account</div>
                     <Pill text="✓ Verified" color={C.accent} />
                     <Pill text="SUPREME 91" color="#10b981" />
                   </div>
-                  <div style={{ fontSize: 14, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", marginTop: 4 }}>@FabsKebabs101</div>
-                  <div style={{ fontSize: 13, color: C.textSecondary, marginTop: 8, lineHeight: 1.5 }}>Solana memecoin trader · Building on-chain · CT degen · Based in 🇦🇺</div>
+                  <div style={{ fontSize: 14, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", marginTop: 4 }}>@ExampleAnon</div>
+                  <div style={{ fontSize: 13, color: C.textSecondary, marginTop: 8, lineHeight: 1.5 }}>Solana dev · On-chain analyst · CT native · Building in crypto</div>
                   <div style={{ display: "flex", gap: 12, marginTop: 10, flexWrap: "wrap" }}>
                     <Pill text="🔥 Tracked 127d" color={C.primary} />
                     <Pill text="⚡ Solana" color={C.accent} />
@@ -2477,13 +2477,13 @@ export default function Web3Gigs() {
                       fontSize: 32, fontWeight: 800, color: "#fff",
                       border: "3px solid rgba(255, 255, 255, 0.1)",
                       flexShrink: 0,
-                    }}>F</div>
+                    }}>E</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                        <span style={{ fontSize: 20, fontWeight: 800, color: "#fff", letterSpacing: -0.5 }}>Fabs Kebabs</span>
+                        <span style={{ fontSize: 20, fontWeight: 800, color: "#fff", letterSpacing: -0.5 }}>Example Account</span>
                         <span style={{ fontSize: 14, color: C.accent }}>✓</span>
                       </div>
-                      <div style={{ fontSize: 13, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", marginTop: 2 }}>@FabsKebabs101</div>
+                      <div style={{ fontSize: 13, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", marginTop: 2 }}>@ExampleAnon</div>
                       <div style={{ display: "flex", gap: 6, marginTop: 6, flexWrap: "wrap" }}>
                         <span style={{ padding: "2px 8px", borderRadius: 12, background: `${C.accent}20`, color: C.accent, fontSize: 9, fontWeight: 600, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.5 }}>Solana</span>
                         <span style={{ padding: "2px 8px", borderRadius: 12, background: `${C.primary}20`, color: C.primary, fontSize: 9, fontWeight: 600, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.5 }}>CT Native</span>
@@ -2556,7 +2556,7 @@ export default function Web3Gigs() {
                     borderTop: "1px solid rgba(212, 255, 0, 0.12)",
                     display: "flex", justifyContent: "space-between", alignItems: "center",
                   }}>
-                    <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>web3gigs.app/@FabsKebabs101</div>
+                    <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>web3gigs.app/@ExampleAnon</div>
                     <div style={{ fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" }}>Verify Yours →</div>
                   </div>
                 </div>
@@ -2921,7 +2921,7 @@ export default function Web3Gigs() {
               ) : (
                 <div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                    <div style={{ fontSize: 14, fontWeight: 700 }}>Forensics Report · @FabsKebabs101</div>
+                    <div style={{ fontSize: 14, fontWeight: 700 }}>Forensics Report · @ExampleAnon</div>
                     <Pill text={`${FORENSICS_REPORT.suspiciousPct}% FLAGGED`} color={FORENSICS_REPORT.suspiciousPct > 20 ? "#ef4444" : FORENSICS_REPORT.suspiciousPct > 10 ? "#f59e0b" : "#10b981"} />
                   </div>
 
@@ -3021,8 +3021,8 @@ export default function Web3Gigs() {
               <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>📬 Delivery Channels</div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 10 }}>
                 {[
-                  ["📧 Email", "fabs@...", true, false],
-                  ["📱 Telegram", "@FabsKebabs101", true, false],
+                  ["📧 Email", "your@email.com", false, false],
+                  ["📱 Telegram", "@yourhandle", false, false],
                   ["🐦 X DM", "Not connected", false, false],
                   ["🔗 Webhook", "Custom endpoint", false, true],
                 ].map(([channel, value, enabled, premium]) => (

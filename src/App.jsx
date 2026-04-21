@@ -659,6 +659,96 @@ const MOCK_JOBS = [
     deliverables: ["20 meme assets", "Original captions", "Posted from your account"],
     tags: ["memes", "warfare", "memecoin"],
   },
+  {
+    id: "job-015", jobType: "ct",
+    title: "Streamer for weekly crypto content sessions",
+    category: "Streaming / Gambling",
+    poster: "@CryptoPartner", posterTrust: 82, posterVerified: true,
+    budget: 2000, budgetCurrency: "USDT",
+    deadline: "Ongoing",
+    postedAgo: "5h ago",
+    proposals: 18,
+    minTrustScore: 60,
+    status: "open",
+    description: "Looking for an active crypto streamer to run weekly sessions on Kick/Twitch/X. Must have 5k+ engaged followers and crypto-native personality. Bonus structure on referrals.",
+    deliverables: ["2x weekly 2h streams", "Cross-post highlights to X", "Promo tweets with referral link"],
+    tags: ["streaming", "kick", "content"],
+  },
+  {
+    id: "job-016", jobType: "ct",
+    title: "Short-form promo clip campaign",
+    category: "Streaming / Gambling",
+    poster: "@CryptoSponsor", posterTrust: 78, posterVerified: true,
+    budget: 800, budgetCurrency: "SOL",
+    deadline: "10d",
+    postedAgo: "1d ago",
+    proposals: 24,
+    minTrustScore: 45,
+    status: "open",
+    description: "Need 10 short-form promo clips (TikTok/Reels style) featuring big wins and giveaway announcements. Fast turnaround, raw footage provided.",
+    deliverables: ["10 vertical clips (30-60s)", "On-brand captions + hooks", "Native-ready for TikTok/Reels/Shorts"],
+    tags: ["promo", "shorts", "clips"],
+  },
+  {
+    id: "job-017", jobType: "ct",
+    title: "Clipper — daily CT highlights reel",
+    category: "Clipping / Editing",
+    poster: "@CTHighlightsDaily", posterTrust: 74, posterVerified: false,
+    budget: 450, budgetCurrency: "USDC",
+    deadline: "Ongoing",
+    postedAgo: "8h ago",
+    proposals: 31,
+    minTrustScore: 40,
+    status: "open",
+    description: "Scrape CT daily for the best moments (cook posts, drama, big calls). Cut 3-5 vertical clips per day with subtitles. Paid weekly.",
+    deliverables: ["3-5 clips/day", "Subtitles + hooks", "Posted to your account + cross-post rights"],
+    tags: ["clipping", "content", "daily"],
+  },
+  {
+    id: "job-020", jobType: "ct",
+    title: "Spaces clipper — viral moments from weekly AMAs",
+    category: "Clipping / Editing",
+    poster: "@SpacesHub", posterTrust: 81, posterVerified: true,
+    budget: 600, budgetCurrency: "USDC",
+    deadline: "Ongoing",
+    postedAgo: "11h ago",
+    proposals: 17,
+    minTrustScore: 45,
+    status: "open",
+    description: "Listen to 2-3 Spaces per week, identify viral-worthy moments (alpha calls, callouts, mic-drops), and cut vertical clips with captions for X + TikTok.",
+    deliverables: ["6-10 clips per week", "Auto-captions + title hooks", "Tagged source Space in description"],
+    tags: ["spaces", "clipping", "viral"],
+  },
+  {
+    id: "job-018", jobType: "ct",
+    title: "Podcast editor — long-form to shorts",
+    category: "Clipping / Editing",
+    poster: "@CryptoPodcastHQ", posterTrust: 86, posterVerified: true,
+    budget: 1200, budgetCurrency: "USDC",
+    deadline: "Ongoing",
+    postedAgo: "2d ago",
+    proposals: 12,
+    minTrustScore: 45,
+    status: "open",
+    description: "Edit weekly 90min podcast down to 1 full episode + 8-12 short clips. Pro-level editing required. Must understand crypto to pick the best moments.",
+    deliverables: ["1 edited full episode", "8-12 vertical clips", "Thumbnails for each"],
+    tags: ["podcast", "editing", "ongoing"],
+  },
+  {
+    id: "job-019", jobType: "ct",
+    title: "Kick stream clipper — crypto degen content",
+    category: "Clipping / Editing",
+    poster: "@DegenStreamer", posterTrust: 69, posterVerified: false,
+    budget: 350, budgetCurrency: "USDT",
+    deadline: "Ongoing",
+    postedAgo: "14h ago",
+    proposals: 22,
+    minTrustScore: 35,
+    status: "open",
+    description: "Active Kick streamer needs a dedicated clipper. 5 clips per stream, 4 streams per week. Good pay for someone fast.",
+    deliverables: ["5 clips per stream", "Upload to X + TikTok", "1hr turnaround after stream ends"],
+    tags: ["kick", "clipping", "degen"],
+  },
 
   // ─── CRYPTO WORK JOBS ───────────────────────────────────
   {
@@ -813,6 +903,8 @@ const JOB_CATEGORIES_CT = [
   { id: "KOL / Raids", label: "Raids", icon: "📢" },
   { id: "Spaces / AMAs", label: "Spaces", icon: "🎙️" },
   { id: "Meme Warfare", label: "Memes", icon: "⚔️" },
+  { id: "Streaming / Gambling", label: "Streaming", icon: "🎰" },
+  { id: "Clipping / Editing", label: "Clips", icon: "✂️" },
 ];
 
 const JOB_CATEGORIES_CRYPTO = [
@@ -1291,6 +1383,11 @@ export default function Web3Gigs() {
                       { icon: "📢", title: "KOL raid · 50 engaged comments", budget: 150, deadline: "24h", trust: 40, status: "open", type: "ct" },
                       { icon: "🎙️", title: "Space host · weekly founder AMAs", budget: 400, deadline: "Ongoing", trust: 70, status: "open", type: "ct" },
                       { icon: "⚔️", title: "Meme warfare · 48h campaign", budget: 250, deadline: "48h", trust: 50, status: "open", type: "ct" },
+                      { icon: "🎥", title: "Streamer · weekly sessions", budget: 2000, deadline: "Ongoing", trust: 60, status: "open", type: "ct" },
+                      { icon: "✂️", title: "Clipper · daily CT highlights", budget: 450, deadline: "Ongoing", trust: 40, status: "open", type: "ct" },
+                      { icon: "🎙️", title: "Spaces clipper · viral moments", budget: 600, deadline: "Ongoing", trust: 45, status: "open", type: "ct" },
+                      { icon: "🎬", title: "Podcast editor · longform to shorts", budget: 1200, deadline: "Ongoing", trust: 45, status: "open", type: "ct" },
+                      { icon: "📺", title: "Kick clipper · stream content", budget: 350, deadline: "Ongoing", trust: 35, status: "open", type: "ct" },
                     ].map((item, i) => {
                       const statusColor = item.status === "open" ? "#10b981" : "#fbbf24";
                       const typeColor = item.type === "crypto" ? "#60a5fa" : "#c084fc";
@@ -1335,7 +1432,7 @@ export default function Web3Gigs() {
               </Reveal>
               <Reveal delay={200}>
                 <p style={{ color: C.textSecondary, fontSize: 18, marginTop: 20, maxWidth: 560, margin: "20px auto 0", lineHeight: 1.5 }}>
-                  Dev, design, audits, writing — or shitposts, raids, and Spaces. Every applicant comes with a Trust Score attached. No middleman. No 20% Fiverr cut. Get paid in USDC.
+                  Dev, design, audits, writing — or shitposts, raids, and Spaces. Every applicant comes with a Trust Score attached. No middleman. No 20% Fiverr cut. Get paid in USDC, USDT or SOL.
                 </p>
               </Reveal>
 
@@ -1560,8 +1657,8 @@ export default function Web3Gigs() {
                 <GlowCard style={{ padding: "20px 24px", background: "rgba(0, 0, 0, 0.5)" }}>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 12 }}>
                     {[
-                      { label: "Open Jobs", val: "13", icon: "💼" },
-                      { label: "Total Budget", val: "$17k+", icon: "💰" },
+                      { label: "Open Jobs", val: "19", icon: "💼" },
+                      { label: "Total Budget", val: "$23k+", icon: "💰" },
                       { label: "vs Fiverr Cut", val: "0%", icon: "✂️" },
                       { label: "Paid in", val: "USDC", icon: "💸" },
                       { label: "Disputes", val: "0", icon: "⚖️" },
@@ -1651,7 +1748,7 @@ export default function Web3Gigs() {
                   Join <span style={{ color: C.primary }}>crypto's work marketplace.</span>
                 </div>
                 <div style={{ fontSize: 15, color: C.textSecondary, marginBottom: 28, maxWidth: 500, margin: "0 auto 28px" }}>
-                  13+ open jobs. Zero middleman fees. Paid in USDC. Reputation-first hiring. Ship the way crypto was meant to work.
+                  19+ open jobs. Zero middleman fees. Paid in USDC, USDT or SOL. Reputation-first hiring. Ship the way crypto was meant to work.
                 </div>
                 <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
                   <button

@@ -1222,22 +1222,31 @@ export default function Web3Gigs() {
 
       {/* Header */}
       <div style={{ borderBottom: "1px solid rgba(212, 255, 0, 0.08)", padding: "16px 24px" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+        <style>{`
+          @media (max-width: 600px) {
+            .w3g-tagline { display: none !important; }
+            .w3g-brand { font-size: 16px !important; }
+            .w3g-waitlist-label { display: none !important; }
+            .w3g-waitlist-btn { padding: 10px 12px !important; }
+          }
+        `}</style>
+        <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "nowrap", gap: 8 }}>
           <div
             onClick={() => setTab("home")}
-            style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", transition: "opacity 0.2s" }}
+            style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", transition: "opacity 0.2s", minWidth: 0 }}
             onMouseEnter={e => e.currentTarget.style.opacity = "0.75"}
             onMouseLeave={e => e.currentTarget.style.opacity = "1"}
           >
-            <div style={{ width: 40, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "#000", fontFamily: "'JetBrains Mono', monospace", letterSpacing: -0.5 }}>W3G</div>
-            <div>
-              <div style={{ fontWeight: 700, fontSize: 18, letterSpacing: -0.5 }}>Web3Gigs</div>
-              <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1, textTransform: "uppercase" }}>Hire · Handshake · Ship</div>
+            <div style={{ width: 40, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "#000", fontFamily: "'JetBrains Mono', monospace", letterSpacing: -0.5, flexShrink: 0 }}>W3G</div>
+            <div style={{ minWidth: 0 }}>
+              <div className="w3g-brand" style={{ fontWeight: 700, fontSize: 18, letterSpacing: -0.5 }}>Web3Gigs</div>
+              <div className="w3g-tagline" style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1, textTransform: "uppercase" }}>Hire · Handshake · Ship</div>
             </div>
           </div>
           {/* Right side — waitlist + menu */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginLeft: "auto", justifyContent: "flex-end" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
             <button
+              className="w3g-waitlist-btn"
               onClick={() => { setWaitlistSubmitted(false); setWaitlistError(""); setShowWaitlistModal(true); }}
               style={{
                 padding: "10px 16px", borderRadius: 12, border: "none",
@@ -1253,7 +1262,7 @@ export default function Web3Gigs() {
               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 20px rgba(212, 255, 0, 0.2)"; }}
             >
               <span>💌</span>
-              <span>Join Waitlist</span>
+              <span className="w3g-waitlist-label">Join Waitlist</span>
             </button>
             {/* Hamburger Menu */}
             <div style={{ position: "relative" }}>

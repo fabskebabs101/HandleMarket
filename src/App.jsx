@@ -1088,8 +1088,8 @@ export default function Web3Gigs() {
               <span>
                 {[
                   ["home", "🏠 Home"],
-                  ["valuate", "🔍 Analyze"],
                   ["jobs", "💼 Jobs"],
+                  ["valuate", "🔍 Analyze"],
                   ["trust", "🛡️ Trust"],
                   ["leaderboard", "🏆 Ranks"],
                   ["profile", "👤 Profile"],
@@ -1126,8 +1126,8 @@ export default function Web3Gigs() {
                   `}</style>
                   {[
                     ["home", "🏠", "Home", "Welcome + overview"],
-                    ["valuate", "🔍", "Analyze", "Full CT account analysis"],
                     ["jobs", "💼", "Jobs", "Hire or get hired"],
+                    ["valuate", "🔍", "Analyze", "Full CT account analysis"],
                     ["trust", "🛡️", "Trust", "Trust Score guide"],
                     ["leaderboard", "🏆", "Ranks", "CT leaderboards"],
                     ["profile", "👤", "Profile", "Public profile page"],
@@ -1318,11 +1318,57 @@ export default function Web3Gigs() {
               </div>
               </Reveal>
 
-              {/* LIVE DEMO CARD */}
+              {/* LIVE JOBS PREVIEW */}
               <Reveal delay={500}>
-                <div style={{ marginTop: 48, maxWidth: 480, margin: "48px auto 0" }}>
-                  <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 12 }}>⚡ Live Trust Score Demo</div>
-                  <DemoCard />
+                <div style={{ marginTop: 48, maxWidth: 720, margin: "48px auto 0" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#10b981", boxShadow: "0 0 10px #10b981", animation: "pulse 2s ease-in-out infinite" }} />
+                      <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2 }}>Live Jobs · Hiring Now</div>
+                    </div>
+                    <button
+                      onClick={() => setTab("jobs")}
+                      style={{
+                        background: "transparent", border: "none", padding: 0, cursor: "pointer",
+                        fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase",
+                      }}
+                    >View all →</button>
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
+                    {[
+                      { icon: "💻", cat: "Dev", title: "Solana dev · Anchor escrow", budget: 2500, deadline: "2w", trust: 40, type: "CRYPTO", typeColor: "#60a5fa" },
+                      { icon: "🔐", cat: "Audit", title: "Smart contract audit · ERC-20", budget: 5000, deadline: "3w", trust: 40, type: "CRYPTO", typeColor: "#60a5fa" },
+                      { icon: "🤡", cat: "Shitpost", title: "Shitpost campaign · memecoin", budget: 500, deadline: "72h", trust: 55, type: "CT", typeColor: "#c084fc" },
+                      { icon: "📄", cat: "Writing", title: "Whitepaper · L2 rollup", budget: 1500, deadline: "3w", trust: 40, type: "CRYPTO", typeColor: "#60a5fa" },
+                    ].map((job, i) => (
+                      <div
+                        key={i}
+                        onClick={() => setTab("jobs")}
+                        style={{
+                          padding: "14px 16px", borderRadius: 12,
+                          background: "rgba(18, 18, 18, 0.7)",
+                          border: "1px solid rgba(255, 255, 255, 0.06)",
+                          cursor: "pointer", transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+                          textAlign: "left",
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(212, 255, 0, 0.3)"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.background = "rgba(30, 30, 30, 0.9)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.06)"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.background = "rgba(18, 18, 18, 0.7)"; }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+                          <span style={{ fontSize: 14 }}>{job.icon}</span>
+                          <span style={{ padding: "2px 6px", borderRadius: 4, background: `${job.typeColor}15`, color: job.typeColor, fontSize: 9, fontWeight: 800, letterSpacing: 0.8, fontFamily: "'JetBrains Mono', monospace" }}>{job.type}</span>
+                          <span style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>{job.cat}</span>
+                        </div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: C.textPrimary, marginBottom: 10, lineHeight: 1.3, textAlign: "left" }}>{job.title}</div>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}>
+                          <span style={{ color: C.primary, fontWeight: 800 }}>${job.budget.toLocaleString()} USDC</span>
+                          <span style={{ color: C.textMuted }}>⏱ {job.deadline}</span>
+                        </div>
+                        <div style={{ marginTop: 6, fontSize: 10, color: "#fbbf24", fontFamily: "'JetBrains Mono', monospace" }}>🛡️ Trust {job.trust}+</div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </Reveal>
 
@@ -1363,51 +1409,6 @@ export default function Web3Gigs() {
                     <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.5, marginBottom: 8 }}>{step.title}</div>
                     <div style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.6 }}>{step.desc}</div>
                   </GlowCard>
-                ))}
-              </div>
-              </div>
-            </Reveal>
-
-            {/* REPUTATION TOOLS */}
-            <Reveal>
-              <div style={{ marginBottom: 60 }}>
-                <div style={{ textAlign: "center", marginBottom: 40 }}>
-                  <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8 }}>Reputation Engine</div>
-                  <h2 style={{ fontSize: 36, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>The tools that <span style={{ color: C.primary }}>power</span> trust.</h2>
-                  <p style={{ color: C.textSecondary, fontSize: 14, marginTop: 12, maxWidth: 520, margin: "12px auto 0", lineHeight: 1.5 }}>
-                    Every Handshake is backed by real signals. Explore the reputation infrastructure that makes the marketplace work.
-                  </p>
-                </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14 }}>
-                {[
-                  { icon: "🛡️", title: "Trust Score", desc: "0-100 authenticity rating. Exposes bot-inflated audiences and engagement pods.", tab: "trust" },
-                  { icon: "🕸️", title: "CIB Detection", desc: "Catches coordinated pods, raid networks, and F4F rings before you get scammed.", tab: "cib" },
-                  { icon: "📊", title: "90-Day Tracking", desc: "Historical timeline exposes sudden growth spikes, bot purchases, and anomalies.", tab: "valuate" },
-                  { icon: "🏆", title: "CT Leaderboards", desc: "Trending, Rising, and Suspicious rankings updated hourly.", tab: "leaderboard" },
-                  { icon: "🔔", title: "Real-Time Alerts", desc: "Watch any account. Get notified the second something changes.", tab: "alerts" },
-                ].map(f => (
-                  <div key={f.title}
-                    onClick={() => setTab(f.tab)}
-                    style={{
-                      padding: "20px 22px", borderRadius: 14,
-                      background: "rgba(18, 18, 18, 0.7)",
-                      border: "1px solid rgba(255, 255, 255, 0.06)",
-                      cursor: "pointer", transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
-                      position: "relative",
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(212, 255, 0, 0.3)"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.background = "rgba(30, 30, 30, 0.9)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.06)"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.background = "rgba(18, 18, 18, 0.7)"; }}
-                  >
-                    {f.badge && (
-                      <div style={{ position: "absolute", top: 12, right: 12, padding: "2px 8px", borderRadius: 6, background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, color: "#000", fontSize: 9, fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>
-                        {f.badge}
-                      </div>
-                    )}
-                    <div style={{ fontSize: 28, marginBottom: 10 }}>{f.icon}</div>
-                    <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 4, letterSpacing: -0.3 }}>{f.title}</div>
-                    <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.5 }}>{f.desc}</div>
-                    <div style={{ fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", marginTop: 10, letterSpacing: 1, textTransform: "uppercase", fontWeight: 700 }}>Explore →</div>
-                  </div>
                 ))}
               </div>
               </div>
@@ -1523,6 +1524,51 @@ export default function Web3Gigs() {
               </div>
             </Reveal>
 
+
+            {/* REPUTATION TOOLS */}
+            <Reveal>
+              <div style={{ marginBottom: 60 }}>
+                <div style={{ textAlign: "center", marginBottom: 40 }}>
+                  <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8 }}>Reputation Engine</div>
+                  <h2 style={{ fontSize: 36, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>The tools that <span style={{ color: C.primary }}>power</span> trust.</h2>
+                  <p style={{ color: C.textSecondary, fontSize: 14, marginTop: 12, maxWidth: 520, margin: "12px auto 0", lineHeight: 1.5 }}>
+                    Every Handshake is backed by real signals. Explore the reputation infrastructure that makes the marketplace work.
+                  </p>
+                </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14 }}>
+                {[
+                  { icon: "🛡️", title: "Trust Score", desc: "0-100 authenticity rating. Exposes bot-inflated audiences and engagement pods.", tab: "trust" },
+                  { icon: "🕸️", title: "CIB Detection", desc: "Catches coordinated pods, raid networks, and F4F rings before you get scammed.", tab: "cib" },
+                  { icon: "📊", title: "90-Day Tracking", desc: "Historical timeline exposes sudden growth spikes, bot purchases, and anomalies.", tab: "valuate" },
+                  { icon: "🏆", title: "CT Leaderboards", desc: "Trending, Rising, and Suspicious rankings updated hourly.", tab: "leaderboard" },
+                  { icon: "🔔", title: "Real-Time Alerts", desc: "Watch any account. Get notified the second something changes.", tab: "alerts" },
+                ].map(f => (
+                  <div key={f.title}
+                    onClick={() => setTab(f.tab)}
+                    style={{
+                      padding: "20px 22px", borderRadius: 14,
+                      background: "rgba(18, 18, 18, 0.7)",
+                      border: "1px solid rgba(255, 255, 255, 0.06)",
+                      cursor: "pointer", transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+                      position: "relative",
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(212, 255, 0, 0.3)"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.background = "rgba(30, 30, 30, 0.9)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.06)"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.background = "rgba(18, 18, 18, 0.7)"; }}
+                  >
+                    {f.badge && (
+                      <div style={{ position: "absolute", top: 12, right: 12, padding: "2px 8px", borderRadius: 6, background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, color: "#000", fontSize: 9, fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>
+                        {f.badge}
+                      </div>
+                    )}
+                    <div style={{ fontSize: 28, marginBottom: 10 }}>{f.icon}</div>
+                    <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 4, letterSpacing: -0.3 }}>{f.title}</div>
+                    <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.5 }}>{f.desc}</div>
+                    <div style={{ fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", marginTop: 10, letterSpacing: 1, textTransform: "uppercase", fontWeight: 700 }}>Explore →</div>
+                  </div>
+                ))}
+              </div>
+              </div>
+            </Reveal>
             {/* TRUST SIGNALS / WHY USE US */}
             <Reveal>
               <div style={{ marginBottom: 60 }}>
@@ -1973,10 +2019,10 @@ export default function Web3Gigs() {
                 <span style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700 }}>The Trust Score</span>
               </div>
               <h1 style={{ fontSize: 48, fontWeight: 900, margin: 0, letterSpacing: -2, lineHeight: 1.1 }}>
-                Don't buy <span style={{ color: C.primary }}>bot-inflated</span><br />garbage accounts.
+                Don't hire <span style={{ color: C.primary }}>bots or scammers.</span>
               </h1>
               <p style={{ color: C.textSecondary, fontSize: 17, marginTop: 16, maxWidth: 560, margin: "16px auto 0", lineHeight: 1.5 }}>
-                Every CT account gets scored 0-100 on authenticity. We catch bot followers, engagement pods, F4F rings, and fake activity — before you get scammed.
+                Every CT account gets scored 0-100 on authenticity. Trust Score gatekeeps who can apply to your jobs — catching bot followers, engagement pods, F4F rings, and fake activity before they waste your budget.
               </p>
             </div>
 

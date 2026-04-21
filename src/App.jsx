@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceDot, Area, AreaChart } from "recharts";
+import { supabase } from "./supabase";
 
 const VALUATION_WEIGHTS = {
   followers: 0.30,
@@ -912,6 +913,36 @@ export default function Web3Gigs() {
   const [jobsType, setJobsType] = useState("crypto"); // "ct" or "crypto" — default to crypto work
   const [waitlistEmail, setWaitlistEmail] = useState("");
   const [waitlistSubmitted, setWaitlistSubmitted] = useState(false);
+  const [waitlistError, setWaitlistError] = useState("");
+  const [waitlistLoading, setWaitlistLoading] = useState(false);
+
+  // Save email to Supabase waitlist
+  const submitWaitlist = async () => {
+    if (!waitlistEmail.includes("@")) return;
+    setWaitlistLoading(true);
+    setWaitlistError("");
+    try {
+      const { error } = await supabase
+        .from("waitlist")
+        .insert([{ email: waitlistEmail.trim().toLowerCase(), source: "analyze" }]);
+      if (error) {
+        // Duplicate email is fine — treat as success
+        if (error.code === "23505") {
+          setWaitlistSubmitted(true);
+        } else {
+          setWaitlistError("Something went wrong. Try again in a sec.");
+          console.error("Waitlist error:", error);
+        }
+      } else {
+        setWaitlistSubmitted(true);
+      }
+    } catch (err) {
+      setWaitlistError("Couldn't connect. Check your internet?");
+      console.error(err);
+    } finally {
+      setWaitlistLoading(false);
+    }
+  };
   const [selectedJob, setSelectedJob] = useState(null);
   const [showPostJob, setShowPostJob] = useState(false);
   const [proposalText, setProposalText] = useState("");
@@ -1687,7 +1718,7 @@ export default function Web3Gigs() {
                       placeholder="your@email.com"
                       value={waitlistEmail}
                       onChange={e => setWaitlistEmail(e.target.value)}
-                      onKeyDown={e => { if (e.key === "Enter" && waitlistEmail.includes("@")) setWaitlistSubmitted(true); }}
+                      onKeyDown={e => { if (e.key === "Enter") submitWaitlist(); }}
                       style={{
                         flex: 1, minWidth: 200, padding: "13px 16px",
                         background: "rgba(0, 0, 0, 0.9)",
@@ -1700,19 +1731,22 @@ export default function Web3Gigs() {
                       onBlur={e => e.target.style.borderColor = "rgba(255, 255, 255, 0.12)"}
                     />
                     <button
-                      onClick={() => { if (waitlistEmail.includes("@")) setWaitlistSubmitted(true); }}
-                      disabled={!waitlistEmail.includes("@")}
+                      onClick={submitWaitlist}
+                      disabled={!waitlistEmail.includes("@") || waitlistLoading}
                       style={{
                         padding: "13px 22px", borderRadius: 10, border: "none",
-                        background: !waitlistEmail.includes("@") ? "rgba(255, 255, 255, 0.05)" : `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
-                        color: !waitlistEmail.includes("@") ? C.textMuted : "#000",
+                        background: (!waitlistEmail.includes("@") || waitlistLoading) ? "rgba(255, 255, 255, 0.05)" : `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+                        color: (!waitlistEmail.includes("@") || waitlistLoading) ? C.textMuted : "#000",
                         fontSize: 13, fontWeight: 900,
                         fontFamily: "'Outfit', sans-serif",
-                        cursor: !waitlistEmail.includes("@") ? "not-allowed" : "pointer",
+                        cursor: (!waitlistEmail.includes("@") || waitlistLoading) ? "not-allowed" : "pointer",
                         letterSpacing: 0.3, transition: "all 0.2s",
                       }}
-                    >🚀 Get Early Access</button>
+                    >{waitlistLoading ? "⏳ Saving..." : "🚀 Get Early Access"}</button>
                   </div>
+                  {waitlistError && (
+                    <div style={{ fontSize: 12, color: "#ef4444", fontFamily: "'JetBrains Mono', monospace", marginTop: 10, marginBottom: 4 }}>⚠ {waitlistError}</div>
+                  )}
                   <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>
                     No spam. One email when we go live. Unsubscribe anytime.
                   </div>

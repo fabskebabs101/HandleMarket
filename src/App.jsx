@@ -1236,7 +1236,7 @@ export default function Web3Gigs() {
             </div>
           </div>
           {/* Right side — waitlist + menu */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginLeft: "auto", justifyContent: "flex-end" }}>
             <button
               onClick={() => { setWaitlistSubmitted(false); setWaitlistError(""); setShowWaitlistModal(true); }}
               style={{
@@ -1410,7 +1410,7 @@ export default function Web3Gigs() {
                   from { transform: translateX(0); }
                   to { transform: translateX(-50%); }
                 }
-                .ticker-track { animation: scrollTicker 70s linear infinite; }
+                .ticker-track { animation: scrollTicker 140s linear infinite; }
               `}</style>
               <div className="ticker-track" style={{ display: "flex", gap: 28, whiteSpace: "nowrap", width: "max-content" }}>
                 {[...Array(2)].map((_, loopIdx) => (
@@ -1478,7 +1478,7 @@ export default function Web3Gigs() {
               <Reveal delay={100}>
                 <h1 style={{ fontSize: 64, fontWeight: 900, margin: 0, letterSpacing: -3, lineHeight: 1 }}>
                   Hire crypto's best.<br />
-                  <span style={{ color: C.primary }}>Without the scams.</span>
+                  <span style={{ color: C.primary }}>Trust-verified.</span>
                 </h1>
               </Reveal>
               <Reveal delay={200}>
@@ -2780,10 +2780,10 @@ export default function Web3Gigs() {
               </div>
               <h1 style={{ fontSize: 42, fontWeight: 900, margin: 0, letterSpacing: -1.5, lineHeight: 1.1 }}>
                 Hire crypto's best.<br />
-                <span style={{ color: C.primary }}>Without the scams.</span>
+                <span style={{ color: C.primary }}>Trust-verified.</span>
               </h1>
               <p style={{ color: C.textSecondary, fontSize: 15, marginTop: 16, maxWidth: 580, margin: "16px auto 0", lineHeight: 1.5 }}>
-                The crypto work marketplace. Hire devs, designers, auditors, and writers — or KOLs, shitposters, and Spaces hosts. Trust-verified. Public on-chain handshakes. Escrow V2 soon.
+                The crypto work marketplace. Hire devs, designers, auditors, and writers — or KOLs, shitposters, and Spaces hosts. Every applicant comes with a Trust Score. Public on-chain Handshakes. Escrow V2 soon.
               </p>
 
               {/* How it works strip */}

@@ -894,6 +894,54 @@ const MOCK_JOBS = [
     tags: ["writing", "defi", "content"],
     requiresPortfolio: true,
   },
+  {
+    id: "job-021", jobType: "crypto",
+    title: "AI trading bot dev — Solana memecoin sniper",
+    category: "AI / ML",
+    poster: "@AlphaBotLabs", posterTrust: 88, posterVerified: true,
+    budget: 3500, budgetCurrency: "USDC",
+    deadline: "3w",
+    postedAgo: "4h ago",
+    proposals: 5,
+    minTrustScore: 45,
+    status: "open",
+    description: "Build an AI-driven sniper bot for Solana memecoins. Model should score new launches by liquidity, holder distribution, dev wallet behavior, and social signals. Python + on-chain integration.",
+    deliverables: ["Trained classifier model", "Live inference pipeline", "Backtest report + docs"],
+    tags: ["ai", "solana", "trading"],
+    requiresPortfolio: true,
+  },
+  {
+    id: "job-022", jobType: "crypto",
+    title: "LLM integration — on-chain analytics assistant",
+    category: "AI / ML",
+    poster: "@OnChainAI", posterTrust: 84, posterVerified: true,
+    budget: 2200, budgetCurrency: "USDC",
+    deadline: "2w",
+    postedAgo: "9h ago",
+    proposals: 7,
+    minTrustScore: 40,
+    status: "open",
+    description: "Wire up a Claude/GPT-based chatbot that can query our on-chain analytics API. Natural language → SQL → formatted response. RAG over existing docs. OpenAI or Anthropic API.",
+    deliverables: ["Working chatbot", "RAG pipeline", "Streamlit or React demo"],
+    tags: ["llm", "rag", "analytics"],
+    requiresPortfolio: true,
+  },
+  {
+    id: "job-023", jobType: "crypto",
+    title: "AI image generator for NFT collection",
+    category: "AI / ML",
+    poster: "@NFTStudio_", posterTrust: 76, posterVerified: false,
+    budget: 1400, budgetCurrency: "USDC",
+    deadline: "2w",
+    postedAgo: "1d ago",
+    proposals: 19,
+    minTrustScore: 35,
+    status: "open",
+    description: "Use Stable Diffusion/Flux fine-tuning to generate 1000 unique NFT pieces based on a custom style. Trait weighting + rarity logic required.",
+    deliverables: ["1000 generated assets", "Metadata JSON", "Trait rarity report"],
+    tags: ["ai", "nft", "generative"],
+    requiresPortfolio: true,
+  },
 ];
 
 const JOB_CATEGORIES_CT = [
@@ -910,6 +958,7 @@ const JOB_CATEGORIES_CT = [
 const JOB_CATEGORIES_CRYPTO = [
   { id: "all", label: "All Crypto Work", icon: "🌐" },
   { id: "Development", label: "Dev", icon: "💻" },
+  { id: "AI / ML", label: "AI", icon: "🤖" },
   { id: "Design", label: "Design", icon: "🎨" },
   { id: "Audits", label: "Audits", icon: "🔐" },
   { id: "Technical Writing", label: "Writing", icon: "✍️" },
@@ -1377,6 +1426,8 @@ export default function Web3Gigs() {
                       { icon: "💬", title: "Community manager · Discord + TG", budget: 1000, deadline: "Ongoing", trust: 35, status: "open", type: "crypto" },
                       { icon: "🎨", title: "Logo + brand kit · DePIN project", budget: 900, deadline: "10d", trust: 30, status: "open", type: "crypto" },
                       { icon: "✍️", title: "Technical blog writer · DeFi primitives", budget: 600, deadline: "Ongoing", trust: 30, status: "open", type: "crypto" },
+                      { icon: "🤖", title: "AI memecoin sniper bot · Solana", budget: 3500, deadline: "3w", trust: 45, status: "open", type: "crypto" },
+                      { icon: "🤖", title: "LLM on-chain analytics assistant", budget: 2200, deadline: "2w", trust: 40, status: "open", type: "crypto" },
                       // CT / KOL
                       { icon: "🤡", title: "Shitpost campaign · memecoin launch", budget: 500, deadline: "72h", trust: 55, status: "open", type: "ct" },
                       { icon: "🧵", title: "Thread writer · weekly alpha", budget: 800, deadline: "Ongoing", trust: 70, status: "open", type: "ct" },
@@ -1657,8 +1708,8 @@ export default function Web3Gigs() {
                 <GlowCard style={{ padding: "20px 24px", background: "rgba(0, 0, 0, 0.5)" }}>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 12 }}>
                     {[
-                      { label: "Open Jobs", val: "19", icon: "💼" },
-                      { label: "Total Budget", val: "$23k+", icon: "💰" },
+                      { label: "Open Jobs", val: "22", icon: "💼" },
+                      { label: "Total Budget", val: "$30k+", icon: "💰" },
                       { label: "vs Fiverr Cut", val: "0%", icon: "✂️" },
                       { label: "Paid in", val: "USDC", icon: "💸" },
                       { label: "Disputes", val: "0", icon: "⚖️" },
@@ -1748,7 +1799,7 @@ export default function Web3Gigs() {
                   Join <span style={{ color: C.primary }}>crypto's work marketplace.</span>
                 </div>
                 <div style={{ fontSize: 15, color: C.textSecondary, marginBottom: 28, maxWidth: 500, margin: "0 auto 28px" }}>
-                  19+ open jobs. Zero middleman fees. Paid in USDC, USDT or SOL. Reputation-first hiring. Ship the way crypto was meant to work.
+                  22+ open jobs. Zero middleman fees. Paid in USDC, USDT or SOL. Reputation-first hiring. Ship the way crypto was meant to work.
                 </div>
                 <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
                   <button

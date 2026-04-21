@@ -891,7 +891,7 @@ const WATCHLIST = [
 ];
 
 
-export default function CTTrust() {
+export default function Web3Gigs() {
   const [tab, setTab] = useState("home");
   const [form, setForm] = useState({
     followers: "", avgLikes: "", avgRetweets: "", avgReplies: "",
@@ -1056,10 +1056,10 @@ export default function CTTrust() {
             onMouseEnter={e => e.currentTarget.style.opacity = "0.75"}
             onMouseLeave={e => e.currentTarget.style.opacity = "1"}
           >
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 900, color: "#000" }}>CT</div>
+            <div style={{ width: 40, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "#000", fontFamily: "'JetBrains Mono', monospace", letterSpacing: -0.5 }}>W3G</div>
             <div>
-              <div style={{ fontWeight: 700, fontSize: 18, letterSpacing: -0.5 }}>CT Trust</div>
-              <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1, textTransform: "uppercase" }}>Score · Verify · Trust</div>
+              <div style={{ fontWeight: 700, fontSize: 18, letterSpacing: -0.5 }}>Web3Gigs</div>
+              <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1, textTransform: "uppercase" }}>Hire · Handshake · Ship</div>
             </div>
           </div>
           {/* Hamburger Menu */}
@@ -1282,7 +1282,7 @@ export default function CTTrust() {
               </Reveal>
               <Reveal delay={200}>
                 <p style={{ color: C.textSecondary, fontSize: 18, marginTop: 20, maxWidth: 560, margin: "20px auto 0", lineHeight: 1.5 }}>
-                  Dev, design, audits, writing — or shitposts, raids, and Spaces. Every applicant comes with a CT Trust Score attached. No middleman. No 20% Fiverr cut. Get paid in USDC.
+                  Dev, design, audits, writing — or shitposts, raids, and Spaces. Every applicant comes with a Trust Score attached. No middleman. No 20% Fiverr cut. Get paid in USDC.
                 </p>
               </Reveal>
 
@@ -1683,7 +1683,7 @@ export default function CTTrust() {
 
               {/* What you can still do */}
               <div style={{ marginTop: 32, paddingTop: 24, borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}>
-                <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 16 }}>Meanwhile, explore CT Trust</div>
+                <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 16 }}>Meanwhile, explore Web3Gigs</div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 8 }}>
                   {[
                     { icon: "🛡️", label: "Trust Score", tab: "trust" },
@@ -2114,7 +2114,7 @@ export default function CTTrust() {
                 <div style={{ fontSize: 20, fontWeight: 900, letterSpacing: -0.5 }}>Can the score be gamed?</div>
               </div>
               <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.6, marginBottom: 16 }}>
-                Hard to. Here's why CT Trust's scoring system holds up where others don't:
+                Hard to. Here's why Web3Gigs' scoring system holds up where others don't:
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14 }}>
                 {[
@@ -2264,7 +2264,7 @@ export default function CTTrust() {
               <h1 style={{ fontSize: 38, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>
                 Public <span style={{ color: C.primary }}>Profile</span>
               </h1>
-              <p style={{ color: C.textSecondary, fontSize: 15, marginTop: 8 }}>Every CT account gets a shareable profile at cttrust.xyz/@username</p>
+              <p style={{ color: C.textSecondary, fontSize: 15, marginTop: 8 }}>Every CT account gets a shareable profile at web3gigs.xyz/@username</p>
             </div>
 
             {/* Sample profile card */}
@@ -2351,7 +2351,7 @@ export default function CTTrust() {
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                       <div style={{ width: 32, height: 32, borderRadius: 8, background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, color: "#000" }}>CT</div>
                       <div>
-                        <div style={{ fontWeight: 800, fontSize: 15, color: "#fff", letterSpacing: -0.3 }}>CT Trust</div>
+                        <div style={{ fontWeight: 800, fontSize: 15, color: "#fff", letterSpacing: -0.3 }}>Web3Gigs</div>
                         <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1.5, textTransform: "uppercase" }}>Verified CT Account</div>
                       </div>
                     </div>
@@ -2454,7 +2454,7 @@ export default function CTTrust() {
                     borderTop: "1px solid rgba(212, 255, 0, 0.12)",
                     display: "flex", justifyContent: "space-between", alignItems: "center",
                   }}>
-                    <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>cttrust.xyz/@FabsKebabs101</div>
+                    <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>web3gigs.xyz/@FabsKebabs101</div>
                     <div style={{ fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" }}>Verify Yours →</div>
                   </div>
                 </div>
@@ -2486,7 +2486,7 @@ export default function CTTrust() {
               </div>
 
               <div style={{ marginTop: 14, padding: "10px 12px", background: "rgba(255, 255, 255, 0.03)", borderRadius: 8, fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.5 }}>
-                ℹ️ Share card is served as an OG image — when you paste your cttrust.xyz/@handle link on X, this card auto-attaches as the preview.
+                ℹ️ Share card is served as an OG image — when you paste your web3gigs.xyz/@handle link on X, this card auto-attaches as the preview.
               </div>
             </GlowCard>
 
@@ -2586,7 +2586,7 @@ export default function CTTrust() {
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 700, color: "#fbbf24", marginBottom: 4, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>V1 — Handshake Mode (No Custody)</div>
                   <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.6 }}>
-                    CT Trust doesn't hold funds yet. V1 uses <strong style={{ color: C.primary }}>on-chain handshakes</strong> — both parties sign a public commitment. Trust scores + community reputation enforce delivery. Multisig escrow (V2) and smart contract escrow (V3) coming soon.
+                    Web3Gigs doesn't hold funds yet. V1 uses <strong style={{ color: C.primary }}>on-chain handshakes</strong> — both parties sign a public commitment. Trust scores + community reputation enforce delivery. Multisig escrow (V2) and smart contract escrow (V3) coming soon.
                   </div>
                 </div>
               </div>
@@ -2709,7 +2709,7 @@ export default function CTTrust() {
               <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 14 }}>🤝 How Handshake Works</div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14 }}>
                 {[
-                  { n: "1", title: "Post or Apply", desc: "Companies post jobs with budget, deadline, and minimum trust score. Applicants send proposals with their CT Trust credentials attached." },
+                  { n: "1", title: "Post or Apply", desc: "Companies post jobs with budget, deadline, and minimum trust score. Applicants send proposals with their Trust Score credentials attached." },
                   { n: "2", title: "Sign Handshake", desc: "Both parties sign a public commitment on Solana — free, gasless. Terms become tamper-proof and publicly verifiable." },
                   { n: "3", title: "Work & Deliver", desc: "Worker delivers per the agreed deliverables. Buyer reviews. Both parties mark the handshake as complete." },
                   { n: "4", title: "Reputation Compounds", desc: "Successful handshakes boost both parties' trust scores. Disputes get arbitrated publicly by the community." },
@@ -3016,7 +3016,7 @@ export default function CTTrust() {
                 {/* Requirements */}
                 <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>🛡️ Requirements</div>
                 <div style={{ padding: "12px 14px", background: "rgba(212, 255, 0, 0.04)", border: "1px solid rgba(212, 255, 0, 0.15)", borderRadius: 8, fontSize: 12, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", marginBottom: 20, lineHeight: 1.6 }}>
-                  Applicants must have a CT Trust Score of <strong style={{ color: C.primary }}>{selectedJob.minTrustScore}+</strong> to submit a proposal.
+                  Applicants must have a Trust Score of <strong style={{ color: C.primary }}>{selectedJob.minTrustScore}+</strong> to submit a proposal.
                 </div>
 
                 {/* Job Poster */}
@@ -3051,7 +3051,7 @@ export default function CTTrust() {
                     <textarea
                       value={proposalText}
                       onChange={e => setProposalText(e.target.value)}
-                      placeholder="Why are you right for this job? Include relevant work, timelines, and what makes you trustworthy. Your CT Trust Score will be auto-attached."
+                      placeholder="Why are you right for this job? Include relevant work, timelines, and what makes you trustworthy. Your Trust Score will be auto-attached."
                       style={{
                         width: "100%", minHeight: 100, padding: "12px 14px",
                         background: "rgba(0, 0, 0, 0.9)",
@@ -3120,7 +3120,7 @@ export default function CTTrust() {
             <div style={{ padding: "24px 28px", borderBottom: `1px solid ${C.border}`, background: `linear-gradient(135deg, rgba(212, 255, 0, 0.04), transparent)`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
                 <div style={{ fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>💼 New Job · Handshake Mode</div>
-                <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5 }}>Post a job on CT Trust</div>
+                <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5 }}>Post a job on Web3Gigs</div>
               </div>
               <button onClick={() => setShowPostJob(false)} style={{
                 width: 32, height: 32, borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.08)",
@@ -3189,7 +3189,7 @@ export default function CTTrust() {
 
       <div style={{ borderTop: "1px solid rgba(255, 255, 255, 0.05)", padding: "20px 24px", marginTop: 60, textAlign: "center" }}>
         <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
-          CT Trust © 2026 · Trust scores are estimates based on public metrics · Not financial advice
+          Web3Gigs © 2026 · Trust scores are estimates based on public metrics · Not financial advice
         </div>
       </div>
     </div>

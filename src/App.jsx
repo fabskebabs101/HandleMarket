@@ -2366,7 +2366,7 @@ export default function Web3Gigs() {
               <h1 style={{ fontSize: 38, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>
                 Public <span style={{ color: C.primary }}>Profile</span>
               </h1>
-              <p style={{ color: C.textSecondary, fontSize: 15, marginTop: 8 }}>Every CT account gets a shareable profile at web3gigs.xyz/@username</p>
+              <p style={{ color: C.textSecondary, fontSize: 15, marginTop: 8 }}>Every CT account gets a shareable profile at web3gigs.app/@username</p>
             </div>
 
             {/* Sample profile card */}
@@ -2556,7 +2556,7 @@ export default function Web3Gigs() {
                     borderTop: "1px solid rgba(212, 255, 0, 0.12)",
                     display: "flex", justifyContent: "space-between", alignItems: "center",
                   }}>
-                    <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>web3gigs.xyz/@FabsKebabs101</div>
+                    <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>web3gigs.app/@FabsKebabs101</div>
                     <div style={{ fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" }}>Verify Yours →</div>
                   </div>
                 </div>
@@ -2588,7 +2588,7 @@ export default function Web3Gigs() {
               </div>
 
               <div style={{ marginTop: 14, padding: "10px 12px", background: "rgba(255, 255, 255, 0.03)", borderRadius: 8, fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.5 }}>
-                ℹ️ Share card is served as an OG image — when you paste your web3gigs.xyz/@handle link on X, this card auto-attaches as the preview.
+                ℹ️ Share card is served as an OG image — when you paste your web3gigs.app/@handle link on X, this card auto-attaches as the preview.
               </div>
             </GlowCard>
 

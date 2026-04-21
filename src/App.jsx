@@ -917,14 +917,14 @@ export default function Web3Gigs() {
   const [waitlistLoading, setWaitlistLoading] = useState(false);
 
   // Save email to Supabase waitlist
-  const submitWaitlist = async () => {
+  const submitWaitlist = async (source = "analyze") => {
     if (!waitlistEmail.includes("@")) return;
     setWaitlistLoading(true);
     setWaitlistError("");
     try {
       const { error } = await supabase
         .from("waitlist")
-        .insert([{ email: waitlistEmail.trim().toLowerCase(), source: "analyze" }]);
+        .insert([{ email: waitlistEmail.trim().toLowerCase(), source }]);
       if (error) {
         // Duplicate email is fine — treat as success
         if (error.code === "23505") {
@@ -945,6 +945,7 @@ export default function Web3Gigs() {
   };
   const [selectedJob, setSelectedJob] = useState(null);
   const [showPostJob, setShowPostJob] = useState(false);
+  const [showWaitlistModal, setShowWaitlistModal] = useState(false);
   const [proposalText, setProposalText] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [hoveredTab, setHoveredTab] = useState(null);
@@ -1093,8 +1094,28 @@ export default function Web3Gigs() {
               <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1, textTransform: "uppercase" }}>Hire · Handshake · Ship</div>
             </div>
           </div>
-          {/* Hamburger Menu */}
-          <div style={{ position: "relative" }}>
+          {/* Right side — waitlist + menu */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            <button
+              onClick={() => { setWaitlistSubmitted(false); setWaitlistError(""); setShowWaitlistModal(true); }}
+              style={{
+                padding: "10px 16px", borderRadius: 12, border: "none",
+                background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+                color: "#000", fontSize: 12, fontWeight: 900,
+                fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+                letterSpacing: 0.3, transition: "all 0.2s",
+                boxShadow: "0 0 20px rgba(212, 255, 0, 0.2)",
+                display: "flex", alignItems: "center", gap: 6,
+                whiteSpace: "nowrap",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 0 28px rgba(212, 255, 0, 0.35)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 20px rgba(212, 255, 0, 0.2)"; }}
+            >
+              <span>💌</span>
+              <span>Join Waitlist</span>
+            </button>
+            {/* Hamburger Menu */}
+            <div style={{ position: "relative" }}>
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               onMouseEnter={e => { e.currentTarget.style.background = "rgba(212, 255, 0, 0.18)"; e.currentTarget.style.transform = "scale(1.05)"; }}
@@ -1221,6 +1242,7 @@ export default function Web3Gigs() {
                 </div>
               </>
             )}
+          </div>
           </div>
         </div>
       </div>
@@ -3262,6 +3284,124 @@ export default function Web3Gigs() {
                   ))}
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── WAITLIST MODAL ───────────────────────────────── */}
+      {showWaitlistModal && (
+        <div
+          onClick={() => setShowWaitlistModal(false)}
+          style={{
+            position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.85)",
+            backdropFilter: "blur(8px)", zIndex: 100,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            padding: "20px", overflowY: "auto", animation: "fadeIn 0.2s ease-out",
+          }}
+        >
+          <style>{`@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }`}</style>
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              maxWidth: 480, width: "100%",
+              background: "rgba(10, 10, 10, 0.98)",
+              border: `1px solid ${C.borderHover}`,
+              borderRadius: 20, padding: 0,
+              boxShadow: "0 40px 100px rgba(0, 0, 0, 0.8), 0 0 60px rgba(212, 255, 0, 0.1)",
+              overflow: "hidden",
+            }}
+          >
+            {/* Header */}
+            <div style={{ padding: "24px 28px", borderBottom: `1px solid ${C.border}`, background: `linear-gradient(135deg, rgba(212, 255, 0, 0.04), transparent)`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <div style={{ fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>💌 Early Access</div>
+                <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: -0.5 }}>Join the Web3Gigs waitlist</div>
+              </div>
+              <button onClick={() => setShowWaitlistModal(false)} style={{
+                width: 32, height: 32, borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.08)",
+                background: "rgba(0, 0, 0, 0.5)", color: C.textSecondary,
+                fontSize: 16, cursor: "pointer", flexShrink: 0,
+              }}>✕</button>
+            </div>
+
+            {/* Body */}
+            <div style={{ padding: "24px 28px" }}>
+              {!waitlistSubmitted ? (
+                <>
+                  <p style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.6, marginTop: 0, marginBottom: 20 }}>
+                    Be first to post jobs, hire talent, and sign Handshakes when we go live. First 500 signups get priority access + free featured listings.
+                  </p>
+
+                  <div style={{ display: "flex", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
+                    <input
+                      type="email"
+                      placeholder="your@email.com"
+                      value={waitlistEmail}
+                      onChange={e => setWaitlistEmail(e.target.value)}
+                      onKeyDown={e => { if (e.key === "Enter") submitWaitlist("nav"); }}
+                      autoFocus
+                      style={{
+                        flex: 1, minWidth: 200, padding: "13px 16px",
+                        background: "rgba(0, 0, 0, 0.9)",
+                        border: "1px solid rgba(255, 255, 255, 0.12)",
+                        borderRadius: 10, color: C.textPrimary,
+                        fontFamily: "'JetBrains Mono', monospace", fontSize: 13,
+                        outline: "none", transition: "border 0.2s",
+                      }}
+                      onFocus={e => e.target.style.borderColor = C.primary}
+                      onBlur={e => e.target.style.borderColor = "rgba(255, 255, 255, 0.12)"}
+                    />
+                    <button
+                      onClick={() => submitWaitlist("nav")}
+                      disabled={!waitlistEmail.includes("@") || waitlistLoading}
+                      style={{
+                        padding: "13px 22px", borderRadius: 10, border: "none",
+                        background: (!waitlistEmail.includes("@") || waitlistLoading) ? "rgba(255, 255, 255, 0.05)" : `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+                        color: (!waitlistEmail.includes("@") || waitlistLoading) ? C.textMuted : "#000",
+                        fontSize: 13, fontWeight: 900,
+                        fontFamily: "'Outfit', sans-serif",
+                        cursor: (!waitlistEmail.includes("@") || waitlistLoading) ? "not-allowed" : "pointer",
+                        letterSpacing: 0.3, transition: "all 0.2s",
+                      }}
+                    >{waitlistLoading ? "⏳" : "🚀 Join"}</button>
+                  </div>
+
+                  {waitlistError && (
+                    <div style={{ fontSize: 12, color: "#ef4444", fontFamily: "'JetBrains Mono', monospace", marginTop: 6, marginBottom: 6 }}>⚠ {waitlistError}</div>
+                  )}
+
+                  <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>
+                    No spam. One email when we go live. Unsubscribe anytime.
+                  </div>
+
+                  {/* What you get */}
+                  <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}>
+                    <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>What you'll get first access to</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                      {[
+                        "Post trust-verified jobs (Crypto + CT)",
+                        "Apply to jobs with your Trust Score attached",
+                        "Sign on-chain Handshakes with buyers",
+                        "Paid in USDC — no middleman, no 20% cut",
+                      ].map((item, i) => (
+                        <div key={i} style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 12, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace" }}>
+                          <span style={{ color: C.primary, fontWeight: 900 }}>→</span>
+                          <span>{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div style={{ padding: "20px", background: "rgba(16, 185, 129, 0.06)", border: "1px solid rgba(16, 185, 129, 0.25)", borderRadius: 12, textAlign: "center" }}>
+                  <div style={{ fontSize: 36, marginBottom: 10 }}>✅</div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: "#10b981", marginBottom: 8 }}>You're on the list!</div>
+                  <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.5, fontFamily: "'JetBrains Mono', monospace" }}>
+                    We'll email <span style={{ color: C.primary }}>{waitlistEmail}</span> the second Web3Gigs goes live.
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

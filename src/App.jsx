@@ -1661,7 +1661,7 @@ export default function Web3Gigs() {
  ].map(j => (
  <div key={j.title} style={{ padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "space-between", border: "1px solid rgba(255, 255, 255, 0.04)"}}>
  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
- <span style={{ fontSize: 14 }}>{j.icon}</span>
+ <span style={{ width: 4, height: 4, borderRadius: "50%", background: C.primary, flexShrink: 0 }} />
  <span style={{ fontSize: 12, color: C.textPrimary, fontFamily: "'JetBrains Mono', monospace"}}>{j.title}</span>
  </div>
  <span style={{ fontSize: 12, color: C.primary, fontFamily: "'JetBrains Mono', monospace", fontWeight: 800 }}>{j.budget}</span>
@@ -1682,7 +1682,7 @@ export default function Web3Gigs() {
 
  {/* CT / KOL SIDE */}
  <GlowCard glow style={{ padding: "24px", background: `linear-gradient(135deg, rgba(52, 211, 153, 0.04), rgba(0, 0, 0, 0.5))` }}>
- <div style={{ fontSize: 32, marginBottom: 8 }}></div>
+ <div style={{ marginBottom: 14, color: "#34d399"}}><Megaphone size={32} strokeWidth={2} /></div>
  <div style={{ fontSize: 20, fontWeight: 900, marginBottom: 6, letterSpacing: -0.5 }}>CT / KOL Jobs</div>
  <div style={{ fontSize: 12, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 14 }}>Shitposts · Threads · Raids · Spaces</div>
  <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.6, marginBottom: 16 }}>Hire CT natives who actually move narratives. KOLs, shitposters, thread writers, meme warriors. Trust Score = your reputation. High-trust accounts get booked first.
@@ -1696,7 +1696,7 @@ export default function Web3Gigs() {
  ].map(j => (
  <div key={j.title} style={{ padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "space-between", border: "1px solid rgba(255, 255, 255, 0.04)"}}>
  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
- <span style={{ fontSize: 14 }}>{j.icon}</span>
+ <span style={{ width: 4, height: 4, borderRadius: "50%", background: C.primary, flexShrink: 0 }} />
  <span style={{ fontSize: 12, color: C.textPrimary, fontFamily: "'JetBrains Mono', monospace"}}>{j.title}</span>
  </div>
  <span style={{ fontSize: 12, color: C.primary, fontFamily: "'JetBrains Mono', monospace", fontWeight: 800 }}>{j.budget}</span>
@@ -1855,7 +1855,7 @@ export default function Web3Gigs() {
  <div>
  <div style={{ textAlign: "center", marginBottom: 40 }}>
  <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 20, background: "rgba(212, 255, 0, 0.06)", border: "1px solid rgba(212, 255, 0, 0.2)", marginBottom: 20 }}>
- <span style={{ fontSize: 12 }}></span>
+ <Search size={12} strokeWidth={2.5} style={{ color: C.primary }} />
  <span style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700 }}>Full Account Analysis</span>
  </div>
  <h1 style={{ fontSize: 42, fontWeight: 900, margin: 0, letterSpacing: -1.5, lineHeight: 1.1 }}>Verify any <span style={{ color: C.primary }}>CT account.</span>
@@ -2042,13 +2042,13 @@ export default function Web3Gigs() {
  <div style={{ marginTop: 18, display: "flex", flexDirection: "column", gap: 8 }}>
  {trustResult.redFlags.map((flag, i) => (
  <div key={`red-${i}`} style={{ padding: "10px 12px", background: "rgba(239, 68, 68, 0.08)", border: "1px solid rgba(239, 68, 68, 0.2)", borderRadius: 8, display: "flex", alignItems: "center", gap: 10 }}>
- <span style={{ fontSize: 14 }}></span>
+ <Flag size={14} strokeWidth={2.5} style={{ color: "#ef4444", flexShrink: 0 }} />
  <span style={{ fontSize: 12, color: "#fca5a5", fontFamily: "'JetBrains Mono', monospace"}}>{flag}</span>
  </div>
  ))}
  {trustResult.greenFlags.map((flag, i) => (
  <div key={`green-${i}`} style={{ padding: "10px 12px", background: "rgba(16, 185, 129, 0.06)", border: "1px solid rgba(16, 185, 129, 0.15)", borderRadius: 8, display: "flex", alignItems: "center", gap: 10 }}>
- <span style={{ fontSize: 14 }}></span>
+ <Check size={14} strokeWidth={2.5} style={{ color: "#10b981", flexShrink: 0 }} />
  <span style={{ fontSize: 12, color: "#6ee7b7", fontFamily: "'JetBrains Mono', monospace"}}>{flag}</span>
  </div>
  ))}
@@ -2177,7 +2177,7 @@ export default function Web3Gigs() {
 
  {historyData.some(p => p.anomaly) && (
  <div style={{ marginTop: 12, padding: "10px 12px", background: "rgba(239, 68, 68, 0.08)", border: "1px solid rgba(239, 68, 68, 0.2)", borderRadius: 8, display: "flex", alignItems: "center", gap: 10 }}>
- <span style={{ fontSize: 14 }}></span>
+ <AlertTriangle size={14} strokeWidth={2.5} style={{ color: "#ef4444", flexShrink: 0 }} />
  <span style={{ fontSize: 12, color: "#fca5a5", fontFamily: "'JetBrains Mono', monospace"}}>Anomaly detected: Sudden follower spike on day {90 - historyData.find(p => p.anomaly).day}</span>
  </div>
  )}
@@ -2222,7 +2222,7 @@ export default function Web3Gigs() {
  {/* Hero */}
  <div style={{ textAlign: "center", marginBottom: 40 }}>
  <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 20, background: "rgba(212, 255, 0, 0.06)", border: "1px solid rgba(212, 255, 0, 0.2)", marginBottom: 20 }}>
- <span style={{ fontSize: 12 }}></span>
+ <Shield size={12} strokeWidth={2.5} style={{ color: C.primary }} />
  <span style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700 }}>The Trust Score</span>
  </div>
  <h1 style={{ fontSize: 48, fontWeight: 900, margin: 0, letterSpacing: -2, lineHeight: 1.1 }}>Don't hire <span style={{ color: C.primary }}>bots or scammers.</span>
@@ -2355,7 +2355,7 @@ export default function Web3Gigs() {
  {/* Anti-gaming */}
  <GlowCard glow style={{ marginBottom: 40, padding: "28px"}}>
  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
- <div style={{ fontSize: 28 }}></div>
+ <Lock size={24} strokeWidth={2} style={{ color: C.primary }} />
  <div style={{ fontSize: 20, fontWeight: 900, letterSpacing: -0.5 }}>Can the score be gamed?</div>
  </div>
  <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.6, marginBottom: 16 }}>Hard to. Here's why Web3Gigs' scoring system holds up where others don't:
@@ -2618,7 +2618,7 @@ export default function Web3Gigs() {
  <div style={{ flex: 1, minWidth: 0 }}>
  <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap"}}>
  <span style={{ fontSize: 20, fontWeight: 800, color: "#fff", letterSpacing: -0.5 }}>Example Account</span>
- <span style={{ fontSize: 14, color: C.accent }}></span>
+ <Check size={14} strokeWidth={3} style={{ color: C.accent }} />
  </div>
  <div style={{ fontSize: 13, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", marginTop: 2 }}>@ExampleAnon</div>
  <div style={{ display: "flex", gap: 6, marginTop: 6, flexWrap: "wrap"}}>
@@ -2764,7 +2764,7 @@ export default function Web3Gigs() {
  {/* Hero */}
  <div style={{ textAlign: "center", marginBottom: 32 }}>
  <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 20, background: "rgba(212, 255, 0, 0.06)", border: "1px solid rgba(212, 255, 0, 0.2)", marginBottom: 16 }}>
- <span style={{ fontSize: 12 }}></span>
+ <Handshake size={12} strokeWidth={2.5} style={{ color: C.primary }} />
  <span style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700 }}>Handshake · Beta</span>
  </div>
  <h1 style={{ fontSize: 42, fontWeight: 900, margin: 0, letterSpacing: -1.5, lineHeight: 1.1 }}>Hire crypto's best.<br />
@@ -2915,7 +2915,7 @@ export default function Web3Gigs() {
  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
  <div style={{ width: 24, height: 24, borderRadius: 6, background: "linear-gradient(135deg, #333, #111)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 900, color: "#fff"}}>{job.poster[1].toUpperCase()}</div>
  <span style={{ fontSize: 12, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace"}}>{job.poster}</span>
- {job.posterVerified && <span style={{ fontSize: 11, color: C.accent }}></span>}
+ {job.posterVerified && <Check size={11} strokeWidth={3} style={{ color: C.accent }} />}
  </div>
  <div style={{ padding: "3px 8px", borderRadius: 6, background: `${posterColor}15`, border: `1px solid ${posterColor}40`, fontFamily: "'JetBrains Mono', monospace", fontSize: 10, fontWeight: 800, color: posterColor }}>{job.posterTrust}</div>
  </div>
@@ -3044,7 +3044,7 @@ export default function Web3Gigs() {
  <GlowCard>
  {!forensicsRun? (
  <div style={{ textAlign: "center", padding: "40px 20px"}}>
- <div style={{ fontSize: 40, marginBottom: 12 }}></div>
+ <div style={{ display: "flex", justifyContent: "center", marginBottom: 16, color: C.primary }}><Search size={40} strokeWidth={1.8} /></div>
  <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>Run Deep Forensics Scan</div>
  <div style={{ fontSize: 13, color: C.textSecondary, marginBottom: 20, maxWidth: 400, margin: "0 auto 20px"}}>Deep-scan the last 50 tweets for engagement manipulation, template replies, bot velocity patterns, and fake reply authors.</div>
  <button onClick={() => setForensicsRun(true)} style={{
@@ -3245,7 +3245,7 @@ export default function Web3Gigs() {
  <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 20 }}>
  {selectedJob.deliverables.map((item, i) => (
  <div key={i} style={{ padding: "10px 12px", background: "rgba(16, 185, 129, 0.04)", border: "1px solid rgba(16, 185, 129, 0.15)", borderRadius: 8, display: "flex", alignItems: "center", gap: 10 }}>
- <span style={{ color: "#10b981", fontWeight: 900 }}></span>
+ <Check size={13} strokeWidth={2.5} style={{ color: "#10b981", flexShrink: 0 }} />
  <span style={{ fontSize: 12, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace"}}>{item}</span>
  </div>
  ))}
@@ -3264,7 +3264,7 @@ export default function Web3Gigs() {
  <div>
  <div style={{ fontSize: 14, fontWeight: 700, display: "flex", alignItems: "center", gap: 6 }}>
  {selectedJob.poster}
- {selectedJob.posterVerified && <span style={{ fontSize: 12, color: C.accent }}></span>}
+ {selectedJob.posterVerified && <Check size={12} strokeWidth={3} style={{ color: C.accent }} />}
  </div>
  <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 2 }}>3 jobs posted · 2 completed · 0 disputes</div>
  </div>

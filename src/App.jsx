@@ -1028,10 +1028,10 @@ const ALERT_TYPES = [
  { id: "follower-spike", name: "Follower Spike", desc: "Alert when followers jump >10% in 24h", Icon: TrendingUp, premium: false },
  { id: "trust-drop", name: "Trust Score Drop", desc: "Alert when Trust Score drops by 10+ points", Icon: AlertTriangle, premium: false },
  { id: "score-milestone", name: "Tier Change", desc: "Alert when Trust Score tier changes (e.g. NOTED → CREDIBLE)", Icon: Trophy, premium: false },
- { id: "bot-flag", name: "Bot Activity Detected", desc: "Alert when CIB detection flags the account", Icon: Bot, premium: true },
- { id: "cluster", name: "Pod Membership", desc: "Alert when account joins a detected engagement pod", Icon: Network, premium: true },
- { id: "engagement-drop", name: "Engagement Collapse", desc: "Alert when engagement rate drops 50%+", Icon: Eye, premium: true },
- { id: "rival", name: "Competitor Movement", desc: "Alert when rival accounts change strategy", Icon: Flag, premium: true },
+ { id: "bot-flag", name: "Bot Activity Detected", desc: "Alert when CIB detection flags the account", Icon: Bot, premium: false },
+ { id: "cluster", name: "Pod Membership", desc: "Alert when account joins a detected engagement pod", Icon: Network, premium: false },
+ { id: "engagement-drop", name: "Engagement Collapse", desc: "Alert when engagement rate drops 50%+", Icon: Eye, premium: false },
+ { id: "rival", name: "Competitor Movement", desc: "Alert when rival accounts change strategy", Icon: Flag, premium: false },
 ];
 
 const WATCHLIST = [
@@ -2973,7 +2973,6 @@ export default function Web3Gigs() {
  <h1 style={{ fontSize: 38, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>CIB <span style={{ color: C.primary }}>Detection</span>
  </h1>
  <p style={{ color: C.textSecondary, fontSize: 15, marginTop: 8 }}>Coordinated Inauthentic Behavior · Exposing engagement pods & raid networks</p>
- <Pill text="PRO FEATURE"color={C.accent} />
  </div>
 
  {/* Detection stats */}
@@ -3140,11 +3139,8 @@ export default function Web3Gigs() {
  <div style={{ fontSize: 13, fontWeight: 700, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1, marginBottom: 12 }}>Available Alert Types</div>
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12, marginBottom: 24 }}>
  {ALERT_TYPES.map(a => (
- <GlowCard key={a.id} glow style={{ padding: "16px", opacity: a.premium? 0.85: 1 }}>
- <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10 }}>
- <div style={{ color: C.primary }}><a.Icon size={24} strokeWidth={2} /></div>
- {a.premium && <Pill text="PRO"color={C.accent} />}
- </div>
+ <GlowCard key={a.id} glow style={{ padding: "16px"}}>
+ <div style={{ color: C.primary, marginBottom: 10 }}><a.Icon size={24} strokeWidth={2} /></div>
  <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{a.name}</div>
  <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.5 }}>{a.desc}</div>
  </GlowCard>
@@ -3159,7 +3155,7 @@ export default function Web3Gigs() {
  ["Email", "your@email.com", false, false],
  ["Telegram", "@yourhandle", false, false],
  ["X DM", "Not connected", false, false],
- ["Webhook", "Custom endpoint", false, true],
+ ["Webhook", "Custom endpoint", false, false],
  ].map(([channel, value, enabled, premium]) => (
  <div key={channel} style={{
  padding: "14px", borderRadius: 10,
@@ -3168,8 +3164,7 @@ export default function Web3Gigs() {
  }}>
  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
  <span style={{ fontSize: 13, fontWeight: 700 }}>{channel}</span>
- {premium && <Pill text="PRO"color={C.accent} />}
- {enabled &&!premium && <span style={{ fontSize: 10, color: "#10b981", fontFamily: "'JetBrains Mono', monospace"}}>● ON</span>}
+ {enabled && <span style={{ fontSize: 10, color: "#10b981", fontFamily: "'JetBrains Mono', monospace"}}>● ON</span>}
  </div>
  <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace"}}>{value}</div>
  </div>

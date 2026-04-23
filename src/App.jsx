@@ -1,6 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceDot, Area, AreaChart } from "recharts";
 import { supabase } from "./supabase";
+import {
+  Home, Briefcase, Search, Shield, Trophy, User, Network, Bell,
+  Mail, Menu as MenuIcon, Check, X as XIcon, AlertTriangle, Flag,
+  Code, Palette, Lock, PenTool, Video, MessageCircle, Bot, Scissors,
+  Mic, Swords, Smile, Hash, Megaphone, Tv, BarChart3, Clock,
+  DollarSign, Rocket, Handshake, Zap, TrendingUp, Eye, Sparkles,
+  ArrowRight, Construction, Radio, Globe, FileText
+} from "lucide-react";
 
 const VALUATION_WEIGHTS = {
  followers: 0.30,
@@ -1262,6 +1270,7 @@ export default function Web3Gigs() {
  onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 0 28px rgba(212, 255, 0, 0.35)"; }}
  onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 20px rgba(212, 255, 0, 0.2)"; }}
  >
+ <Mail size={14} strokeWidth={2.5} />
  <span className="w3g-waitlist-short">WL</span>
  <span className="w3g-waitlist-label">Join Waitlist</span>
  </button>
@@ -1282,12 +1291,8 @@ export default function Web3Gigs() {
  transition: "all 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
  }}
  >
- {/* Animated hamburger icon */}
- <div style={{ display: "flex", flexDirection: "column", gap: 3, width: 16 }}>
- <div style={{ height: 2, background: "currentColor", borderRadius: 1, transition: "all 0.3s", transform: menuOpen? "rotate(45deg) translate(4px, 4px)": "none"}} />
- <div style={{ height: 2, background: "currentColor", borderRadius: 1, transition: "all 0.2s", opacity: menuOpen? 0: 1 }} />
- <div style={{ height: 2, background: "currentColor", borderRadius: 1, transition: "all 0.3s", transform: menuOpen? "rotate(-45deg) translate(4px, -4px)": "none"}} />
- </div>
+ {/* Menu icon */}
+ <MenuIcon size={16} strokeWidth={2.5} style={{ transition: "transform 0.3s", transform: menuOpen? "rotate(90deg)": "none"}} />
  <span>
  {[
  ["home", "Home"],
@@ -1328,15 +1333,15 @@ export default function Web3Gigs() {
  }
  `}</style>
  {[
- ["home", "Home", "Welcome + overview"],
- ["jobs", "Jobs", "Hire or get hired"],
- ["valuate", "Analyze", "Full CT account analysis"],
- ["trust", "Trust", "Trust Score guide"],
- ["leaderboard", "Ranks", "CT leaderboards"],
- ["profile", "Profile", "Public profile page"],
- ["cib", "CIB", "Bot & pod detection"],
- ["alerts", "Alerts", "Real-time watchlist"],
- ].map(([t, label, desc]) => {
+ ["home", Home, "Home", "Welcome + overview"],
+ ["jobs", Briefcase, "Jobs", "Hire or get hired"],
+ ["valuate", Search, "Analyze", "Full CT account analysis"],
+ ["trust", Shield, "Trust", "Trust Score guide"],
+ ["leaderboard", Trophy, "Ranks", "CT leaderboards"],
+ ["profile", User, "Profile", "Public profile page"],
+ ["cib", Network, "CIB", "Bot & pod detection"],
+ ["alerts", Bell, "Alerts", "Real-time watchlist"],
+ ].map(([t, Icon, label, desc]) => {
  const isActive = tab === t;
  const isHovered = hoveredTab === t;
  return (
@@ -1359,6 +1364,13 @@ export default function Web3Gigs() {
  marginBottom: 2,
  }}
  >
+ <div style={{
+ width: 28, display: "flex", alignItems: "center", justifyContent: "center",
+ color: isActive ? C.primary : isHovered ? C.textPrimary : C.textMuted,
+ transition: "color 0.2s",
+ }}>
+ <Icon size={isHovered ? 20 : 18} strokeWidth={2} />
+ </div>
  <div style={{ flex: 1 }}>
  <div style={{
  fontSize: isHovered? 14: 13,
@@ -1451,14 +1463,17 @@ export default function Web3Gigs() {
  return (
  <div key={`${loopIdx}-${i}`} style={{ display: "flex", alignItems: "center", gap: 12, fontFamily: "'JetBrains Mono', monospace", fontSize: 12 }}>
  <span style={{ width: 5, height: 5, borderRadius: "50%", background: statusColor, boxShadow: `0 0 6px ${statusColor}` }} />
- <span style={{ fontSize: 13 }}>{item.icon}</span>
  <span style={{ padding: "2px 6px", borderRadius: 4, background: `${typeColor}15`, color: typeColor, fontSize: 9, fontWeight: 800, letterSpacing: 0.8 }}>{typeLabel}</span>
  <span style={{ color: C.textPrimary, fontWeight: 700 }}>{item.title}</span>
  <span style={{ color: C.primary, fontWeight: 800 }}>${item.budget.toLocaleString()} USDC</span>
  <span style={{ color: C.textMuted }}>·</span>
- <span style={{ color: C.textSecondary, fontSize: 11 }}>⏱ {item.deadline}</span>
+ <span style={{ color: C.textSecondary, fontSize: 11, display: "inline-flex", alignItems: "center", gap: 4 }}>
+ <Clock size={11} strokeWidth={2} /> {item.deadline}
+ </span>
  <span style={{ color: C.textMuted }}>·</span>
- <span style={{ color: "#fbbf24", fontSize: 11 }}> {item.trust}+</span>
+ <span style={{ color: "#fbbf24", fontSize: 11, display: "inline-flex", alignItems: "center", gap: 4 }}>
+ <Shield size={11} strokeWidth={2} /> {item.trust}+
+ </span>
  <span style={{ color: C.textMuted, marginLeft: 8 }}>·</span>
  </div>
  );
@@ -1737,11 +1752,11 @@ export default function Web3Gigs() {
  </div>
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14 }}>
  {[
- { icon: "", title: "Trust Score", desc: "0-100 authenticity rating. Exposes bot-inflated audiences and engagement pods.", tab: "trust"},
- { icon: "", title: "CIB Detection", desc: "Catches coordinated pods, raid networks, and F4F rings before you get scammed.", tab: "cib"},
- { icon: "", title: "90-Day Tracking", desc: "Historical timeline exposes sudden growth spikes, bot purchases, and anomalies.", tab: "valuate"},
- { icon: "", title: "CT Leaderboards", desc: "Trending, Rising, and Suspicious rankings updated hourly.", tab: "leaderboard"},
- { icon: "", title: "Real-Time Alerts", desc: "Watch any account. Get notified the second something changes.", tab: "alerts"},
+ { Icon: Shield, title: "Trust Score", desc: "0-100 authenticity rating. Exposes bot-inflated audiences and engagement pods.", tab: "trust"},
+ { Icon: Network, title: "CIB Detection", desc: "Catches coordinated pods, raid networks, and F4F rings before you get scammed.", tab: "cib"},
+ { Icon: TrendingUp, title: "90-Day Tracking", desc: "Historical timeline exposes sudden growth spikes, bot purchases, and anomalies.", tab: "valuate"},
+ { Icon: Trophy, title: "CT Leaderboards", desc: "Trending, Rising, and Suspicious rankings updated hourly.", tab: "leaderboard"},
+ { Icon: Bell, title: "Real-Time Alerts", desc: "Watch any account. Get notified the second something changes.", tab: "alerts"},
  ].map(f => (
  <div key={f.title}
  onClick={() => setTab(f.tab)}
@@ -1760,10 +1775,14 @@ export default function Web3Gigs() {
  {f.badge}
  </div>
  )}
- <div style={{ fontSize: 28, marginBottom: 10 }}>{f.icon}</div>
+ <div style={{ marginBottom: 14, color: C.primary }}>
+ <f.Icon size={28} strokeWidth={2} />
+ </div>
  <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 4, letterSpacing: -0.3 }}>{f.title}</div>
  <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.5 }}>{f.desc}</div>
- <div style={{ fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", marginTop: 10, letterSpacing: 1, textTransform: "uppercase", fontWeight: 700 }}>Explore →</div>
+ <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", marginTop: 10, letterSpacing: 1, textTransform: "uppercase", fontWeight: 700 }}>
+ Explore <ArrowRight size={11} strokeWidth={2.5} />
+ </div>
  </div>
  ))}
  </div>

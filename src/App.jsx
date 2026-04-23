@@ -953,25 +953,25 @@ const MOCK_JOBS = [
 ];
 
 const JOB_CATEGORIES_CT = [
- { id: "all", label: "All CT Jobs", icon: ""},
- { id: "Shitposting", label: "Shitposting", icon: ""},
- { id: "Thread Writing", label: "Threads", icon: ""},
- { id: "KOL / Raids", label: "Raids", icon: ""},
- { id: "Spaces / AMAs", label: "Spaces", icon: ""},
- { id: "Meme Warfare", label: "Memes", icon: ""},
- { id: "Streaming / Gambling", label: "Streaming", icon: ""},
- { id: "Clipping / Editing", label: "Clips", icon: ""},
+ { id: "all", label: "All CT Jobs", Icon: Globe },
+ { id: "Shitposting", label: "Shitposting", Icon: Smile },
+ { id: "Thread Writing", label: "Threads", Icon: Hash },
+ { id: "KOL / Raids", label: "Raids", Icon: Megaphone },
+ { id: "Spaces / AMAs", label: "Spaces", Icon: Mic },
+ { id: "Meme Warfare", label: "Memes", Icon: Swords },
+ { id: "Streaming / Gambling", label: "Streaming", Icon: Radio },
+ { id: "Clipping / Editing", label: "Clips", Icon: Scissors },
 ];
 
 const JOB_CATEGORIES_CRYPTO = [
- { id: "all", label: "All Crypto Work", icon: ""},
- { id: "Development", label: "Dev", icon: ""},
- { id: "AI / ML", label: "AI", icon: ""},
- { id: "Design", label: "Design", icon: ""},
- { id: "Audits", label: "Audits", icon: ""},
- { id: "Technical Writing", label: "Writing", icon: ""},
- { id: "Video Editing", label: "Video", icon: ""},
- { id: "Community", label: "Community", icon: ""},
+ { id: "all", label: "All Crypto Work", Icon: Globe },
+ { id: "Development", label: "Dev", Icon: Code },
+ { id: "AI / ML", label: "AI", Icon: Bot },
+ { id: "Design", label: "Design", Icon: Palette },
+ { id: "Audits", label: "Audits", Icon: Lock },
+ { id: "Technical Writing", label: "Writing", Icon: PenTool },
+ { id: "Video Editing", label: "Video", Icon: Video },
+ { id: "Community", label: "Community", Icon: MessageCircle },
 ];
 
 // ─── PHASE 4: CIB Detection + Forensics + Alerts ────────────────
@@ -1025,13 +1025,13 @@ const FORENSICS_REPORT = {
 };
 
 const ALERT_TYPES = [
- { id: "follower-spike", name: "Follower Spike", desc: "Alert when followers jump >10% in 24h", icon: "", premium: false },
- { id: "trust-drop", name: "Trust Score Drop", desc: "Alert when Trust Score drops by 10+ points", icon: "", premium: false },
- { id: "score-milestone", name: "Tier Change", desc: "Alert when Trust Score tier changes (e.g. NOTED → CREDIBLE)", icon: "", premium: false },
- { id: "bot-flag", name: "Bot Activity Detected", desc: "Alert when CIB detection flags the account", icon: "", premium: true },
- { id: "cluster", name: "Pod Membership", desc: "Alert when account joins a detected engagement pod", icon: "", premium: true },
- { id: "engagement-drop", name: "Engagement Collapse", desc: "Alert when engagement rate drops 50%+", icon: "", premium: true },
- { id: "rival", name: "Competitor Movement", desc: "Alert when rival accounts change strategy", icon: "", premium: true },
+ { id: "follower-spike", name: "Follower Spike", desc: "Alert when followers jump >10% in 24h", Icon: TrendingUp, premium: false },
+ { id: "trust-drop", name: "Trust Score Drop", desc: "Alert when Trust Score drops by 10+ points", Icon: AlertTriangle, premium: false },
+ { id: "score-milestone", name: "Tier Change", desc: "Alert when Trust Score tier changes (e.g. NOTED → CREDIBLE)", Icon: Trophy, premium: false },
+ { id: "bot-flag", name: "Bot Activity Detected", desc: "Alert when CIB detection flags the account", Icon: Bot, premium: true },
+ { id: "cluster", name: "Pod Membership", desc: "Alert when account joins a detected engagement pod", Icon: Network, premium: true },
+ { id: "engagement-drop", name: "Engagement Collapse", desc: "Alert when engagement rate drops 50%+", Icon: Eye, premium: true },
+ { id: "rival", name: "Competitor Movement", desc: "Alert when rival accounts change strategy", Icon: Flag, premium: true },
 ];
 
 const WATCHLIST = [
@@ -1434,28 +1434,28 @@ export default function Web3Gigs() {
  <div key={loopIdx} style={{ display: "flex", gap: 28 }}>
  {[
  // Crypto Work
- { icon: "", title: "Solana dev · Anchor escrow mod", budget: 2500, deadline: "2w", trust: 40, status: "open", type: "crypto"},
- { icon: "", title: "Smart contract audit · ERC-20 + staking", budget: 5000, deadline: "3w", trust: 40, status: "open", type: "crypto"},
- { icon: "", title: "Frontend dev · React + Wagmi dashboard", budget: 1800, deadline: "2w", trust: 30, status: "open", type: "crypto"},
- { icon: "", title: "Video editor · 30s crypto explainer", budget: 300, deadline: "5d", trust: 30, status: "open", type: "crypto"},
- { icon: "", title: "Whitepaper writer · L2 rollup", budget: 1500, deadline: "3w", trust: 40, status: "open", type: "crypto"},
- { icon: "", title: "NFT PFP design · 10 pieces", budget: 1200, deadline: "10d", trust: 30, status: "progress", type: "crypto"},
- { icon: "", title: "Community manager · Discord + TG", budget: 1000, deadline: "Ongoing", trust: 35, status: "open", type: "crypto"},
- { icon: "", title: "Logo + brand kit · DePIN project", budget: 900, deadline: "10d", trust: 30, status: "open", type: "crypto"},
- { icon: "", title: "Technical blog writer · DeFi primitives", budget: 600, deadline: "Ongoing", trust: 30, status: "open", type: "crypto"},
- { icon: "", title: "AI memecoin sniper bot · Solana", budget: 3500, deadline: "3w", trust: 45, status: "open", type: "crypto"},
- { icon: "", title: "LLM on-chain analytics assistant", budget: 2200, deadline: "2w", trust: 40, status: "open", type: "crypto"},
+ { title: "Solana dev · Anchor escrow mod", budget: 2500, deadline: "2w", trust: 40, status: "open", type: "crypto"},
+ { title: "Smart contract audit · ERC-20 + staking", budget: 5000, deadline: "3w", trust: 40, status: "open", type: "crypto"},
+ { title: "Frontend dev · React + Wagmi dashboard", budget: 1800, deadline: "2w", trust: 30, status: "open", type: "crypto"},
+ { title: "Video editor · 30s crypto explainer", budget: 300, deadline: "5d", trust: 30, status: "open", type: "crypto"},
+ { title: "Whitepaper writer · L2 rollup", budget: 1500, deadline: "3w", trust: 40, status: "open", type: "crypto"},
+ { title: "NFT PFP design · 10 pieces", budget: 1200, deadline: "10d", trust: 30, status: "progress", type: "crypto"},
+ { title: "Community manager · Discord + TG", budget: 1000, deadline: "Ongoing", trust: 35, status: "open", type: "crypto"},
+ { title: "Logo + brand kit · DePIN project", budget: 900, deadline: "10d", trust: 30, status: "open", type: "crypto"},
+ { title: "Technical blog writer · DeFi primitives", budget: 600, deadline: "Ongoing", trust: 30, status: "open", type: "crypto"},
+ { title: "AI memecoin sniper bot · Solana", budget: 3500, deadline: "3w", trust: 45, status: "open", type: "crypto"},
+ { title: "LLM on-chain analytics assistant", budget: 2200, deadline: "2w", trust: 40, status: "open", type: "crypto"},
  // CT / KOL
- { icon: "", title: "Shitpost campaign · memecoin launch", budget: 500, deadline: "72h", trust: 55, status: "open", type: "ct"},
- { icon: "", title: "Thread writer · weekly alpha", budget: 800, deadline: "Ongoing", trust: 70, status: "open", type: "ct"},
- { icon: "", title: "KOL raid · 50 engaged comments", budget: 150, deadline: "24h", trust: 40, status: "open", type: "ct"},
- { icon: "", title: "Space host · weekly founder AMAs", budget: 400, deadline: "Ongoing", trust: 70, status: "open", type: "ct"},
- { icon: "", title: "Meme warfare · 48h campaign", budget: 250, deadline: "48h", trust: 50, status: "open", type: "ct"},
- { icon: "", title: "Streamer · weekly sessions", budget: 2000, deadline: "Ongoing", trust: 60, status: "open", type: "ct"},
- { icon: "", title: "Clipper · daily CT highlights", budget: 450, deadline: "Ongoing", trust: 40, status: "open", type: "ct"},
- { icon: "", title: "Spaces clipper · viral moments", budget: 600, deadline: "Ongoing", trust: 45, status: "open", type: "ct"},
- { icon: "", title: "Podcast editor · longform to shorts", budget: 1200, deadline: "Ongoing", trust: 45, status: "open", type: "ct"},
- { icon: "", title: "Kick clipper · stream content", budget: 350, deadline: "Ongoing", trust: 35, status: "open", type: "ct"},
+ { title: "Shitpost campaign · memecoin launch", budget: 500, deadline: "72h", trust: 55, status: "open", type: "ct"},
+ { title: "Thread writer · weekly alpha", budget: 800, deadline: "Ongoing", trust: 70, status: "open", type: "ct"},
+ { title: "KOL raid · 50 engaged comments", budget: 150, deadline: "24h", trust: 40, status: "open", type: "ct"},
+ { title: "Space host · weekly founder AMAs", budget: 400, deadline: "Ongoing", trust: 70, status: "open", type: "ct"},
+ { title: "Meme warfare · 48h campaign", budget: 250, deadline: "48h", trust: 50, status: "open", type: "ct"},
+ { title: "Streamer · weekly sessions", budget: 2000, deadline: "Ongoing", trust: 60, status: "open", type: "ct"},
+ { title: "Clipper · daily CT highlights", budget: 450, deadline: "Ongoing", trust: 40, status: "open", type: "ct"},
+ { title: "Spaces clipper · viral moments", budget: 600, deadline: "Ongoing", trust: 45, status: "open", type: "ct"},
+ { title: "Podcast editor · longform to shorts", budget: 1200, deadline: "Ongoing", trust: 45, status: "open", type: "ct"},
+ { title: "Kick clipper · stream content", budget: 350, deadline: "Ongoing", trust: 35, status: "open", type: "ct"},
  ].map((item, i) => {
  const statusColor = item.status === "open"? "#10b981": "#fbbf24";
  const typeColor = item.type === "crypto"? "#60a5fa": "#c084fc";
@@ -1556,10 +1556,10 @@ export default function Web3Gigs() {
 
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
  {[
- { icon: "", cat: "Dev", title: "Solana dev · Anchor escrow", budget: 2500, deadline: "2w", trust: 40, type: "CRYPTO", typeColor: "#60a5fa"},
- { icon: "", cat: "Audit", title: "Smart contract audit · ERC-20", budget: 5000, deadline: "3w", trust: 40, type: "CRYPTO", typeColor: "#60a5fa"},
- { icon: "", cat: "Shitpost", title: "Shitpost campaign · memecoin", budget: 500, deadline: "72h", trust: 55, type: "CT", typeColor: "#c084fc"},
- { icon: "", cat: "Writing", title: "Whitepaper · L2 rollup", budget: 1500, deadline: "3w", trust: 40, type: "CRYPTO", typeColor: "#60a5fa"},
+ { cat: "Dev", title: "Solana dev · Anchor escrow", budget: 2500, deadline: "2w", trust: 40, type: "CRYPTO", typeColor: "#60a5fa"},
+ { cat: "Audit", title: "Smart contract audit · ERC-20", budget: 5000, deadline: "3w", trust: 40, type: "CRYPTO", typeColor: "#60a5fa"},
+ { cat: "Shitpost", title: "Shitpost campaign · memecoin", budget: 500, deadline: "72h", trust: 55, type: "CT", typeColor: "#c084fc"},
+ { cat: "Writing", title: "Whitepaper · L2 rollup", budget: 1500, deadline: "3w", trust: 40, type: "CRYPTO", typeColor: "#60a5fa"},
  ].map((job, i) => (
  <div
  key={i}
@@ -1618,13 +1618,13 @@ export default function Web3Gigs() {
  </div>
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
  {[
- { num: "01", title: "Post or Apply", desc: "Post a job with budget, deadline, and minimum trust score. Or browse jobs and apply with your reputation attached.", icon: ""},
- { num: "02", title: "Handshake", desc: "Both parties sign a public on-chain commitment. Trust scores + community reputation enforce delivery. No middleman taking a cut.", icon: ""},
- { num: "03", title: "Get Paid in USDC", desc: "Work delivered, buyer approves, funds released. Reputation compounds for both sides. Pure crypto-native workflow.", icon: ""},
+ { num: "01", title: "Post or Apply", desc: "Post a job with budget, deadline, and minimum trust score. Or browse jobs and apply with your reputation attached.", Icon: FileText },
+ { num: "02", title: "Handshake", desc: "Both parties sign a public on-chain commitment. Trust scores + community reputation enforce delivery. No middleman taking a cut.", Icon: Handshake },
+ { num: "03", title: "Get Paid in USDC", desc: "Work delivered, buyer approves, funds released. Reputation compounds for both sides. Pure crypto-native workflow.", Icon: DollarSign },
  ].map((step, i) => (
  <GlowCard key={step.num} glow style={{ position: "relative", paddingTop: 32 }}>
  <div style={{ position: "absolute", top: 20, right: 20, fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, letterSpacing: 2 }}>/ {step.num}</div>
- <div style={{ fontSize: 40, marginBottom: 14 }}>{step.icon}</div>
+ <div style={{ marginBottom: 14, color: C.primary }}><step.Icon size={36} strokeWidth={2} /></div>
  <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.5, marginBottom: 8 }}>{step.title}</div>
  <div style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.6 }}>{step.desc}</div>
  </GlowCard>
@@ -1647,7 +1647,7 @@ export default function Web3Gigs() {
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 16, marginBottom: 24 }}>
  {/* CRYPTO WORK SIDE */}
  <GlowCard glow style={{ padding: "24px", background: `linear-gradient(135deg, rgba(212, 255, 0, 0.04), rgba(0, 0, 0, 0.5))` }}>
- <div style={{ fontSize: 32, marginBottom: 8 }}></div>
+ <div style={{ marginBottom: 14, color: C.primary }}><Briefcase size={32} strokeWidth={2} /></div>
  <div style={{ fontSize: 20, fontWeight: 900, marginBottom: 6, letterSpacing: -0.5 }}>Crypto Work</div>
  <div style={{ fontSize: 12, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 14 }}>Dev · Design · Audits · Writing</div>
  <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.6, marginBottom: 16 }}>Hire real professionals for real crypto work. Solana devs, smart contract auditors, designers, whitepaper writers, community managers. Portfolio-based. Scam-free.
@@ -1655,9 +1655,9 @@ export default function Web3Gigs() {
  {/* Sample job mini-cards */}
  <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
  {[
- { icon: "", title: "Solana dev · Anchor escrow", budget: "$2.5k"},
- { icon: "", title: "Smart contract audit", budget: "$5k"},
- { icon: "", title: "Logo + brand kit · DePIN", budget: "$900"},
+ { title: "Solana dev · Anchor escrow", budget: "$2.5k"},
+ { title: "Smart contract audit", budget: "$5k"},
+ { title: "Logo + brand kit · DePIN", budget: "$900"},
  ].map(j => (
  <div key={j.title} style={{ padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "space-between", border: "1px solid rgba(255, 255, 255, 0.04)"}}>
  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -1690,9 +1690,9 @@ export default function Web3Gigs() {
  {/* Sample job mini-cards */}
  <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
  {[
- { icon: "", title: "Thread writer · weekly alpha", budget: "$800"},
- { icon: "", title: "Shitpost campaign · memecoin", budget: "$500"},
- { icon: "", title: "Space host · weekly AMAs", budget: "$400"},
+ { title: "Thread writer · weekly alpha", budget: "$800"},
+ { title: "Shitpost campaign · memecoin", budget: "$500"},
+ { title: "Space host · weekly AMAs", budget: "$400"},
  ].map(j => (
  <div key={j.title} style={{ padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "space-between", border: "1px solid rgba(255, 255, 255, 0.04)"}}>
  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -1723,14 +1723,14 @@ export default function Web3Gigs() {
  <GlowCard style={{ padding: "20px 24px", background: "rgba(0, 0, 0, 0.5)"}}>
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 12 }}>
  {[
- { label: "Open Jobs", val: "22", icon: ""},
- { label: "Total Budget", val: "$30k+", icon: ""},
- { label: "vs Fiverr Cut", val: "0%", icon: ""},
- { label: "Paid in", val: "USDC", icon: ""},
- { label: "Disputes", val: "0", icon: ""},
+ { label: "Open Jobs", val: "22", Icon: Briefcase },
+ { label: "Total Budget", val: "$30k+", Icon: DollarSign },
+ { label: "vs Fiverr Cut", val: "0%", Icon: Zap },
+ { label: "Paid in", val: "USDC", Icon: Sparkles },
+ { label: "Disputes", val: "0", Icon: Shield },
  ].map(s => (
  <div key={s.label} style={{ textAlign: "center"}}>
- <div style={{ fontSize: 18, marginBottom: 4 }}>{s.icon}</div>
+ <div style={{ display: "flex", justifyContent: "center", marginBottom: 6, color: C.primary }}><s.Icon size={18} strokeWidth={2} /></div>
  <div style={{ fontSize: 18, fontWeight: 900, color: C.primary, fontFamily: "'JetBrains Mono', monospace", letterSpacing: -0.5 }}>{s.val}</div>
  <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1, marginTop: 2 }}>{s.label}</div>
  </div>
@@ -1794,10 +1794,10 @@ export default function Web3Gigs() {
  <GlowCard glow style={{ padding: "32px"}}>
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 24 }}>
  {[
- { icon: "", title: "Independent Analysis", desc: "No paid placements. Every score is algorithmically generated from public data."},
- { icon: "", title: "Bot Detection", desc: "Our algorithm exposes bot-inflated followings and fake engagement."},
- { icon: "", title: "Public Data Only", desc: "We only analyze what X makes public — no special access, no ToS violations."},
- { icon: "", title: "Tracked History", desc: "90-day account snapshots expose sudden growth spikes and red flags."},
+ { title: "Independent Analysis", desc: "No paid placements. Every score is algorithmically generated from public data."},
+ { title: "Bot Detection", desc: "Our algorithm exposes bot-inflated followings and fake engagement."},
+ { title: "Public Data Only", desc: "We only analyze what X makes public — no special access, no ToS violations."},
+ { title: "Tracked History", desc: "90-day account snapshots expose sudden growth spikes and red flags."},
  ].map(item => (
  <div key={item.title}>
  <div style={{ fontSize: 24, marginBottom: 8 }}>{item.icon}</div>
@@ -1933,7 +1933,7 @@ export default function Web3Gigs() {
  </>
  ): (
  <div style={{ padding: "20px", background: "rgba(16, 185, 129, 0.06)", border: "1px solid rgba(16, 185, 129, 0.25)", borderRadius: 12, maxWidth: 400, margin: "0 auto"}}>
- <div style={{ fontSize: 28, marginBottom: 8 }}></div>
+ <div style={{ display: "flex", justifyContent: "center", marginBottom: 8, color: "#10b981"}}><Check size={28} strokeWidth={2.5} /></div>
  <div style={{ fontSize: 16, fontWeight: 800, color: "#10b981", marginBottom: 6 }}>You're on the list!</div>
  <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.5, fontFamily: "'JetBrains Mono', monospace"}}>We'll email <span style={{ color: C.primary }}>{waitlistEmail}</span> the second live lookups go live.
  </div>
@@ -1945,10 +1945,10 @@ export default function Web3Gigs() {
  <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 16 }}>Meanwhile, explore Web3Gigs</div>
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 8 }}>
  {[
- { icon: "", label: "Trust Score", tab: "trust"},
- { icon: "", label: "Browse Jobs", tab: "jobs"},
- { icon: "", label: "CIB Detection", tab: "cib"},
- { icon: "", label: "Leaderboards", tab: "leaderboard"},
+ { label: "Trust Score", tab: "trust", Icon: Shield },
+ { label: "Browse Jobs", tab: "jobs", Icon: Briefcase },
+ { label: "CIB Detection", tab: "cib", Icon: Network },
+ { label: "Leaderboards", tab: "leaderboard", Icon: Trophy },
  ].map(link => (
  <button
  key={link.label}
@@ -1965,7 +1965,7 @@ export default function Web3Gigs() {
  onMouseEnter={e => { e.currentTarget.style.borderColor = `${C.primary}40`; e.currentTarget.style.color = C.primary; }}
  onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.06)"; e.currentTarget.style.color = C.textSecondary; }}
  >
- <span>{link.icon}</span>
+ <link.Icon size={13} strokeWidth={2} />
  <span>{link.label}</span>
  </button>
  ))}
@@ -2238,12 +2238,12 @@ export default function Web3Gigs() {
 
  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
  {[
- { range: "85-100", label: "SUPREME", color: "#10b981", icon: "", desc: "Legit, established, zero red flags. Premium tier."},
- { range: "70-84", label: "CREDIBLE", color: "#34d399", icon: "", desc: "Solid authenticity signals. Safe buy."},
- { range: "55-69", label: "NOTED", color: "#fbbf24", icon: "", desc: "Decent account. Some signals worth verifying."},
- { range: "40-54", label: "UNKNOWN", color: "#f97316", icon: "", desc: "Mixed signals. Proceed with caution and verify."},
- { range: "25-39", label: "SUSPICIOUS", color: "#ef4444", icon: "", desc: "Multiple red flags detected. High risk."},
- { range: "0-24", label: "LIKELY BOT", color: "#dc2626", icon: "", desc: "Heavy bot signals. Do not buy."},
+ { range: "85-100", label: "SUPREME", color: "#10b981", desc: "Legit, established, zero red flags. Premium tier."},
+ { range: "70-84", label: "CREDIBLE", color: "#34d399", desc: "Solid authenticity signals. Safe buy."},
+ { range: "55-69", label: "NOTED", color: "#fbbf24", desc: "Decent account. Some signals worth verifying."},
+ { range: "40-54", label: "UNKNOWN", color: "#f97316", desc: "Mixed signals. Proceed with caution and verify."},
+ { range: "25-39", label: "SUSPICIOUS", color: "#ef4444", desc: "Multiple red flags detected. High risk."},
+ { range: "0-24", label: "LIKELY BOT", color: "#dc2626", desc: "Heavy bot signals. Do not buy."},
  ].map(tier => (
  <div key={tier.label} style={{
  padding: "16px 20px", borderRadius: 12,
@@ -2273,27 +2273,27 @@ export default function Web3Gigs() {
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 }}>
  {[
  {
- icon: "", title: "Follow Ratio", weight: "20%",
+ title: "Follow Ratio", weight: "20%",
  desc: "Real accounts have way more followers than they follow. Accounts following thousands with low follower counts are flagged as F4F (follow-for-follow) patterns.",
  flag: "Red flag: following > followers"},
  {
- icon: "", title: "Engagement Quality", weight: "30%",
+ title: "Engagement Quality", weight: "30%",
  desc: "Bot-inflated accounts have massive follower counts but tiny engagement. This is the single biggest tell. We compare total engagement to follower count to catch fakes.",
  flag: "Red flag: <0.1% engagement rate"},
  {
- icon: "", title: "Conversations", weight: "15%",
+ title: "Conversations", weight: "15%",
  desc: "Real audiences reply. Bots and engagement pods only drop likes. We measure the ratio of replies to likes — genuine accounts have meaningful conversations.",
  flag: "Red flag: likes but no replies"},
  {
- icon: "", title: "Activity Pattern", weight: "15%",
+ title: "Activity Pattern", weight: "15%",
  desc: "Brand new accounts with huge followings are suspicious — you can't grow 50k followers in a month organically. We flag rapid growth and bot-like posting frequencies.",
  flag: "Red flag: new account + big followers"},
  {
- icon: "", title: "Verification", weight: "10%",
+ title: "Verification", weight: "10%",
  desc: "X verification (legacy blue, gold, or paid) is a trust boost but doesn't override other signals. A verified bot account is still a bot account.",
  flag: "Bonus: verified status"},
  {
- icon: "", title: "Bot Detection", weight: "10%",
+ title: "Bot Detection", weight: "10%",
  desc: "We estimate what % of followers are likely bots based on engagement gap and follow patterns. Accounts with >30% estimated bots are flagged.",
  flag: "Red flag: >30% bot estimate"},
  ].map(signal => (
@@ -2659,10 +2659,10 @@ export default function Web3Gigs() {
  <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>Authenticity Verified</div>
  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
  {[
- { icon: "", label: "Bot-free audience", detail: "Only 8% estimated bot followers"},
- { icon: "", label: "Real engagement", detail: "High reply-to-like ratio"},
- { icon: "", label: "Organic growth", detail: "No anomaly spikes in 90d"},
- { icon: "", label: "CIB-clean", detail: "Not part of any detected pod"},
+ { label: "Bot-free audience", detail: "Only 8% estimated bot followers"},
+ { label: "Real engagement", detail: "High reply-to-like ratio"},
+ { label: "Organic growth", detail: "No anomaly spikes in 90d"},
+ { label: "CIB-clean", detail: "Not part of any detected pod"},
  ].map(sig => (
  <div key={sig.label} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 11, fontFamily: "'JetBrains Mono', monospace"}}>
  <span style={{ fontSize: 12 }}>{sig.icon}</span>
@@ -2741,13 +2741,13 @@ export default function Web3Gigs() {
 
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10 }}>
  {[
- { label: "Completed", val: "0", icon: ""},
- { label: "In Progress", val: "0", icon: ""},
- { label: "Disputes", val: "0", icon: ""},
- { label: "Rating", val: "N/A", icon: ""},
+ { label: "Completed", val: "0", Icon: Check },
+ { label: "In Progress", val: "0", Icon: Clock },
+ { label: "Disputes", val: "0", Icon: AlertTriangle },
+ { label: "Rating", val: "N/A", Icon: Trophy },
  ].map(stat => (
  <div key={stat.label} style={{ padding: "12px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 10, textAlign: "center", border: "1px solid rgba(255, 255, 255, 0.04)"}}>
- <div style={{ fontSize: 18, marginBottom: 4 }}>{stat.icon}</div>
+ <div style={{ display: "flex", justifyContent: "center", marginBottom: 6, color: C.primary }}><stat.Icon size={18} strokeWidth={2} /></div>
  <div style={{ fontSize: 18, fontWeight: 800, color: C.textPrimary, fontFamily: "'JetBrains Mono', monospace"}}>{stat.val}</div>
  <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1, marginTop: 2 }}>{stat.label}</div>
  </div>
@@ -2776,13 +2776,13 @@ export default function Web3Gigs() {
  {/* How it works strip */}
  <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: 24, flexWrap: "wrap"}}>
  {[
- { icon: "", label: "Post or apply"},
- { icon: "", label: "Sign handshake"},
- { icon: "", label: "Deliver work"},
- { icon: "", label: "Build reputation"},
+ { label: "Post or apply", Icon: FileText },
+ { label: "Sign handshake", Icon: Handshake },
+ { label: "Deliver work", Icon: Check },
+ { label: "Build reputation", Icon: Sparkles },
  ].map(step => (
  <div key={step.label} style={{ padding: "6px 12px", borderRadius: 16, background: "rgba(255, 255, 255, 0.04)", border: "1px solid rgba(255, 255, 255, 0.08)", fontSize: 11, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", display: "flex", alignItems: "center", gap: 6 }}>
- <span>{step.icon}</span>
+ <step.Icon size={12} strokeWidth={2} />
  <span>{step.label}</span>
  </div>
  ))}
@@ -2793,8 +2793,8 @@ export default function Web3Gigs() {
  <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}>
  <div style={{ display: "flex", gap: 4, background: "rgba(0, 0, 0, 0.5)", borderRadius: 14, padding: 4, border: "1px solid rgba(255, 255, 255, 0.06)"}}>
  {[
- { id: "crypto", label: "Crypto Work", desc: "Dev, design, audits, writing"},
- { id: "ct", label: "CT / KOL Jobs", desc: "Shitposts, threads, raids, spaces"},
+ { id: "crypto", label: "Crypto Work", desc: "Dev, design, audits, writing", Icon: Briefcase },
+ { id: "ct", label: "CT / KOL Jobs", desc: "Shitposts, threads, raids, spaces", Icon: Megaphone },
  ].map(st => (
  <button
  key={st.id}
@@ -2807,10 +2807,14 @@ export default function Web3Gigs() {
  cursor: "pointer", letterSpacing: 0.3, transition: "all 0.2s",
  border: `1px solid ${jobsType === st.id? `${C.primary}40`: "transparent"}`,
  textAlign: "left",
+ display: "flex", alignItems: "center", gap: 10,
  }}
  >
+ <st.Icon size={18} strokeWidth={2} />
+ <div>
  <div>{st.label}</div>
  <div style={{ fontSize: 10, fontFamily: "'JetBrains Mono', monospace", color: C.textMuted, marginTop: 2, fontWeight: 500, letterSpacing: 0.5 }}>{st.desc}</div>
+ </div>
  </button>
  ))}
  </div>
@@ -2819,7 +2823,7 @@ export default function Web3Gigs() {
  {/* V1 Beta disclaimer */}
  <GlowCard style={{ marginBottom: 24, padding: "16px 20px", background: "rgba(245, 158, 11, 0.04)", border: "1px solid rgba(245, 158, 11, 0.2)"}}>
  <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
- <span style={{ fontSize: 20 }}></span>
+ <AlertTriangle size={20} strokeWidth={2} style={{ color: "#fbbf24", flexShrink: 0, marginTop: 2 }} />
  <div>
  <div style={{ fontSize: 13, fontWeight: 700, color: "#fbbf24", marginBottom: 4, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>V1 — Handshake Mode (No Custody)</div>
  <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.6 }}>Web3Gigs doesn't hold funds yet. V1 uses <strong style={{ color: C.primary }}>on-chain handshakes</strong> — both parties sign a public commitment. Trust scores + community reputation enforce delivery. Multisig escrow (V2) and smart contract escrow (V3) coming soon.
@@ -2845,7 +2849,7 @@ export default function Web3Gigs() {
  display: "flex", alignItems: "center", gap: 6,
  }}
  >
- <span>{cat.icon}</span>
+ <cat.Icon size={13} strokeWidth={2} />
  <span>{cat.label}</span>
  </button>
  ))}
@@ -3138,7 +3142,7 @@ export default function Web3Gigs() {
  {ALERT_TYPES.map(a => (
  <GlowCard key={a.id} glow style={{ padding: "16px", opacity: a.premium? 0.85: 1 }}>
  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10 }}>
- <div style={{ fontSize: 28 }}>{a.icon}</div>
+ <div style={{ color: C.primary }}><a.Icon size={24} strokeWidth={2} /></div>
  {a.premium && <Pill text="PRO"color={C.accent} />}
  </div>
  <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{a.name}</div>
@@ -3217,8 +3221,9 @@ export default function Web3Gigs() {
  <button onClick={() => { setSelectedJob(null); setProposalText(""); }} style={{
  width: 32, height: 32, borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.08)",
  background: "rgba(0, 0, 0, 0.5)", color: C.textSecondary,
- fontSize: 16, cursor: "pointer", fontFamily: "'Outfit', sans-serif", flexShrink: 0,
- }}></button>
+ cursor: "pointer", flexShrink: 0,
+ display: "flex", alignItems: "center", justifyContent: "center",
+ }}><XIcon size={16} strokeWidth={2} /></button>
  </div>
 
  {/* Hero Budget */}
@@ -3355,14 +3360,15 @@ export default function Web3Gigs() {
  <button onClick={() => setShowPostJob(false)} style={{
  width: 32, height: 32, borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.08)",
  background: "rgba(0, 0, 0, 0.5)", color: C.textSecondary,
- fontSize: 16, cursor: "pointer", flexShrink: 0,
- }}></button>
+ cursor: "pointer", flexShrink: 0,
+ display: "flex", alignItems: "center", justifyContent: "center",
+ }}><XIcon size={16} strokeWidth={2} /></button>
  </div>
 
  <div style={{ padding: "24px 28px"}}>
  {/* Coming Soon treatment */}
  <div style={{ textAlign: "center", padding: "40px 20px"}}>
- <div style={{ fontSize: 48, marginBottom: 16 }}></div>
+ <div style={{ display: "flex", justifyContent: "center", marginBottom: 16, color: "#fbbf24"}}><Construction size={48} strokeWidth={2} /></div>
  <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 8, letterSpacing: -0.5 }}>Job posting opens soon</div>
  <div style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.6, maxWidth: 400, margin: "0 auto 24px"}}>We're polishing the post flow before opening it up. In the meantime, you can browse open jobs and see how Handshake works.
  </div>
@@ -3402,7 +3408,7 @@ export default function Web3Gigs() {
  "Release reputation rewards when work is completed",
  ].map((item, i) => (
  <div key={i} style={{ display: "flex", gap: 10, alignItems: "center", fontSize: 12, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace"}}>
- <span style={{ color: C.primary, fontWeight: 900 }}>→</span>
+ <ArrowRight size={12} strokeWidth={2.5} style={{ color: C.primary, flexShrink: 0 }} />
  <span>{item}</span>
  </div>
  ))}
@@ -3445,8 +3451,9 @@ export default function Web3Gigs() {
  <button onClick={() => setShowWaitlistModal(false)} style={{
  width: 32, height: 32, borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.08)",
  background: "rgba(0, 0, 0, 0.5)", color: C.textSecondary,
- fontSize: 16, cursor: "pointer", flexShrink: 0,
- }}></button>
+ cursor: "pointer", flexShrink: 0,
+ display: "flex", alignItems: "center", justifyContent: "center",
+ }}><XIcon size={16} strokeWidth={2} /></button>
  </div>
 
  {/* Body */}
@@ -3506,7 +3513,7 @@ export default function Web3Gigs() {
  "Paid in USDC — no middleman, no 20% cut",
  ].map((item, i) => (
  <div key={i} style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 12, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace"}}>
- <span style={{ color: C.primary, fontWeight: 900 }}>→</span>
+ <ArrowRight size={12} strokeWidth={2.5} style={{ color: C.primary, flexShrink: 0 }} />
  <span>{item}</span>
  </div>
  ))}
@@ -3515,7 +3522,7 @@ export default function Web3Gigs() {
  </>
  ): (
  <div style={{ padding: "20px", background: "rgba(16, 185, 129, 0.06)", border: "1px solid rgba(16, 185, 129, 0.25)", borderRadius: 12, textAlign: "center"}}>
- <div style={{ fontSize: 36, marginBottom: 10 }}></div>
+ <div style={{ display: "flex", justifyContent: "center", marginBottom: 10, color: "#10b981"}}><Check size={36} strokeWidth={2.5} /></div>
  <div style={{ fontSize: 18, fontWeight: 800, color: "#10b981", marginBottom: 8 }}>You're on the list!</div>
  <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.5, fontFamily: "'JetBrains Mono', monospace"}}>We'll email <span style={{ color: C.primary }}>{waitlistEmail}</span> the second Web3Gigs goes live.
  </div>

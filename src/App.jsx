@@ -1100,6 +1100,7 @@ export default function Web3Gigs() {
  const [hoveredTab, setHoveredTab] = useState(null);
  const [cibSearchHandle, setCibSearchHandle] = useState("");
  const [profileSearchHandle, setProfileSearchHandle] = useState("");
+ const [openFaqIndex, setOpenFaqIndex] = useState(0);
  const resultRef = useRef(null);
 
  const API_BASE = "http://localhost:3001"; // Change this to your deployed backend URL
@@ -1809,6 +1810,99 @@ export default function Web3Gigs() {
  ))}
  </div>
  </GlowCard>
+ </div>
+ </Reveal>
+
+ {/* FAQ SECTION */}
+ <Reveal>
+ <div style={{ marginBottom: 60 }}>
+ <div style={{ textAlign: "center", marginBottom: 32 }}>
+ <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8 }}>FAQ</div>
+ <h2 style={{ fontSize: 36, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>Common <span style={{ color: C.primary }}>questions</span>.</h2>
+ </div>
+ <div style={{ maxWidth: 720, margin: "0 auto", display: "flex", flexDirection: "column", gap: 10 }}>
+ {[
+ {
+ q: "When does Web3Gigs launch?",
+ a: "V1 launches soon. Join the waitlist to get first access to the trust-verified marketplace, on-chain Handshakes, and full Trust Score analytics. Early waitlist members get priority onboarding and zero listing fees at launch.",
+ },
+ {
+ q: "How does the Trust Score work?",
+ a: "Every CT account gets a 0-100 authenticity rating based on 7 signals: follower velocity, engagement quality, bot follower ratio, CIB cluster membership, account age, content consistency, and cross-platform verification. Trust Scores are public, on-chain anchored, and portable — not locked to Web3Gigs. You can't game it by buying followers or joining pods."
+ },
+ {
+ q: "Is it free to use?",
+ a: "Browsing jobs, viewing profiles, and checking Trust Scores will always be free. V1 launches with zero fees on job posts or applications — we're not taking a cut during the early phase. Optional premium features (advanced CIB scans, real-time alerts, verification boosts) may be introduced later, but the core marketplace stays free-to-use.",
+ },
+ {
+ q: "How are disputes handled?",
+ a: "V1 uses a reputation-first Handshake model — both parties sign a public commitment before work starts. If a party breaks the handshake, their Trust Score takes a public, permanent hit. V2 will add optional Squads multisig escrow for higher-stakes jobs. V3 will introduce Kleros-style decentralized arbitration. No centralized mediator takes your side by default.",
+ },
+ {
+ q: "How do payments work?",
+ a: "Direct wallet-to-wallet. Web3Gigs never holds your money — funds move directly between buyer and worker in USDC, USDT or SOL. No 14-day holds, no chargebacks, no platform taking a % of your payout. You keep 100% of what you earn.",
+ },
+ {
+ q: "Who is Web3Gigs for?",
+ a: "Anyone hiring or getting hired in crypto. Devs, designers, smart contract auditors, technical writers, community managers, video editors, AI/ML builders — plus the CT-native side: shitposters, thread writers, Spaces hosts, KOL raids, meme warfare, and clippers. If the work pays in stables or SOL and reputation matters, it's probably here.",
+ },
+ {
+ q: "Who's behind Web3Gigs?",
+ a: "Built by @FabsKebabs101 — a solo builder active in the Solana memecoin and CT ecosystems. No VCs, no token, no promises of riches. Just a product trying to solve the actual problem of hiring without getting scammed in crypto. Follow the builder on X for dev updates, alpha drops, and early access invites.",
+ },
+ ].map((item, i) => {
+ const isOpen = openFaqIndex === i;
+ return (
+ <GlowCard key={i} style={{ padding: 0, overflow: "hidden", cursor: "pointer"}}>
+ <div
+ onClick={() => setOpenFaqIndex(isOpen ? -1 : i)}
+ style={{
+ padding: "18px 22px",
+ display: "flex", alignItems: "center", justifyContent: "space-between",
+ gap: 12,
+ }}
+ >
+ <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1 }}>
+ <div style={{
+ width: 24, height: 24, borderRadius: 6,
+ background: isOpen ? `${C.primary}20` : "rgba(255, 255, 255, 0.04)",
+ color: isOpen ? C.primary : C.textMuted,
+ display: "flex", alignItems: "center", justifyContent: "center",
+ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 900,
+ flexShrink: 0, transition: "all 0.2s",
+ }}>{String(i + 1).padStart(2, "0")}</div>
+ <div style={{ fontSize: 15, fontWeight: 700, color: isOpen ? C.primary : C.textPrimary, letterSpacing: -0.2, transition: "color 0.2s"}}>{item.q}</div>
+ </div>
+ <div style={{
+ width: 24, height: 24, borderRadius: 6,
+ background: "rgba(255, 255, 255, 0.04)",
+ display: "flex", alignItems: "center", justifyContent: "center",
+ color: isOpen ? C.primary : C.textMuted,
+ transform: isOpen ? "rotate(45deg)" : "rotate(0deg)",
+ transition: "all 0.3s",
+ flexShrink: 0,
+ }}>
+ <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M12 5v14M5 12h14"/></svg>
+ </div>
+ </div>
+ {isOpen && (
+ <div style={{
+ padding: "0 22px 20px 58px",
+ fontSize: 13, color: C.textSecondary, lineHeight: 1.6,
+ borderTop: "1px solid rgba(255, 255, 255, 0.04)",
+ paddingTop: 14,
+ margin: "0 0 0 0",
+ }}>
+ {item.a}
+ </div>
+ )}
+ </GlowCard>
+ );
+ })}
+ </div>
+ <div style={{ textAlign: "center", marginTop: 24 }}>
+ <div style={{ fontSize: 12, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5 }}>Got more questions? DM <span style={{ color: C.primary, fontWeight: 700 }}>@FabsKebabs101</span> on X</div>
+ </div>
  </div>
  </Reveal>
 

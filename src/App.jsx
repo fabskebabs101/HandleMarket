@@ -1250,21 +1250,21 @@ export default function Web3Gigs() {
  onMouseEnter={e => e.currentTarget.style.opacity = "0.75"}
  onMouseLeave={e => e.currentTarget.style.opacity = "1"}
  >
- <svg width="40" height="40" viewBox="0 0 80 80" style={{ flexShrink: 0 }} xmlns="http://www.w3.org/2000/svg">
+ <svg width="40" height="40" viewBox="0 0 80 80" style={{ flexShrink: 0, overflow: "visible"}} xmlns="http://www.w3.org/2000/svg">
  <defs>
  <linearGradient id="logoLime" x1="0" y1="0" x2="1" y2="1">
  <stop offset="0%" stopColor="#d4ff00"/>
  <stop offset="100%" stopColor="#b8e600"/>
  </linearGradient>
  </defs>
- {/* Shield outline */}
- <path d="M 40 5 L 73 15 L 73 49 Q 73 69 40 85 Q 7 69 7 49 L 7 15 Z"
- fill="none" stroke="url(#logoLime)" strokeWidth="4.5" strokeLinejoin="round"/>
+ {/* Shield outline — safe-margins so nothing clips on any side */}
+ <path d="M 40 10 L 66 18 L 66 45 Q 66 60 40 72 Q 14 60 14 45 L 14 18 Z"
+ fill="none" stroke="url(#logoLime)" strokeWidth="4.5" strokeLinejoin="round" strokeLinecap="round"/>
  {/* Lucide Handshake icon inside shield */}
- <g transform="translate(19, 27) scale(1.75)"
+ <g transform="translate(22, 28) scale(1.45)"
  fill="none"
  stroke="url(#logoLime)"
- strokeWidth="1.7"
+ strokeWidth="2"
  strokeLinecap="round"
  strokeLinejoin="round">
  <path d="m11 17 2 2a1 1 0 1 0 3-3"/>

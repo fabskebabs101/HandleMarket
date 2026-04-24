@@ -1616,13 +1616,13 @@ export default function Web3Gigs() {
  <div style={{ marginBottom: 60 }}>
  <div style={{ textAlign: "center", marginBottom: 40 }}>
  <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8 }}>How It Works</div>
- <h2 style={{ fontSize: 36, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>Three steps. No bullshit.</h2>
+ <h2 style={{ fontSize: 36, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>How it <span style={{ color: C.primary }}>works</span>.</h2>
  </div>
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
  {[
  { num: "01", title: "Post or Apply", desc: "Post a job with budget, deadline, and minimum trust score. Or browse jobs and apply with your reputation attached.", Icon: FileText },
  { num: "02", title: "Handshake", desc: "Both parties sign a public on-chain commitment. Trust scores + community reputation enforce delivery. No middleman taking a cut.", Icon: Handshake },
- { num: "03", title: "Get Paid in USDC", desc: "Work delivered, buyer approves, funds released. Reputation compounds for both sides. Pure crypto-native workflow.", Icon: DollarSign },
+ { num: "03", title: "Get Paid", desc: "Work delivered, buyer approves, funds released in USDC, USDT or SOL. Reputation compounds for both sides. Pure crypto-native workflow.", Icon: DollarSign },
  ].map((step, i) => (
  <GlowCard key={step.num} glow style={{ position: "relative", paddingTop: 32 }}>
  <div style={{ position: "absolute", top: 20, right: 20, fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, letterSpacing: 2 }}>/ {step.num}</div>

@@ -1901,7 +1901,22 @@ export default function Web3Gigs() {
  })}
  </div>
  <div style={{ textAlign: "center", marginTop: 24 }}>
- <div style={{ fontSize: 12, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5 }}>Got more questions? DM <span style={{ color: C.primary, fontWeight: 700 }}>@FabsKebabs</span> on X</div>
+ <div style={{ fontSize: 12, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5 }}>
+ Got more questions? DM{" "}
+ <a
+ href="https://x.com/FabsKebabs"
+ target="_blank"
+ rel="noopener noreferrer"
+ style={{
+ color: C.primary, fontWeight: 700,
+ textDecoration: "none",
+ borderBottom: `1px solid ${C.primary}40`,
+ transition: "all 0.2s",
+ }}
+ onMouseEnter={e => { e.currentTarget.style.borderBottomColor = C.primary; e.currentTarget.style.textShadow = `0 0 8px ${C.primary}60`; }}
+ onMouseLeave={e => { e.currentTarget.style.borderBottomColor = `${C.primary}40`; e.currentTarget.style.textShadow = "none"; }}
+ >@FabsKebabs</a>{" "}on X
+ </div>
  </div>
  </div>
  </Reveal>

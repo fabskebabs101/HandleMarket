@@ -1848,7 +1848,7 @@ export default function Web3Gigs() {
  },
  {
  q: "Who's behind Web3Gigs?",
- a: "Built by @FabsKebabs101 — a solo builder active in the Solana memecoin and CT ecosystems. No VCs, no token, no promises of riches. Just a product trying to solve the actual problem of hiring without getting scammed in crypto. Follow the builder on X for dev updates, alpha drops, and early access invites.",
+ a: "Built by @FabsKebabs — a solo builder active in the Solana memecoin and CT ecosystems. No VCs, no token, no promises of riches. Just a product trying to solve the actual problem of hiring without getting scammed in crypto. Follow the builder on X for dev updates, alpha drops, and early access invites.",
  },
  ].map((item, i) => {
  const isOpen = openFaqIndex === i;
@@ -1901,7 +1901,7 @@ export default function Web3Gigs() {
  })}
  </div>
  <div style={{ textAlign: "center", marginTop: 24 }}>
- <div style={{ fontSize: 12, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5 }}>Got more questions? DM <span style={{ color: C.primary, fontWeight: 700 }}>@FabsKebabs101</span> on X</div>
+ <div style={{ fontSize: 12, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5 }}>Got more questions? DM <span style={{ color: C.primary, fontWeight: 700 }}>@FabsKebabs</span> on X</div>
  </div>
  </div>
  </Reveal>

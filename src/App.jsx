@@ -1098,6 +1098,8 @@ export default function Web3Gigs() {
  const [proposalText, setProposalText] = useState("");
  const [menuOpen, setMenuOpen] = useState(false);
  const [hoveredTab, setHoveredTab] = useState(null);
+ const [cibSearchHandle, setCibSearchHandle] = useState("");
+ const [profileSearchHandle, setProfileSearchHandle] = useState("");
  const resultRef = useRef(null);
 
  const API_BASE = "http://localhost:3001"; // Change this to your deployed backend URL
@@ -1300,9 +1302,9 @@ export default function Web3Gigs() {
  ["valuate", "Analyze"],
  ["trust", "Trust"],
  ["leaderboard", "Ranks"],
- ["profile", "Profile"],
  ["cib", "CIB"],
  ["alerts", "Alerts"],
+ ["profile", "Profile"],
  ].find(([t]) => t === tab)?.[1] || "Menu"}
  </span>
  </button>
@@ -1338,9 +1340,9 @@ export default function Web3Gigs() {
  ["valuate", Search, "Analyze", "Full CT account analysis"],
  ["trust", Shield, "Trust", "Trust Score guide"],
  ["leaderboard", Trophy, "Ranks", "CT leaderboards"],
- ["profile", User, "Profile", "Public profile page"],
  ["cib", Network, "CIB", "Bot & pod detection"],
  ["alerts", Bell, "Alerts", "Real-time watchlist"],
+ ["profile", User, "Profile", "Example profile preview"],
  ].map(([t, Icon, label, desc]) => {
  const isActive = tab === t;
  const isHovered = hoveredTab === t;
@@ -2500,11 +2502,46 @@ export default function Web3Gigs() {
  {/* PROFILE TAB — sample public profile page */}
  {tab === "profile"&& (
  <div>
- <div style={{ textAlign: "center", marginBottom: 32 }}>
+ <div style={{ textAlign: "center", marginBottom: 28 }}>
  <h1 style={{ fontSize: 38, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>Public <span style={{ color: C.primary }}>Profile</span>
  </h1>
  <p style={{ color: C.textSecondary, fontSize: 15, marginTop: 8 }}>Every CT account gets a shareable profile at web3gigs.app/@username</p>
  </div>
+
+ {/* Handle search */}
+ <GlowCard glow style={{ padding: "20px", marginBottom: 20, maxWidth: 560, margin: "0 auto 20px"}}>
+ <div style={{ fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 10, fontWeight: 700 }}>View a profile</div>
+ <div style={{ display: "flex", gap: 8 }}>
+ <div style={{ flex: 1, position: "relative"}}>
+ <Search size={16} strokeWidth={2} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: C.textMuted }} />
+ <input
+ type="text"
+ placeholder="@handle — preview their Web3Gigs profile"
+ value={profileSearchHandle}
+ onChange={e => setProfileSearchHandle(e.target.value)}
+ style={{
+ width: "100%", padding: "12px 14px 12px 40px", borderRadius: 10,
+ background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.1)",
+ color: C.textPrimary, fontSize: 14, fontFamily: "'JetBrains Mono', monospace",
+ outline: "none", boxSizing: "border-box",
+ }}
+ onFocus={e => e.currentTarget.style.borderColor = `${C.primary}60`}
+ onBlur={e => e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.1)"}
+ />
+ </div>
+ <button
+ onClick={() => { setWaitlistSubmitted(false); setWaitlistError(""); setShowWaitlistModal(true); }}
+ style={{
+ padding: "12px 18px", borderRadius: 10, border: "none",
+ background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+ color: "#000", fontSize: 12, fontWeight: 900,
+ fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+ letterSpacing: 0.5, whiteSpace: "nowrap",
+ }}
+ >View</button>
+ </div>
+ <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 10, letterSpacing: 0.5 }}>Profile lookup launches with waitlist · Join for early access · Preview below</div>
+ </GlowCard>
 
  {/* Sample profile card */}
  <GlowCard glow style={{ marginBottom: 20 }}>
@@ -2969,11 +3006,46 @@ export default function Web3Gigs() {
  {/* ─── PHASE 4: CIB DETECTION TAB ──────────────────── */}
  {tab === "cib"&& (
  <div>
- <div style={{ textAlign: "center", marginBottom: 32 }}>
+ <div style={{ textAlign: "center", marginBottom: 28 }}>
  <h1 style={{ fontSize: 38, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>CIB <span style={{ color: C.primary }}>Detection</span>
  </h1>
  <p style={{ color: C.textSecondary, fontSize: 15, marginTop: 8 }}>Coordinated Inauthentic Behavior · Exposing engagement pods & raid networks</p>
  </div>
+
+ {/* Handle search */}
+ <GlowCard glow style={{ padding: "20px", marginBottom: 24, maxWidth: 560, margin: "0 auto 24px"}}>
+ <div style={{ fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 10, fontWeight: 700 }}>Check an account</div>
+ <div style={{ display: "flex", gap: 8 }}>
+ <div style={{ flex: 1, position: "relative"}}>
+ <Search size={16} strokeWidth={2} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: C.textMuted }} />
+ <input
+ type="text"
+ placeholder="@handle — scan for pod membership"
+ value={cibSearchHandle}
+ onChange={e => setCibSearchHandle(e.target.value)}
+ style={{
+ width: "100%", padding: "12px 14px 12px 40px", borderRadius: 10,
+ background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.1)",
+ color: C.textPrimary, fontSize: 14, fontFamily: "'JetBrains Mono', monospace",
+ outline: "none", boxSizing: "border-box",
+ }}
+ onFocus={e => e.currentTarget.style.borderColor = `${C.primary}60`}
+ onBlur={e => e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.1)"}
+ />
+ </div>
+ <button
+ onClick={() => { setWaitlistSubmitted(false); setWaitlistError(""); setShowWaitlistModal(true); }}
+ style={{
+ padding: "12px 18px", borderRadius: 10, border: "none",
+ background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+ color: "#000", fontSize: 12, fontWeight: 900,
+ fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+ letterSpacing: 0.5, whiteSpace: "nowrap",
+ }}
+ >Scan</button>
+ </div>
+ <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 10, letterSpacing: 0.5 }}>CIB lookup launches with waitlist · Join for early access</div>
+ </GlowCard>
 
  {/* Detection stats */}
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10, marginBottom: 24 }}>

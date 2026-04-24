@@ -1250,7 +1250,30 @@ export default function Web3Gigs() {
  onMouseEnter={e => e.currentTarget.style.opacity = "0.75"}
  onMouseLeave={e => e.currentTarget.style.opacity = "1"}
  >
- <div style={{ width: 40, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "#000", fontFamily: "'JetBrains Mono', monospace", letterSpacing: -0.5, flexShrink: 0 }}>W3G</div>
+ <svg width="40" height="40" viewBox="0 0 80 80" style={{ flexShrink: 0 }} xmlns="http://www.w3.org/2000/svg">
+ <defs>
+ <linearGradient id="logoLime" x1="0" y1="0" x2="1" y2="1">
+ <stop offset="0%" stopColor="#d4ff00"/>
+ <stop offset="100%" stopColor="#b8e600"/>
+ </linearGradient>
+ </defs>
+ {/* Shield outline */}
+ <path d="M 40 5 L 73 15 L 73 49 Q 73 69 40 85 Q 7 69 7 49 L 7 15 Z"
+ fill="none" stroke="url(#logoLime)" strokeWidth="4.5" strokeLinejoin="round"/>
+ {/* Lucide Handshake icon inside shield */}
+ <g transform="translate(19, 27) scale(1.75)"
+ fill="none"
+ stroke="url(#logoLime)"
+ strokeWidth="1.7"
+ strokeLinecap="round"
+ strokeLinejoin="round">
+ <path d="m11 17 2 2a1 1 0 1 0 3-3"/>
+ <path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/>
+ <path d="m21 3 1 11h-2"/>
+ <path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/>
+ <path d="M3 4h8"/>
+ </g>
+ </svg>
  <div style={{ minWidth: 0 }}>
  <div className="w3g-brand"style={{ fontWeight: 700, fontSize: 18, letterSpacing: -0.5 }}>Web3Gigs</div>
  <div className="w3g-tagline"style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1, textTransform: "uppercase"}}>Hire · Handshake · Ship</div>

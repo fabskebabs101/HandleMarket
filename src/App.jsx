@@ -1616,7 +1616,7 @@ export default function Web3Gigs() {
  <div style={{ marginBottom: 60 }}>
  <div style={{ textAlign: "center", marginBottom: 40 }}>
  <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8 }}>How It Works</div>
- <h2 style={{ fontSize: 36, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>How it <span style={{ color: C.primary }}>works</span>.</h2>
+ <h2 style={{ fontSize: 36, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>Three <span style={{ color: C.primary }}>easy</span> steps.</h2>
  </div>
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
  {[

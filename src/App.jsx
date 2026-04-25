@@ -1107,6 +1107,10 @@ export default function Web3Gigs() {
      setJobError("Description needs at least 30 characters.");
      return;
    }
+   if (!jobForm.posterName.trim() || jobForm.posterName.length < 2) {
+     setJobError("Add a company or team name that posters will see.");
+     return;
+   }
    if (!jobForm.email.includes("@")) {
      setJobError("Need a valid email so we can reach you.");
      return;
@@ -1130,6 +1134,7 @@ export default function Web3Gigs() {
          description: jobForm.description.trim(),
          deliverables: jobForm.deliverables.trim(),
          min_trust_score: Number(jobForm.minTrust) || 0,
+         poster_name: jobForm.posterName.trim(),
          poster_handle: jobForm.contact.trim().replace(/^@/, ""),
          poster_email: jobForm.email.trim().toLowerCase(),
          status: "pending",
@@ -1153,7 +1158,7 @@ export default function Web3Gigs() {
      title: "", jobType: "crypto", category: "Development",
      budget: "", currency: "USDC", deadline: "",
      description: "", deliverables: "",
-     minTrust: "0", contact: "", email: "",
+     minTrust: "0", posterName: "", contact: "", email: "",
    });
    setJobSubmitted(false);
    setJobError("");
@@ -1171,7 +1176,7 @@ export default function Web3Gigs() {
    title: "", jobType: "crypto", category: "Development",
    budget: "", currency: "USDC", deadline: "",
    description: "", deliverables: "",
-   minTrust: "0", contact: "", email: "",
+   minTrust: "0", posterName: "", contact: "", email: "",
  });
  const [jobSubmitting, setJobSubmitting] = useState(false);
  const [jobSubmitted, setJobSubmitted] = useState(false);
@@ -3121,6 +3126,7 @@ export default function Web3Gigs() {
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 14, marginBottom: 40 }}>
  {MOCK_JOBS
 .filter(j => j.jobType === jobsType && (jobsFilter === "all"|| j.category === jobsFilter))
+.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0))
 .map(job => {
  const statusColor = job.status === "open"? "#10b981": job.status === "in_progress"? "#fbbf24": C.textMuted;
  const statusLabel = job.status === "open"? "OPEN": job.status === "in_progress"? "IN PROGRESS": "COMPLETED";
@@ -3144,6 +3150,9 @@ export default function Web3Gigs() {
  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
  <span style={{ width: 6, height: 6, borderRadius: "50%", background: statusColor, boxShadow: `0 0 8px ${statusColor}` }} />
  <span style={{ fontSize: 9, color: statusColor, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, letterSpacing: 1.5 }}>{statusLabel}</span>
+ {job.isNew && (
+ <span style={{ marginLeft: 4, padding: "2px 6px", borderRadius: 4, background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, color: "#000", fontSize: 8, fontWeight: 900, letterSpacing: 1, fontFamily: "'JetBrains Mono', monospace", boxShadow: `0 0 8px ${C.primary}40` }}>NEW</span>
+ )}
  </div>
  <span style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace"}}>{job.postedAgo}</span>
  </div>
@@ -3662,6 +3671,20 @@ export default function Web3Gigs() {
  maxLength={100}
  style={{ width: "100%", padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: 8, color: C.textPrimary, fontSize: 13, fontFamily: "'JetBrains Mono', monospace", boxSizing: "border-box", outline: "none"}}
  />
+ </div>
+
+ {/* Posted By */}
+ <div style={{ marginBottom: 14 }}>
+ <label style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, display: "block", marginBottom: 6 }}>Posted By *</label>
+ <input
+ type="text"
+ placeholder="Company or team name (e.g. Web3Kings, Solana Labs, AlphaBot Studios)"
+ value={jobForm.posterName}
+ onChange={e => setJobForm({...jobForm, posterName: e.target.value})}
+ maxLength={60}
+ style={{ width: "100%", padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: 8, color: C.textPrimary, fontSize: 13, fontFamily: "'JetBrains Mono', monospace", boxSizing: "border-box", outline: "none"}}
+ />
+ <div style={{ fontSize: 10, color: C.textMuted, marginTop: 4, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.3 }}>This is the name applicants will see on the job card</div>
  </div>
 
  {/* Type + Category row */}

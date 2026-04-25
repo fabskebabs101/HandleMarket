@@ -1236,11 +1236,14 @@ export default function Web3Gigs() {
  <style>{`
 .w3g-waitlist-short { display: none; }
  @media (max-width: 600px) {
-.w3g-tagline { display: none!important; }
+.w3g-tagline { font-size: 9px!important; letter-spacing: 0.8px!important; }
 .w3g-brand { font-size: 16px!important; }
 .w3g-waitlist-label { display: none!important; }
 .w3g-waitlist-short { display: inline!important; }
 .w3g-waitlist-btn { padding: 10px 14px!important; font-size: 13px!important; letter-spacing: 1px!important; }
+ }
+ @media (max-width: 380px) {
+.w3g-tagline { display: none!important; }
  }
  `}</style>
  <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "nowrap", gap: 8 }}>

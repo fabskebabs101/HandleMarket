@@ -1153,6 +1153,63 @@ export default function Web3Gigs() {
    }
  };
 
+ const fetchApprovedJobs = async () => {
+   setApprovedJobsLoading(true);
+   try {
+     const { data, error } = await supabase
+       .from("job_submissions")
+       .select("*")
+       .eq("status", "approved")
+       .order("created_at", { ascending: false });
+     if (error) {
+       console.error("Failed to fetch approved jobs:", error);
+       return;
+     }
+     // Map Supabase rows → MOCK_JOBS shape
+     const mapped = (data || []).map((row) => {
+       const createdDate = new Date(row.created_at);
+       const now = new Date();
+       const ageMinutes = Math.floor((now - createdDate) / 60000);
+       let postedAgo = "Just now";
+       if (ageMinutes >= 60 * 24) postedAgo = `${Math.floor(ageMinutes / (60 * 24))}d ago`;
+       else if (ageMinutes >= 60) postedAgo = `${Math.floor(ageMinutes / 60)}h ago`;
+       else if (ageMinutes >= 1) postedAgo = `${ageMinutes}m ago`;
+       return {
+         id: `live-${row.id}`,
+         jobType: row.job_type,
+         isNew: true,
+         title: row.title,
+         category: row.category,
+         poster: row.poster_name ? `@${row.poster_name.replace(/^@/, "")}` : `@${row.poster_handle}`,
+         posterTrust: 75,
+         posterVerified: false,
+         budget: Number(row.budget),
+         budgetCurrency: row.currency,
+         deadline: row.deadline || "Flexible",
+         postedAgo,
+         proposals: 0,
+         minTrustScore: row.min_trust_score || 0,
+         status: "open",
+         description: row.description,
+         deliverables: row.deliverables ? row.deliverables.split("\n").filter(Boolean) : [],
+         tags: ["new"],
+       };
+     });
+     setApprovedJobs(mapped);
+   } catch (err) {
+     console.error("Couldn't fetch approved jobs:", err);
+   } finally {
+     setApprovedJobsLoading(false);
+   }
+ };
+
+ // Fetch approved jobs on mount + whenever Jobs tab opens
+ useEffect(() => {
+   if (tab === "jobs" || tab === "home") {
+     fetchApprovedJobs();
+   }
+ }, [tab]);
+
  const resetJobForm = () => {
    setJobForm({
      title: "", jobType: "crypto", category: "Development",
@@ -1181,6 +1238,8 @@ export default function Web3Gigs() {
  const [jobSubmitting, setJobSubmitting] = useState(false);
  const [jobSubmitted, setJobSubmitted] = useState(false);
  const [jobError, setJobError] = useState("");
+ const [approvedJobs, setApprovedJobs] = useState([]);
+ const [approvedJobsLoading, setApprovedJobsLoading] = useState(false);
  const resultRef = useRef(null);
 
  const API_BASE = "http://localhost:3001"; // Change this to your deployed backend URL
@@ -3124,7 +3183,7 @@ export default function Web3Gigs() {
 
  {/* Jobs grid */}
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 14, marginBottom: 40 }}>
- {MOCK_JOBS
+ {[...approvedJobs, ...MOCK_JOBS]
 .filter(j => j.jobType === jobsType && (jobsFilter === "all"|| j.category === jobsFilter))
 .sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0))
 .map(job => {
@@ -3194,7 +3253,7 @@ export default function Web3Gigs() {
  </div>
 
  {/* Empty state message if no jobs match filter */}
- {MOCK_JOBS.filter(j => j.jobType === jobsType && (jobsFilter === "all"|| j.category === jobsFilter)).length === 0 && (
+ {[...approvedJobs, ...MOCK_JOBS].filter(j => j.jobType === jobsType && (jobsFilter === "all"|| j.category === jobsFilter)).length === 0 && (
  <div style={{ textAlign: "center", padding: "40px 20px", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace"}}>No jobs in this category yet. Try "All"or <span style={{ color: C.primary, cursor: "pointer"}} onClick={() => setShowPostJob(true)}>post the first one →</span>
  </div>
  )}

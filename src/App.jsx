@@ -950,6 +950,37 @@ const MOCK_JOBS = [
  tags: ["ai", "nft", "generative"],
  requiresPortfolio: true,
  },
+ {
+ id: "job-024", jobType: "crypto",
+ title: "Clipper for founder Spaces · weekly cuts",
+ category: "Clipping",
+ poster: "@FounderHQ", posterTrust: 81, posterVerified: true,
+ budget: 800, budgetCurrency: "USDC",
+ deadline: "Ongoing",
+ postedAgo: "6h ago",
+ proposals: 11,
+ minTrustScore: 40,
+ status: "open",
+ description: "Crypto founder running 2 Spaces per week needs a clipper to cut viral moments (alpha calls, hot takes, mic drops) into vertical shorts for X + TikTok + YouTube Shorts.",
+ deliverables: ["6-10 clips per week", "Auto-captions + on-brand title cards", "Posted natively to founder's channels"],
+ tags: ["clipping", "spaces", "founder"],
+ requiresPortfolio: true,
+ },
+ {
+ id: "job-025", jobType: "crypto",
+ title: "Stream clipper for KOL · daily highlights",
+ category: "Clipping",
+ poster: "@KOLStudio", posterTrust: 76, posterVerified: false,
+ budget: 1200, budgetCurrency: "USDC",
+ deadline: "Ongoing",
+ postedAgo: "1d ago",
+ proposals: 23,
+ minTrustScore: 35,
+ status: "open",
+ description: "Crypto KOL streams 4-5h daily on Kick + X. Looking for a fast clipper to pull the best 30-90s moments and post within 2 hours of the live stream ending. Volume play.",
+ deliverables: ["3-5 clips per stream day", "Subtitles + thumbnails", "Posted to KOL's accounts"],
+ tags: ["clipping", "kol", "streaming"],
+ },
 ];
 
 const JOB_CATEGORIES_CT = [
@@ -971,6 +1002,7 @@ const JOB_CATEGORIES_CRYPTO = [
  { id: "Audits", label: "Audits", Icon: Lock },
  { id: "Technical Writing", label: "Writing", Icon: PenTool },
  { id: "Video Editing", label: "Video", Icon: Video },
+ { id: "Clipping", label: "Clips", Icon: Scissors },
  { id: "Community", label: "Community", Icon: MessageCircle },
 ];
 
@@ -1891,8 +1923,8 @@ export default function Web3Gigs() {
  <GlowCard style={{ padding: "20px 24px", background: "rgba(0, 0, 0, 0.5)"}}>
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 12 }}>
  {[
- { label: "Open Jobs", val: "22", Icon: Briefcase },
- { label: "Total Budget", val: "$30k+", Icon: DollarSign },
+ { label: "Open Jobs", val: "24", Icon: Briefcase },
+ { label: "Total Budget", val: "$32k+", Icon: DollarSign },
  { label: "vs Fiverr Cut", val: "0%", Icon: Zap },
  { label: "Paid in", val: "USDC", Icon: Sparkles },
  { label: "Disputes", val: "0", Icon: Shield },
@@ -2092,7 +2124,7 @@ export default function Web3Gigs() {
  <div style={{ fontSize: 32, fontWeight: 900, letterSpacing: -1.5, marginBottom: 12 }}>Join <span style={{ color: C.primary }}>crypto's work marketplace.</span>
  </div>
  <div style={{ fontSize: 15, color: C.textSecondary, marginBottom: 28, maxWidth: 500, margin: "0 auto 28px"}}>
- 22+ open jobs. Zero middleman fees. Paid in USDC, USDT or SOL. Reputation-first hiring. Ship the way crypto was meant to work.
+ 24+ open jobs. Zero middleman fees. Paid in USDC, USDT or SOL. Reputation-first hiring. Ship the way crypto was meant to work.
  </div>
  <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap"}}>
  <button
@@ -3774,6 +3806,7 @@ export default function Web3Gigs() {
  <option value="Audits">Audits</option>
  <option value="Technical Writing">Writing</option>
  <option value="Video Editing">Video Editing</option>
+ <option value="Clipping">Clipping</option>
  <option value="Community">Community</option>
  </>
  ) : (

@@ -1092,6 +1092,72 @@ export default function Web3Gigs() {
  setWaitlistLoading(false);
  }
  };
+
+ const submitJob = async () => {
+   // Basic validation
+   if (!jobForm.title.trim() || jobForm.title.length < 8) {
+     setJobError("Title needs to be at least 8 characters.");
+     return;
+   }
+   if (!jobForm.budget || isNaN(Number(jobForm.budget)) || Number(jobForm.budget) < 50) {
+     setJobError("Budget must be a number, minimum $50.");
+     return;
+   }
+   if (!jobForm.description.trim() || jobForm.description.length < 30) {
+     setJobError("Description needs at least 30 characters.");
+     return;
+   }
+   if (!jobForm.email.includes("@")) {
+     setJobError("Need a valid email so we can reach you.");
+     return;
+   }
+   if (!jobForm.contact.trim()) {
+     setJobError("Add your X handle (so we can verify and tag you).");
+     return;
+   }
+   setJobSubmitting(true);
+   setJobError("");
+   try {
+     const { error } = await supabase
+       .from("job_submissions")
+       .insert([{
+         title: jobForm.title.trim(),
+         job_type: jobForm.jobType,
+         category: jobForm.category,
+         budget: Number(jobForm.budget),
+         currency: jobForm.currency,
+         deadline: jobForm.deadline.trim() || "Flexible",
+         description: jobForm.description.trim(),
+         deliverables: jobForm.deliverables.trim(),
+         min_trust_score: Number(jobForm.minTrust) || 0,
+         poster_handle: jobForm.contact.trim().replace(/^@/, ""),
+         poster_email: jobForm.email.trim().toLowerCase(),
+         status: "pending",
+       }]);
+     if (error) {
+       setJobError("Couldn't submit. Try again in a moment.");
+       console.error("Job submit error:", error);
+     } else {
+       setJobSubmitted(true);
+     }
+   } catch (err) {
+     setJobError("Couldn't connect. Check your internet?");
+     console.error(err);
+   } finally {
+     setJobSubmitting(false);
+   }
+ };
+
+ const resetJobForm = () => {
+   setJobForm({
+     title: "", jobType: "crypto", category: "Development",
+     budget: "", currency: "USDC", deadline: "",
+     description: "", deliverables: "",
+     minTrust: "0", contact: "", email: "",
+   });
+   setJobSubmitted(false);
+   setJobError("");
+ };
  const [selectedJob, setSelectedJob] = useState(null);
  const [showPostJob, setShowPostJob] = useState(false);
  const [showWaitlistModal, setShowWaitlistModal] = useState(false);
@@ -1101,6 +1167,15 @@ export default function Web3Gigs() {
  const [cibSearchHandle, setCibSearchHandle] = useState("");
  const [profileSearchHandle, setProfileSearchHandle] = useState("");
  const [openFaqIndex, setOpenFaqIndex] = useState(0);
+ const [jobForm, setJobForm] = useState({
+   title: "", jobType: "crypto", category: "Development",
+   budget: "", currency: "USDC", deadline: "",
+   description: "", deliverables: "",
+   minTrust: "0", contact: "", email: "",
+ });
+ const [jobSubmitting, setJobSubmitting] = useState(false);
+ const [jobSubmitted, setJobSubmitted] = useState(false);
+ const [jobError, setJobError] = useState("");
  const resultRef = useRef(null);
 
  const API_BASE = "http://localhost:3001"; // Change this to your deployed backend URL
@@ -3556,7 +3631,7 @@ export default function Web3Gigs() {
  >
  <div style={{ padding: "24px 28px", borderBottom: `1px solid ${C.border}`, background: `linear-gradient(135deg, rgba(212, 255, 0, 0.04), transparent)`, display: "flex", justifyContent: "space-between", alignItems: "center"}}>
  <div>
- <div style={{ fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>New Job · Handshake Mode</div>
+ <div style={{ fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>New Job · Manually Reviewed</div>
  <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5 }}>Post a job on Web3Gigs</div>
  </div>
  <button onClick={() => setShowPostJob(false)} style={{
@@ -3567,55 +3642,222 @@ export default function Web3Gigs() {
  }}><XIcon size={16} strokeWidth={2} /></button>
  </div>
 
- <div style={{ padding: "24px 28px"}}>
- {/* Coming Soon treatment */}
- <div style={{ textAlign: "center", padding: "40px 20px"}}>
- <div style={{ display: "flex", justifyContent: "center", marginBottom: 16, color: "#fbbf24"}}><Construction size={48} strokeWidth={2} /></div>
- <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 8, letterSpacing: -0.5 }}>Job posting opens soon</div>
- <div style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.6, maxWidth: 400, margin: "0 auto 24px"}}>We're polishing the post flow before opening it up. In the meantime, you can browse open jobs and see how Handshake works.
+ <div style={{ padding: "24px 28px", maxHeight: "70vh", overflowY: "auto"}}>
+ {!jobSubmitted ? (
+ <>
+ {/* Trust banner */}
+ <div style={{ padding: "12px 14px", background: "rgba(212, 255, 0, 0.04)", border: "1px solid rgba(212, 255, 0, 0.18)", borderRadius: 10, marginBottom: 20, display: "flex", gap: 10, alignItems: "flex-start"}}>
+ <Shield size={16} strokeWidth={2.2} style={{ color: C.primary, flexShrink: 0, marginTop: 2 }} />
+ <div style={{ fontSize: 11, color: C.textSecondary, lineHeight: 1.5, fontFamily: "'JetBrains Mono', monospace"}}>All jobs are manually reviewed within 24h. We're keeping the standard high during early access. You'll get an email once your post is live.</div>
  </div>
 
- {/* Waitlist placeholder */}
- <div style={{ display: "flex", gap: 8, maxWidth: 360, margin: "0 auto", flexWrap: "wrap"}}>
+ {/* Title */}
+ <div style={{ marginBottom: 14 }}>
+ <label style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, display: "block", marginBottom: 6 }}>Job Title *</label>
  <input
- type="email"placeholder="your@email.com"style={{
- flex: 1, minWidth: 180, padding: "12px 14px",
- background: "rgba(0, 0, 0, 0.9)",
- border: "1px solid rgba(255, 255, 255, 0.12)",
- borderRadius: 10, color: C.textPrimary,
- fontFamily: "'JetBrains Mono', monospace", fontSize: 12,
- outline: "none",
- }}
+ type="text"
+ placeholder="e.g. Solana smart contract audit · staking program"
+ value={jobForm.title}
+ onChange={e => setJobForm({...jobForm, title: e.target.value})}
+ maxLength={100}
+ style={{ width: "100%", padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: 8, color: C.textPrimary, fontSize: 13, fontFamily: "'JetBrains Mono', monospace", boxSizing: "border-box", outline: "none"}}
  />
- <button style={{
- padding: "12px 18px", borderRadius: 10, border: "none",
- background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
- color: "#000", fontSize: 12, fontWeight: 900,
- fontFamily: "'Outfit', sans-serif", cursor: "pointer", letterSpacing: 0.3,
- }}>Notify Me</button>
  </div>
- <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 16, letterSpacing: 1 }}>First 100 to signup get priority access + free featured listing
+
+ {/* Type + Category row */}
+ <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
+ <div>
+ <label style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, display: "block", marginBottom: 6 }}>Type *</label>
+ <select
+ value={jobForm.jobType}
+ onChange={e => setJobForm({...jobForm, jobType: e.target.value, category: e.target.value === "crypto" ? "Development" : "Shitposting"})}
+ style={{ width: "100%", padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: 8, color: C.textPrimary, fontSize: 13, fontFamily: "'JetBrains Mono', monospace", boxSizing: "border-box", outline: "none", cursor: "pointer"}}
+ >
+ <option value="crypto">Crypto Work</option>
+ <option value="ct">CT / KOL Jobs</option>
+ </select>
+ </div>
+ <div>
+ <label style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, display: "block", marginBottom: 6 }}>Category *</label>
+ <select
+ value={jobForm.category}
+ onChange={e => setJobForm({...jobForm, category: e.target.value})}
+ style={{ width: "100%", padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: 8, color: C.textPrimary, fontSize: 13, fontFamily: "'JetBrains Mono', monospace", boxSizing: "border-box", outline: "none", cursor: "pointer"}}
+ >
+ {jobForm.jobType === "crypto" ? (
+ <>
+ <option value="Development">Development</option>
+ <option value="AI / ML">AI / ML</option>
+ <option value="Design">Design</option>
+ <option value="Audits">Audits</option>
+ <option value="Technical Writing">Writing</option>
+ <option value="Video Editing">Video Editing</option>
+ <option value="Community">Community</option>
+ </>
+ ) : (
+ <>
+ <option value="Shitposting">Shitposting</option>
+ <option value="Thread Writing">Thread Writing</option>
+ <option value="KOL / Raids">KOL / Raids</option>
+ <option value="Spaces / AMAs">Spaces / AMAs</option>
+ <option value="Meme Warfare">Meme Warfare</option>
+ <option value="Streaming / Gambling">Streaming</option>
+ <option value="Clipping / Editing">Clipping / Editing</option>
+ </>
+ )}
+ </select>
  </div>
  </div>
 
- {/* What to expect */}
- <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
- <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 12 }}>What you'll be able to do</div>
- <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
- {[
- "Post jobs with budget, deadline, and deliverables",
- "Set minimum Trust Score gate to filter applicants",
- "Review proposals with attached reputation data",
- "Sign public on-chain handshake with selected worker",
- "Release reputation rewards when work is completed",
- ].map((item, i) => (
- <div key={i} style={{ display: "flex", gap: 10, alignItems: "center", fontSize: 12, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace"}}>
- <ArrowRight size={12} strokeWidth={2.5} style={{ color: C.primary, flexShrink: 0 }} />
- <span>{item}</span>
+ {/* Budget + Currency + Deadline */}
+ <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 14 }}>
+ <div>
+ <label style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, display: "block", marginBottom: 6 }}>Budget *</label>
+ <input
+ type="number"
+ placeholder="500"
+ value={jobForm.budget}
+ onChange={e => setJobForm({...jobForm, budget: e.target.value})}
+ min="50"
+ style={{ width: "100%", padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: 8, color: C.textPrimary, fontSize: 13, fontFamily: "'JetBrains Mono', monospace", boxSizing: "border-box", outline: "none"}}
+ />
  </div>
- ))}
+ <div>
+ <label style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, display: "block", marginBottom: 6 }}>Currency</label>
+ <select
+ value={jobForm.currency}
+ onChange={e => setJobForm({...jobForm, currency: e.target.value})}
+ style={{ width: "100%", padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: 8, color: C.textPrimary, fontSize: 13, fontFamily: "'JetBrains Mono', monospace", boxSizing: "border-box", outline: "none", cursor: "pointer"}}
+ >
+ <option value="USDC">USDC</option>
+ <option value="USDT">USDT</option>
+ <option value="SOL">SOL</option>
+ </select>
+ </div>
+ <div>
+ <label style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, display: "block", marginBottom: 6 }}>Deadline</label>
+ <input
+ type="text"
+ placeholder="2w, 30d, Ongoing"
+ value={jobForm.deadline}
+ onChange={e => setJobForm({...jobForm, deadline: e.target.value})}
+ maxLength={20}
+ style={{ width: "100%", padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: 8, color: C.textPrimary, fontSize: 13, fontFamily: "'JetBrains Mono', monospace", boxSizing: "border-box", outline: "none"}}
+ />
  </div>
  </div>
+
+ {/* Description */}
+ <div style={{ marginBottom: 14 }}>
+ <label style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, display: "block", marginBottom: 6 }}>Description *</label>
+ <textarea
+ placeholder="What's the job? Include scope, tech stack, expectations, anything weird about the project. Be specific — vague posts get rejected."
+ value={jobForm.description}
+ onChange={e => setJobForm({...jobForm, description: e.target.value})}
+ maxLength={1000}
+ rows={5}
+ style={{ width: "100%", padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: 8, color: C.textPrimary, fontSize: 13, fontFamily: "'JetBrains Mono', monospace", boxSizing: "border-box", outline: "none", resize: "vertical"}}
+ />
+ <div style={{ fontSize: 10, color: C.textMuted, marginTop: 4, fontFamily: "'JetBrains Mono', monospace"}}>{jobForm.description.length}/1000</div>
+ </div>
+
+ {/* Deliverables */}
+ <div style={{ marginBottom: 14 }}>
+ <label style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, display: "block", marginBottom: 6 }}>Deliverables</label>
+ <textarea
+ placeholder="What does done look like? E.g. 'Audit report, 3-day turnaround, retest after fixes'"
+ value={jobForm.deliverables}
+ onChange={e => setJobForm({...jobForm, deliverables: e.target.value})}
+ maxLength={400}
+ rows={2}
+ style={{ width: "100%", padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: 8, color: C.textPrimary, fontSize: 13, fontFamily: "'JetBrains Mono', monospace", boxSizing: "border-box", outline: "none", resize: "vertical"}}
+ />
+ </div>
+
+ {/* Min Trust + Email row */}
+ <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 10, marginBottom: 14 }}>
+ <div>
+ <label style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, display: "block", marginBottom: 6 }}>Min Trust</label>
+ <input
+ type="number"
+ min="0" max="100"
+ placeholder="0"
+ value={jobForm.minTrust}
+ onChange={e => setJobForm({...jobForm, minTrust: e.target.value})}
+ style={{ width: "100%", padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: 8, color: C.textPrimary, fontSize: 13, fontFamily: "'JetBrains Mono', monospace", boxSizing: "border-box", outline: "none"}}
+ />
+ </div>
+ <div>
+ <label style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, display: "block", marginBottom: 6 }}>Your X Handle *</label>
+ <input
+ type="text"
+ placeholder="@yourhandle"
+ value={jobForm.contact}
+ onChange={e => setJobForm({...jobForm, contact: e.target.value})}
+ maxLength={50}
+ style={{ width: "100%", padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: 8, color: C.textPrimary, fontSize: 13, fontFamily: "'JetBrains Mono', monospace", boxSizing: "border-box", outline: "none"}}
+ />
+ </div>
+ </div>
+
+ {/* Email */}
+ <div style={{ marginBottom: 16 }}>
+ <label style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, display: "block", marginBottom: 6 }}>Email *</label>
+ <input
+ type="email"
+ placeholder="your@email.com — kept private, used for approval notification"
+ value={jobForm.email}
+ onChange={e => setJobForm({...jobForm, email: e.target.value})}
+ maxLength={120}
+ style={{ width: "100%", padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: 8, color: C.textPrimary, fontSize: 13, fontFamily: "'JetBrains Mono', monospace", boxSizing: "border-box", outline: "none"}}
+ />
+ </div>
+
+ {/* Error */}
+ {jobError && (
+ <div style={{ padding: "10px 12px", background: "rgba(239, 68, 68, 0.08)", border: "1px solid rgba(239, 68, 68, 0.25)", borderRadius: 8, marginBottom: 14, fontSize: 12, color: "#fca5a5", fontFamily: "'JetBrains Mono', monospace", display: "flex", alignItems: "center", gap: 8 }}>
+ <AlertTriangle size={14} strokeWidth={2.5} style={{ flexShrink: 0 }} />
+ <span>{jobError}</span>
+ </div>
+ )}
+
+ {/* Submit */}
+ <button
+ onClick={submitJob}
+ disabled={jobSubmitting}
+ style={{
+ width: "100%", padding: "14px", borderRadius: 10, border: "none",
+ background: jobSubmitting ? "rgba(212, 255, 0, 0.3)" : `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+ color: "#000", fontSize: 14, fontWeight: 900,
+ fontFamily: "'Outfit', sans-serif", cursor: jobSubmitting ? "wait" : "pointer",
+ letterSpacing: 0.5, transition: "all 0.2s",
+ boxShadow: jobSubmitting ? "none" : "0 0 24px rgba(212, 255, 0, 0.25)",
+ }}
+ >{jobSubmitting ? "Submitting..." : "Submit for Review"}</button>
+
+ <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textAlign: "center", marginTop: 10, letterSpacing: 0.5 }}>Free to post during early access · No platform fee · Manual moderation within 24h</div>
+ </>
+ ) : (
+ <div style={{ padding: "30px 20px", textAlign: "center"}}>
+ <div style={{ display: "flex", justifyContent: "center", marginBottom: 14, color: "#10b981"}}><Check size={48} strokeWidth={2.5} /></div>
+ <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 10, color: "#10b981", letterSpacing: -0.5 }}>Job submitted for review</div>
+ <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.6, maxWidth: 400, margin: "0 auto 20px"}}>Thanks! We'll review your post within 24 hours and email you at <span style={{ color: C.primary, fontWeight: 700 }}>{jobForm.email}</span> when it's live. If anything's unclear, we'll DM <span style={{ color: C.primary, fontWeight: 700 }}>@{jobForm.contact.replace(/^@/, "")}</span> on X.</div>
+ <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap"}}>
+ <button onClick={() => { resetJobForm(); }} style={{
+ padding: "10px 16px", borderRadius: 8, border: `1px solid ${C.borderHover}`,
+ background: "transparent", color: C.textPrimary,
+ fontSize: 12, fontWeight: 700, fontFamily: "'Outfit', sans-serif",
+ cursor: "pointer", letterSpacing: 0.3,
+ }}>Post Another</button>
+ <button onClick={() => { setShowPostJob(false); resetJobForm(); }} style={{
+ padding: "10px 16px", borderRadius: 8, border: "none",
+ background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+ color: "#000", fontSize: 12, fontWeight: 900, fontFamily: "'Outfit', sans-serif",
+ cursor: "pointer", letterSpacing: 0.3,
+ }}>Done</button>
+ </div>
+ </div>
+ )}
  </div>
  </div>
  </div>

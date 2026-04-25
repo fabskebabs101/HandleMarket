@@ -1242,6 +1242,73 @@ export default function Web3Gigs() {
    }
  }, [tab]);
 
+ const fetchWaitlistCount = async () => {
+   try {
+     const { count, error } = await supabase
+       .from("waitlist")
+       .select("*", { count: "exact", head: true });
+     if (!error && typeof count === "number") {
+       setWaitlistCount(count);
+     }
+   } catch (err) {
+     console.error("Couldn't fetch waitlist count:", err);
+   }
+ };
+
+ const submitApply = async () => {
+   if (!selectedJob) return;
+   if (!applyForm.handle.trim()) {
+     setApplyError("Add your X handle so the poster can verify you.");
+     return;
+   }
+   if (!applyForm.message.trim() || applyForm.message.length < 30) {
+     setApplyError("Add a real message (min 30 chars). Cookie-cutter pitches get rejected.");
+     return;
+   }
+   if (!applyForm.email.includes("@")) {
+     setApplyError("Add a valid email so the poster can reach you.");
+     return;
+   }
+   setApplySubmitting(true);
+   setApplyError("");
+   try {
+     const { error } = await supabase
+       .from("job_applications")
+       .insert([{
+         job_id: selectedJob.id,
+         job_title: selectedJob.title,
+         job_poster: selectedJob.poster,
+         applicant_handle: applyForm.handle.trim().replace(/^@/, ""),
+         applicant_email: applyForm.email.trim().toLowerCase(),
+         message: applyForm.message.trim(),
+         portfolio_url: applyForm.portfolio.trim(),
+         expected_pay: applyForm.expectedPay.trim(),
+         status: "pending",
+       }]);
+     if (error) {
+       setApplyError("Couldn't submit. Try again in a moment.");
+       console.error("Apply submit error:", error);
+     } else {
+       setApplySubmitted(true);
+     }
+   } catch (err) {
+     setApplyError("Couldn't connect. Check your internet?");
+     console.error(err);
+   } finally {
+     setApplySubmitting(false);
+   }
+ };
+
+ const resetApplyForm = () => {
+   setApplyForm({ handle: "", message: "", portfolio: "", expectedPay: "", email: "" });
+   setApplySubmitted(false);
+   setApplyError("");
+ };
+
+ useEffect(() => {
+   fetchWaitlistCount();
+ }, [tab]);
+
  const resetJobForm = () => {
    setJobForm({
      title: "", jobType: "crypto", category: "Development",
@@ -1272,6 +1339,14 @@ export default function Web3Gigs() {
  const [jobError, setJobError] = useState("");
  const [approvedJobs, setApprovedJobs] = useState([]);
  const [approvedJobsLoading, setApprovedJobsLoading] = useState(false);
+ const [waitlistCount, setWaitlistCount] = useState(null);
+ const [jobSearch, setJobSearch] = useState("");
+ const [applyForm, setApplyForm] = useState({
+   handle: "", message: "", portfolio: "", expectedPay: "", email: "",
+ });
+ const [applySubmitting, setApplySubmitting] = useState(false);
+ const [applySubmitted, setApplySubmitted] = useState(false);
+ const [applyError, setApplyError] = useState("");
  const resultRef = useRef(null);
 
  const API_BASE = "http://localhost:3001"; // Change this to your deployed backend URL
@@ -1735,6 +1810,16 @@ export default function Web3Gigs() {
  onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.15)"; e.currentTarget.style.color = C.textPrimary; }}
  >Analyze Any Account</button>
  </div>
+ {waitlistCount !== null && waitlistCount > 0 && (
+ <div style={{ marginTop: 20, display: "flex", justifyContent: "center"}}>
+ <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 16px", borderRadius: 20, background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(212, 255, 0, 0.2)"}}>
+ <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", boxShadow: "0 0 8px #10b981" }} />
+ <span style={{ fontSize: 11, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.8 }}>
+ <span style={{ color: C.primary, fontWeight: 800 }}>{waitlistCount.toLocaleString()}</span> {waitlistCount === 1 ? "builder" : "builders"} on the waitlist
+ </span>
+ </div>
+ </div>
+ )}
  </Reveal>
 
  {/* LIVE JOBS PREVIEW */}
@@ -3175,6 +3260,37 @@ export default function Web3Gigs() {
  </div>
  </GlowCard>
 
+ {/* Search bar */}
+ <div style={{ position: "relative", marginBottom: 14 }}>
+ <Search size={16} strokeWidth={2} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: C.textMuted, pointerEvents: "none"}} />
+ <input
+ type="text"
+ placeholder="Search jobs by title, skill, or company..."
+ value={jobSearch}
+ onChange={e => setJobSearch(e.target.value)}
+ style={{
+ width: "100%", padding: "12px 14px 12px 40px", borderRadius: 10,
+ background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.08)",
+ color: C.textPrimary, fontSize: 13, fontFamily: "'JetBrains Mono', monospace",
+ boxSizing: "border-box", outline: "none", transition: "border-color 0.2s",
+ }}
+ onFocus={e => e.currentTarget.style.borderColor = `${C.primary}40`}
+ onBlur={e => e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.08)"}
+ />
+ {jobSearch && (
+ <button
+ onClick={() => setJobSearch("")}
+ style={{
+ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+ width: 24, height: 24, borderRadius: 6,
+ background: "rgba(255, 255, 255, 0.06)", border: "none",
+ color: C.textMuted, cursor: "pointer",
+ display: "flex", alignItems: "center", justifyContent: "center",
+ }}
+ ><XIcon size={12} strokeWidth={2.5} /></button>
+ )}
+ </div>
+
  {/* Top action bar */}
  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
  <div style={{ display: "flex", gap: 6, flexWrap: "wrap"}}>
@@ -3216,7 +3332,16 @@ export default function Web3Gigs() {
  {/* Jobs grid */}
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 14, marginBottom: 40 }}>
  {[...approvedJobs, ...MOCK_JOBS]
-.filter(j => j.jobType === jobsType && (jobsFilter === "all"|| j.category === jobsFilter))
+.filter(j => {
+   if (j.jobType !== jobsType) return false;
+   if (jobsFilter !== "all" && j.category !== jobsFilter) return false;
+   if (jobSearch.trim()) {
+     const q = jobSearch.toLowerCase().trim();
+     const haystack = `${j.title} ${j.description || ""} ${j.poster || ""} ${(j.tags || []).join(" ")} ${j.category}`.toLowerCase();
+     if (!haystack.includes(q)) return false;
+   }
+   return true;
+ })
 .sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0))
 .map(job => {
  const statusColor = job.status === "open"? "#10b981": job.status === "in_progress"? "#fbbf24": C.textMuted;
@@ -3285,7 +3410,16 @@ export default function Web3Gigs() {
  </div>
 
  {/* Empty state message if no jobs match filter */}
- {[...approvedJobs, ...MOCK_JOBS].filter(j => j.jobType === jobsType && (jobsFilter === "all"|| j.category === jobsFilter)).length === 0 && (
+ {[...approvedJobs, ...MOCK_JOBS].filter(j => {
+   if (j.jobType !== jobsType) return false;
+   if (jobsFilter !== "all" && j.category !== jobsFilter) return false;
+   if (jobSearch.trim()) {
+     const q = jobSearch.toLowerCase().trim();
+     const haystack = `${j.title} ${j.description || ""} ${j.poster || ""} ${(j.tags || []).join(" ")} ${j.category}`.toLowerCase();
+     if (!haystack.includes(q)) return false;
+   }
+   return true;
+ }).length === 0 && (
  <div style={{ textAlign: "center", padding: "40px 20px", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace"}}>No jobs in this category yet. Try "All"or <span style={{ color: C.primary, cursor: "pointer"}} onClick={() => setShowPostJob(true)}>post the first one →</span>
  </div>
  )}
@@ -3564,7 +3698,7 @@ export default function Web3Gigs() {
  const statusLabel = selectedJob.status === "open"? "OPEN": selectedJob.status === "in_progress"? "IN PROGRESS": "COMPLETED";
  return (
  <div
- onClick={() => { setSelectedJob(null); setProposalText(""); }}
+ onClick={() => { setSelectedJob(null); setProposalText(""); resetApplyForm(); }}
  style={{
  position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.85)",
  backdropFilter: "blur(8px)", zIndex: 100,
@@ -3595,7 +3729,7 @@ export default function Web3Gigs() {
  <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: -0.5, lineHeight: 1.2 }}>{selectedJob.title}</div>
  <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 6 }}>Posted {selectedJob.postedAgo} · {selectedJob.proposals} proposals</div>
  </div>
- <button onClick={() => { setSelectedJob(null); setProposalText(""); }} style={{
+ <button onClick={() => { setSelectedJob(null); setProposalText(""); resetApplyForm(); }} style={{
  width: 32, height: 32, borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.08)",
  background: "rgba(0, 0, 0, 0.5)", color: C.textSecondary,
  cursor: "pointer", flexShrink: 0,
@@ -3658,40 +3792,120 @@ export default function Web3Gigs() {
  ))}
  </div>
 
- {/* Submit Proposal */}
- {selectedJob.status === "open"&& (
+ {/* Apply to job */}
+ {selectedJob.status === "open" && (
  <>
- <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>Submit Proposal</div>
+ {!applySubmitted ? (
+ <>
+ <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, gap: 10, flexWrap: "wrap"}}>
+ <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5 }}>Apply for this job</div>
+ <a
+ href={`https://x.com/messages/compose?recipient=${(selectedJob.poster || "").replace(/^@/, "")}`}
+ target="_blank"
+ rel="noopener noreferrer"
+ style={{
+ display: "inline-flex", alignItems: "center", gap: 6,
+ padding: "6px 12px", borderRadius: 8,
+ background: "rgba(0, 0, 0, 0.5)",
+ border: "1px solid rgba(255, 255, 255, 0.08)",
+ color: C.textSecondary, fontSize: 11,
+ fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5,
+ textDecoration: "none", transition: "all 0.2s",
+ }}
+ onMouseEnter={e => { e.currentTarget.style.borderColor = `${C.primary}40`; e.currentTarget.style.color = C.primary; }}
+ onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.08)"; e.currentTarget.style.color = C.textSecondary; }}
+ >
+ <MessageCircle size={11} strokeWidth={2.5} />
+ <span>DM {selectedJob.poster} on X</span>
+ </a>
+ </div>
+
+ <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
+ <input
+ type="text"
+ placeholder="Your X handle (@yourhandle)"
+ value={applyForm.handle}
+ onChange={e => setApplyForm({...applyForm, handle: e.target.value})}
+ maxLength={50}
+ style={{ padding: "10px 12px", background: "rgba(0, 0, 0, 0.9)", border: "1px solid rgba(255, 255, 255, 0.12)", borderRadius: 10, color: C.textPrimary, fontFamily: "'JetBrains Mono', monospace", fontSize: 12, outline: "none", boxSizing: "border-box"}}
+ />
+ <input
+ type="email"
+ placeholder="your@email.com"
+ value={applyForm.email}
+ onChange={e => setApplyForm({...applyForm, email: e.target.value})}
+ maxLength={120}
+ style={{ padding: "10px 12px", background: "rgba(0, 0, 0, 0.9)", border: "1px solid rgba(255, 255, 255, 0.12)", borderRadius: 10, color: C.textPrimary, fontFamily: "'JetBrains Mono', monospace", fontSize: 12, outline: "none", boxSizing: "border-box"}}
+ />
+ </div>
+
  <textarea
- value={proposalText}
- onChange={e => setProposalText(e.target.value)}
- placeholder="Why are you right for this job? Include relevant work, timelines, and what makes you trustworthy. Your Trust Score will be auto-attached."style={{
- width: "100%", minHeight: 100, padding: "12px 14px",
+ value={applyForm.message}
+ onChange={e => setApplyForm({...applyForm, message: e.target.value})}
+ placeholder="Why are you right for this job? Mention relevant work, timeline, and what makes you trustworthy."
+ maxLength={1000}
+ style={{
+ width: "100%", minHeight: 90, padding: "10px 12px",
  background: "rgba(0, 0, 0, 0.9)",
  border: "1px solid rgba(255, 255, 255, 0.12)",
  borderRadius: 10, color: C.textPrimary,
  fontFamily: "'JetBrains Mono', monospace", fontSize: 12,
- resize: "vertical", outline: "none", marginBottom: 12,
- transition: "border 0.2s",
+ resize: "vertical", outline: "none", marginBottom: 10,
+ boxSizing: "border-box",
  }}
- onFocus={e => e.target.style.borderColor = C.primary}
- onBlur={e => e.target.style.borderColor = "rgba(255, 255, 255, 0.12)"}
  />
+
+ <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 10, marginBottom: 12 }}>
+ <input
+ type="text"
+ placeholder="Portfolio / GitHub / past work URL (optional)"
+ value={applyForm.portfolio}
+ onChange={e => setApplyForm({...applyForm, portfolio: e.target.value})}
+ maxLength={200}
+ style={{ padding: "10px 12px", background: "rgba(0, 0, 0, 0.9)", border: "1px solid rgba(255, 255, 255, 0.12)", borderRadius: 10, color: C.textPrimary, fontFamily: "'JetBrains Mono', monospace", fontSize: 12, outline: "none", boxSizing: "border-box"}}
+ />
+ <input
+ type="text"
+ placeholder="Expected pay"
+ value={applyForm.expectedPay}
+ onChange={e => setApplyForm({...applyForm, expectedPay: e.target.value})}
+ maxLength={50}
+ style={{ padding: "10px 12px", background: "rgba(0, 0, 0, 0.9)", border: "1px solid rgba(255, 255, 255, 0.12)", borderRadius: 10, color: C.textPrimary, fontFamily: "'JetBrains Mono', monospace", fontSize: 12, outline: "none", boxSizing: "border-box"}}
+ />
+ </div>
+
+ {applyError && (
+ <div style={{ padding: "10px 12px", background: "rgba(239, 68, 68, 0.08)", border: "1px solid rgba(239, 68, 68, 0.25)", borderRadius: 8, marginBottom: 12, fontSize: 12, color: "#fca5a5", fontFamily: "'JetBrains Mono', monospace", display: "flex", alignItems: "center", gap: 8 }}>
+ <AlertTriangle size={14} strokeWidth={2.5} style={{ flexShrink: 0 }} />
+ <span>{applyError}</span>
+ </div>
+ )}
+
  <button
- disabled={!proposalText.trim()}
+ onClick={submitApply}
+ disabled={applySubmitting}
  style={{
  width: "100%", padding: "14px 20px", borderRadius: 12, border: "none",
- background:!proposalText.trim()? "rgba(255, 255, 255, 0.05)": `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
- color:!proposalText.trim()? C.textMuted: "#000",
- fontSize: 14, fontWeight: 900,
+ background: applySubmitting ? "rgba(212, 255, 0, 0.3)" : `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+ color: "#000", fontSize: 14, fontWeight: 900,
  fontFamily: "'Outfit', sans-serif",
- cursor:!proposalText.trim()? "not-allowed": "pointer",
+ cursor: applySubmitting ? "wait" : "pointer",
  letterSpacing: 0.3, transition: "all 0.2s",
+ boxShadow: applySubmitting ? "none" : "0 0 24px rgba(212, 255, 0, 0.25)",
  }}
- >Sign Handshake & Submit</button>
+ >{applySubmitting ? "Submitting..." : "Submit Application"}</button>
 
- <div style={{ marginTop: 14, padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 8, fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.5, textAlign: "center"}}>Submitting creates a free on-chain commitment. If selected, both parties sign a public handshake. Trust scores enforce delivery.
+ <div style={{ marginTop: 12, padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 8, fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.5, textAlign: "center"}}>Your application gets forwarded to the poster within 24h. Trust Score is auto-attached at V1 launch. No platform fee.
  </div>
+ </>
+ ) : (
+ <div style={{ padding: "20px", background: "rgba(16, 185, 129, 0.06)", border: "1px solid rgba(16, 185, 129, 0.25)", borderRadius: 12, textAlign: "center"}}>
+ <div style={{ display: "flex", justifyContent: "center", marginBottom: 10, color: "#10b981"}}><Check size={32} strokeWidth={2.5} /></div>
+ <div style={{ fontSize: 16, fontWeight: 800, color: "#10b981", marginBottom: 6 }}>Application sent!</div>
+ <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.5, fontFamily: "'JetBrains Mono', monospace"}}>The poster will be notified within 24h. Want to apply for another job?</div>
+ <button onClick={() => resetApplyForm()} style={{ marginTop: 12, padding: "8px 16px", borderRadius: 8, border: `1px solid ${C.borderHover}`, background: "transparent", color: C.textPrimary, fontSize: 11, fontWeight: 700, fontFamily: "'Outfit', sans-serif", cursor: "pointer"}}>Apply Again</button>
+ </div>
+ )}
  </>
  )}
 
@@ -4006,6 +4220,11 @@ export default function Web3Gigs() {
  <div>
  <div style={{ fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, fontWeight: 700, marginBottom: 4 }}>Early Access</div>
  <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: -0.5 }}>Join the Web3Gigs waitlist</div>
+ {waitlistCount !== null && waitlistCount > 0 && (
+ <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5, marginTop: 6 }}>
+ <span style={{ color: "#10b981", fontWeight: 700 }}>●</span> {waitlistCount.toLocaleString()} already on the list
+ </div>
+ )}
  </div>
  <button onClick={() => setShowWaitlistModal(false)} style={{
  width: 32, height: 32, borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.08)",

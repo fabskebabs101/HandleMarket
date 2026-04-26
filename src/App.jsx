@@ -98,15 +98,15 @@ function calculateTrustScore({ followers, following, avgLikes, avgRetweets, avgR
  else if (engagementRate >= 0.8) engagementQualityScore = 75;
  else if (engagementRate >= 0.3) engagementQualityScore = 50;
  else if (engagementRate >= 0.1) { engagementQualityScore = 25; redFlags.push("Low engagement for follower count"); }
- else if (followers > 1000) { engagementQualityScore = 5; redFlags.push("Very low engagement — possible bot followers"); }
+ else if (followers > 1000) { engagementQualityScore = 5; redFlags.push("Very low engagement: possible bot followers"); }
 
  // 3. Reply-to-like ratio (real conversations vs drive-by likes)
  const replyRatio = avgLikes > 0? avgReplies / avgLikes: 0;
  let conversationScore = 50;
- if (replyRatio >= 0.15) { conversationScore = 90; greenFlags.push("Strong conversation ratio — real audience"); }
+ if (replyRatio >= 0.15) { conversationScore = 90; greenFlags.push("Strong conversation ratio, real audience"); }
  else if (replyRatio >= 0.05) conversationScore = 70;
  else if (replyRatio >= 0.02) conversationScore = 50;
- else if (avgLikes > 50) { conversationScore = 25; redFlags.push("Likes but no replies — possible engagement pods"); }
+ else if (avgLikes > 50) { conversationScore = 25; redFlags.push("Likes but no replies: possible engagement pods"); }
 
  // 4. Account age vs activity
  // Brand new accounts with huge followers = sus. Old accounts with consistent posting = trusted.
@@ -120,7 +120,7 @@ function calculateTrustScore({ followers, following, avgLikes, avgRetweets, avgR
  redFlags.push("Rapid follower growth for account age");
  } else if (tweetsPerDay > 50) {
  activityScore = 20;
- redFlags.push("Abnormally high posting frequency — possible bot");
+ redFlags.push("Abnormally high posting frequency: possible bot");
  } else if (tweetsPerDay > 0.3 && accountAgeDays > 365) {
  activityScore = 85;
  greenFlags.push("Consistent long-term activity");
@@ -188,7 +188,7 @@ function calculateTrustScore({ followers, following, avgLikes, avgRetweets, avgR
 }
 
 const C = {
- // Single accent — electric lime. Hits hard against monochrome, feels CT-native without being the usual purple.
+ // Single accent, electric lime. Hits hard against monochrome, feels CT-native without being the usual purple.
  primary: "#d4ff00",
  primaryLight: "#e4ff55",
  primaryDark: "#a8cc00",
@@ -316,7 +316,7 @@ const DEMO_ACCOUNTS = [
  score: 91, bars: [92, 88, 85, 94, 100],
  flags: [
  { text: "Healthy organic engagement", type: "green"},
- { text: "Strong conversation ratio — real audience", type: "green"},
+ { text: "Strong conversation ratio, real audience", type: "green"},
  { text: "Verified account", type: "green"},
  ],
  },
@@ -349,15 +349,15 @@ const DEMO_ACCOUNTS = [
  handle: "@PumpBot2024", niche: "Crypto · 85.3k followers", initial: "P",
  score: 22, bars: [15, 10, 18, 20, 20],
  flags: [
- { text: "Very low engagement — possible bot followers", type: "red"},
+ { text: "Very low engagement: possible bot followers", type: "red"},
  { text: "Rapid follower growth for account age", type: "red"},
- { text: "Abnormally high posting frequency — possible bot", type: "red"},
+ { text: "Abnormally high posting frequency: possible bot", type: "red"},
  ],
  },
 ];
 
 function DemoCard() {
- // Pick one random demo account on mount — cycles between refreshes
+ // Pick one random demo account on mount, cycles between refreshes
  const [account] = useState(() =>DEMO_ACCOUNTS[Math.floor(Math.random() * DEMO_ACCOUNTS.length)]);
  const [score, setScore] = useState(0);
  const [bars, setBars] = useState([0, 0, 0, 0, 0]);
@@ -490,7 +490,7 @@ function DemoCard() {
  {/* Fictional disclaimer */}
  {flags.length > 0 && (
  <div style={{ marginTop: 10, fontSize: 9, color: "#525252", fontFamily: "'JetBrains Mono', monospace", textAlign: "center", letterSpacing: 1, textTransform: "uppercase"}}>
- * Demo account — illustrative example
+ * Demo account, illustrative example
  </div>
  )}
 
@@ -609,7 +609,7 @@ const MOCK_JOBS = [
  },
  {
  id: "job-003", jobType: "ct",
- title: "Thread writer — weekly alpha research",
+ title: "Thread writer · weekly alpha research",
  category: "Thread Writing",
  poster: "@AlphaResearch", posterTrust: 88, posterVerified: true,
  budget: 800, budgetCurrency: "USDC",
@@ -624,7 +624,7 @@ const MOCK_JOBS = [
  },
  {
  id: "job-005", jobType: "ct",
- title: "KOL raid — 50 engaged comments",
+ title: "KOL raid · 50 engaged comments",
  category: "KOL / Raids",
  poster: "@NewLaunchCo", posterTrust: 62, posterVerified: false,
  budget: 150, budgetCurrency: "USDC",
@@ -699,7 +699,7 @@ const MOCK_JOBS = [
  },
  {
  id: "job-017", jobType: "ct",
- title: "Clipper — daily CT highlights reel",
+ title: "Clipper · daily CT highlights reel",
  category: "Clipping / Editing",
  poster: "@CTHighlightsDaily", posterTrust: 74, posterVerified: false,
  budget: 450, budgetCurrency: "USDC",
@@ -714,7 +714,7 @@ const MOCK_JOBS = [
  },
  {
  id: "job-020", jobType: "ct",
- title: "Spaces clipper — viral moments from weekly AMAs",
+ title: "Spaces clipper · viral moments from weekly AMAs",
  category: "Clipping / Editing",
  poster: "@SpacesHub", posterTrust: 81, posterVerified: true,
  budget: 600, budgetCurrency: "USDC",
@@ -729,7 +729,7 @@ const MOCK_JOBS = [
  },
  {
  id: "job-018", jobType: "ct",
- title: "Podcast editor — long-form to shorts",
+ title: "Podcast editor · long-form to shorts",
  category: "Clipping / Editing",
  poster: "@CryptoPodcastHQ", posterTrust: 86, posterVerified: true,
  budget: 1200, budgetCurrency: "USDC",
@@ -744,7 +744,7 @@ const MOCK_JOBS = [
  },
  {
  id: "job-019", jobType: "ct",
- title: "Kick stream clipper — crypto degen content",
+ title: "Kick stream clipper · crypto degen content",
  category: "Clipping / Editing",
  poster: "@DegenStreamer", posterTrust: 69, posterVerified: false,
  budget: 350, budgetCurrency: "USDT",
@@ -761,7 +761,7 @@ const MOCK_JOBS = [
  // ─── CRYPTO WORK JOBS ───────────────────────────────────
  {
  id: "job-004", jobType: "crypto",
- title: "Solana smart contract dev — escrow modification",
+ title: "Solana smart contract dev · escrow modification",
  category: "Development",
  poster: "@BuildersDAO", posterTrust: 93, posterVerified: true,
  budget: 2500, budgetCurrency: "USDC",
@@ -777,7 +777,7 @@ const MOCK_JOBS = [
  },
  {
  id: "job-002", jobType: "crypto",
- title: "Video editor for 30s reel — crypto explainer",
+ title: "Video editor for 30s reel · crypto explainer",
  category: "Video Editing",
  poster: "@DeFi_Founder", posterTrust: 91, posterVerified: true,
  budget: 300, budgetCurrency: "USDC",
@@ -793,7 +793,7 @@ const MOCK_JOBS = [
  },
  {
  id: "job-006", jobType: "crypto",
- title: "NFT PFP collection design — 10 pieces",
+ title: "NFT PFP collection design · 10 pieces",
  category: "Design",
  poster: "@NFTArtist_Dao", posterTrust: 79, posterVerified: true,
  budget: 1200, budgetCurrency: "USDC",
@@ -809,7 +809,7 @@ const MOCK_JOBS = [
  },
  {
  id: "job-009", jobType: "crypto",
- title: "Smart contract audit — ERC-20 + staking",
+ title: "Smart contract audit · ERC-20 + staking",
  category: "Audits",
  poster: "@DeFiProtocol", posterTrust: 92, posterVerified: true,
  budget: 5000, budgetCurrency: "USDC",
@@ -825,7 +825,7 @@ const MOCK_JOBS = [
  },
  {
  id: "job-010", jobType: "crypto",
- title: "Frontend dev — React + Wagmi dashboard",
+ title: "Frontend dev · React + Wagmi dashboard",
  category: "Development",
  poster: "@YieldProtocol", posterTrust: 85, posterVerified: true,
  budget: 1800, budgetCurrency: "USDC",
@@ -841,7 +841,7 @@ const MOCK_JOBS = [
  },
  {
  id: "job-011", jobType: "crypto",
- title: "Whitepaper writer — L2 rollup protocol",
+ title: "Whitepaper writer · L2 rollup protocol",
  category: "Technical Writing",
  poster: "@L2Research", posterTrust: 89, posterVerified: true,
  budget: 1500, budgetCurrency: "USDC",
@@ -857,7 +857,7 @@ const MOCK_JOBS = [
  },
  {
  id: "job-012", jobType: "crypto",
- title: "Community manager — Discord + Telegram",
+ title: "Community manager · Discord + Telegram",
  category: "Community",
  poster: "@MemecoinProject", posterTrust: 74, posterVerified: false,
  budget: 1000, budgetCurrency: "USDC",
@@ -872,7 +872,7 @@ const MOCK_JOBS = [
  },
  {
  id: "job-013", jobType: "crypto",
- title: "Logo + brand kit — DePIN project",
+ title: "Logo + brand kit · DePIN project",
  category: "Design",
  poster: "@DePINFounder", posterTrust: 81, posterVerified: true,
  budget: 900, budgetCurrency: "USDC",
@@ -888,7 +888,7 @@ const MOCK_JOBS = [
  },
  {
  id: "job-014", jobType: "crypto",
- title: "Technical blog writer — DeFi primitives",
+ title: "Technical blog writer · DeFi primitives",
  category: "Technical Writing",
  poster: "@DeFiResearchCo", posterTrust: 86, posterVerified: true,
  budget: 600, budgetCurrency: "USDC",
@@ -904,7 +904,7 @@ const MOCK_JOBS = [
  },
  {
  id: "job-021", jobType: "crypto",
- title: "AI trading bot dev — Solana memecoin sniper",
+ title: "AI trading bot dev · Solana memecoin sniper",
  category: "AI / ML",
  poster: "@AlphaBotLabs", posterTrust: 88, posterVerified: true,
  budget: 3500, budgetCurrency: "USDC",
@@ -920,7 +920,7 @@ const MOCK_JOBS = [
  },
  {
  id: "job-022", jobType: "crypto",
- title: "LLM integration — on-chain analytics assistant",
+ title: "LLM integration · on-chain analytics assistant",
  category: "AI / ML",
  poster: "@OnChainAI", posterTrust: 84, posterVerified: true,
  budget: 2200, budgetCurrency: "USDC",
@@ -1067,9 +1067,9 @@ const ALERT_TYPES = [
 ];
 
 const WATCHLIST = [
- { handle: "@0xTrenchKing", score: 94, alerts: ["follower-spike", "trust-drop"], lastAlert: "2h ago — followers +12%"},
+ { handle: "@0xTrenchKing", score: 94, alerts: ["follower-spike", "trust-drop"], lastAlert: "2h ago, followers +12%"},
  { handle: "@BigKOL", score: 88, alerts: ["listing", "engagement-drop"], lastAlert: "None in 7d"},
- { handle: "@CompetitorX", score: 76, alerts: ["follower-spike", "listing", "cluster"], lastAlert: "Yesterday — flagged in cluster-003"},
+ { handle: "@CompetitorX", score: 76, alerts: ["follower-spike", "listing", "cluster"], lastAlert: "Yesterday, flagged in cluster-003"},
 ];
 
 
@@ -1091,7 +1091,7 @@ export default function Web3Gigs() {
  const [selectedCluster, setSelectedCluster] = useState(null);
  const [forensicsRun, setForensicsRun] = useState(false);
  const [jobsFilter, setJobsFilter] = useState("all");
- const [jobsType, setJobsType] = useState("crypto"); // "ct"or "crypto"— default to crypto work
+ const [jobsType, setJobsType] = useState("crypto"); // "ct"or "crypto", default to crypto work
  const [waitlistEmail, setWaitlistEmail] = useState("");
  const [waitlistSubmitted, setWaitlistSubmitted] = useState(false);
  const [waitlistError, setWaitlistError] = useState("");
@@ -1107,7 +1107,7 @@ export default function Web3Gigs() {
 .from("waitlist")
 .insert([{ email: waitlistEmail.trim().toLowerCase(), source }]);
  if (error) {
- // Duplicate email is fine — treat as success
+ // Duplicate email is fine, treat as success
  if (error.code === "23505") {
  setWaitlistSubmitted(true);
  } else {
@@ -1506,7 +1506,7 @@ export default function Web3Gigs() {
  <stop offset="100%" stopColor="#b8e600"/>
  </linearGradient>
  </defs>
- {/* Shield outline — safe-margins so nothing clips on any side */}
+ {/* Shield outline, safe-margins so nothing clips on any side */}
  <path d="M 40 10 L 66 18 L 66 45 Q 66 60 40 72 Q 14 60 14 45 L 14 18 Z"
  fill="none" stroke="url(#logoLime)" strokeWidth="4.5" strokeLinejoin="round" strokeLinecap="round"/>
  {/* Lucide Handshake icon inside shield */}
@@ -1528,7 +1528,7 @@ export default function Web3Gigs() {
  <div className="w3g-tagline"style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1, textTransform: "uppercase"}}>Hire · Handshake · Ship</div>
  </div>
  </div>
- {/* Right side — waitlist + menu */}
+ {/* Right side, waitlist + menu */}
  <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
  <button
  className="w3g-waitlist-btn"onClick={() => { setWaitlistSubmitted(false); setWaitlistError(""); setShowWaitlistModal(true); }}
@@ -1776,7 +1776,7 @@ export default function Web3Gigs() {
  </h1>
  </Reveal>
  <Reveal delay={200}>
- <p style={{ color: C.textSecondary, fontSize: 18, marginTop: 20, maxWidth: 560, margin: "20px auto 0", lineHeight: 1.5 }}>Dev, design, audits, writing — or shitposts, raids, and Spaces. Every applicant comes with a Trust Score attached. No middleman. No 20% Fiverr cut. Get paid in USDC, USDT or SOL.
+ <p style={{ color: C.textSecondary, fontSize: 18, marginTop: 20, maxWidth: 560, margin: "20px auto 0", lineHeight: 1.5 }}>Dev, design, audits, writing, or shitposts, raids, and Spaces. Every applicant comes with a Trust Score attached. No middleman. No 20% Fiverr cut. Get paid in USDC, USDT or SOL.
  </p>
  </Reveal>
 
@@ -1876,7 +1876,7 @@ export default function Web3Gigs() {
  </div>
  </Reveal>
 
- {/* Social proof bar — animated counters */}
+ {/* Social proof bar, animated counters */}
  <Reveal delay={200}>
  <div style={{ display: "flex", justifyContent: "center", gap: 32, marginTop: 56, flexWrap: "wrap"}}>
  {[
@@ -2081,7 +2081,7 @@ export default function Web3Gigs() {
  {[
  { title: "Independent Analysis", desc: "No paid placements. Every score is algorithmically generated from public data."},
  { title: "Bot Detection", desc: "Our algorithm exposes bot-inflated followings and fake engagement."},
- { title: "Public Data Only", desc: "We only analyze what X makes public — no special access, no ToS violations."},
+ { title: "Public Data Only", desc: "We only analyze what X makes public, no special access, no ToS violations."},
  { title: "Tracked History", desc: "90-day account snapshots expose sudden growth spikes and red flags."},
  ].map(item => (
  <div key={item.title}>
@@ -2110,27 +2110,27 @@ export default function Web3Gigs() {
  },
  {
  q: "How does the Trust Score work?",
- a: "Every CT account gets a 0-100 authenticity rating based on 7 signals: follower velocity, engagement quality, bot follower ratio, CIB cluster membership, account age, content consistency, and cross-platform verification. Trust Scores are public, on-chain anchored, and portable — not locked to Web3Gigs. You can't game it by buying followers or joining pods."
+ a: "Every CT account gets a 0-100 authenticity rating based on 7 signals: follower velocity, engagement quality, bot follower ratio, CIB cluster membership, account age, content consistency, and cross-platform verification. Trust Scores are public, on-chain anchored, and portable, not locked to Web3Gigs. You can't game it by buying followers or joining pods."
  },
  {
  q: "Is it free to use?",
- a: "Browsing jobs, viewing profiles, and checking Trust Scores will always be free. V1 launches with zero fees on job posts or applications — we're not taking a cut during the early phase. Optional premium features (advanced CIB scans, real-time alerts, verification boosts) may be introduced later, but the core marketplace stays free-to-use.",
+ a: "Browsing jobs, viewing profiles, and checking Trust Scores will always be free. V1 launches with zero fees on job posts or applications, we're not taking a cut during the early phase. Optional premium features (advanced CIB scans, real-time alerts, verification boosts) may be introduced later, but the core marketplace stays free-to-use.",
  },
  {
  q: "How are disputes handled?",
- a: "V1 uses a reputation-first Handshake model — both parties sign a public commitment before work starts. If a party breaks the handshake, their Trust Score takes a public, permanent hit. V2 will add optional Squads multisig escrow for higher-stakes jobs. V3 will introduce Kleros-style decentralized arbitration. No centralized mediator takes your side by default.",
+ a: "V1 uses a reputation-first Handshake model, both parties sign a public commitment before work starts. If a party breaks the handshake, their Trust Score takes a public, permanent hit. V2 will add optional Squads multisig escrow for higher-stakes jobs. V3 will introduce Kleros-style decentralized arbitration. No centralized mediator takes your side by default.",
  },
  {
  q: "How do payments work?",
- a: "Direct wallet-to-wallet. Web3Gigs never holds your money — funds move directly between buyer and worker in USDC, USDT or SOL. No 14-day holds, no chargebacks, no platform taking a % of your payout. You keep 100% of what you earn.",
+ a: "Direct wallet-to-wallet. Web3Gigs never holds your money, funds move directly between buyer and worker in USDC, USDT or SOL. No 14-day holds, no chargebacks, no platform taking a % of your payout. You keep 100% of what you earn.",
  },
  {
  q: "Who is Web3Gigs for?",
- a: "Anyone hiring or getting hired in crypto. Devs, designers, smart contract auditors, technical writers, community managers, video editors, AI/ML builders — plus the CT-native side: shitposters, thread writers, Spaces hosts, KOL raids, meme warfare, and clippers. If the work pays in stables or SOL and reputation matters, it's probably here.",
+ a: "Anyone hiring or getting hired in crypto. Devs, designers, smart contract auditors, technical writers, community managers, video editors, AI/ML builders, plus the CT-native side: shitposters, thread writers, Spaces hosts, KOL raids, meme warfare, and clippers. If the work pays in stables or SOL and reputation matters, it's probably here.",
  },
  {
  q: "Who's behind Web3Gigs?",
- a: "Built by @FabsKebabs — a solo builder active in the Solana memecoin and CT ecosystems. No VCs, no token, no promises of riches. Just a product trying to solve the actual problem of hiring without getting scammed in crypto. Follow the builder on X for dev updates, alpha drops, and early access invites.",
+ a: "Built by @FabsKebabs, a solo builder active in the Solana memecoin and CT ecosystems. No VCs, no token, no promises of riches. Just a product trying to solve the actual problem of hiring without getting scammed in crypto. Follow the builder on X for dev updates, alpha drops, and early access invites.",
  },
  ].map((item, i) => {
  const isOpen = openFaqIndex === i;
@@ -2253,7 +2253,7 @@ export default function Web3Gigs() {
  </div>
  <h1 style={{ fontSize: 42, fontWeight: 900, margin: 0, letterSpacing: -1.5, lineHeight: 1.1 }}>Verify any <span style={{ color: C.primary }}>CT account.</span>
  </h1>
- <p style={{ color: C.textSecondary, fontSize: 16, marginTop: 12, fontWeight: 400, maxWidth: 520, margin: "12px auto 0", lineHeight: 1.5 }}>Trust score, bot detection, CIB analysis, 90-day tracking, engagement forensics, and red flag signals — all in one lookup.
+ <p style={{ color: C.textSecondary, fontSize: 16, marginTop: 12, fontWeight: 400, maxWidth: 520, margin: "12px auto 0", lineHeight: 1.5 }}>Trust score, bot detection, CIB analysis, 90-day tracking, engagement forensics, and red flag signals, all in one lookup.
  </p>
 
  {/* What you'll see */}
@@ -2283,7 +2283,7 @@ export default function Web3Gigs() {
  <div style={{ fontSize: 32, fontWeight: 900, letterSpacing: -1.5, marginBottom: 12 }}>Live lookup <span style={{ color: C.primary }}>opens soon.</span>
  </div>
 
- <p style={{ color: C.textSecondary, fontSize: 14, maxWidth: 460, margin: "0 auto 24px", lineHeight: 1.6 }}>We're polishing the Trust Score engine before turning on live lookups. Join the waitlist for early access — first 500 signups get priority when we open the floodgates.
+ <p style={{ color: C.textSecondary, fontSize: 14, maxWidth: 460, margin: "0 auto 24px", lineHeight: 1.6 }}>We're polishing the Trust Score engine before turning on live lookups. Join the waitlist for early access, first 500 signups get priority when we open the floodgates.
  </p>
 
  <button
@@ -2429,27 +2429,27 @@ export default function Web3Gigs() {
  {
  label: "Follow Ratio",
  score: trustResult.breakdown.followRatio,
- meaning: trustResult.breakdown.followRatio >= 80? "Followers far outnumber following — organic growth pattern.": trustResult.breakdown.followRatio >= 50? "Balanced ratio — neither suspicious nor premium.": "Following count is close to or exceeds followers. Common F4F pattern.",
+ meaning: trustResult.breakdown.followRatio >= 80? "Followers far outnumber following, organic growth pattern.": trustResult.breakdown.followRatio >= 50? "Balanced ratio, neither suspicious nor premium.": "Following count is close to or exceeds followers. Common F4F pattern.",
  color: "#10b981"},
  {
  label: "Engagement Quality",
  score: trustResult.breakdown.engagementQuality,
- meaning: trustResult.breakdown.engagementQuality >= 80? `${trustResult.followRatio}x ratio — real humans are engaging with content.`: trustResult.breakdown.engagementQuality >= 50? "Moderate engagement — audience is present but not highly active.": "Low engagement relative to follower count — heavy bot follower signal.",
+ meaning: trustResult.breakdown.engagementQuality >= 80? `${trustResult.followRatio}x ratio, real humans are engaging with content.`: trustResult.breakdown.engagementQuality >= 50? "Moderate engagement, audience is present but not highly active.": "Low engagement relative to follower count, heavy bot follower signal.",
  color: "#06b6d4"},
  {
  label: "Conversations",
  score: trustResult.breakdown.conversation,
- meaning: trustResult.breakdown.conversation >= 80? "Strong reply-to-like ratio indicates real discussion, not passive likes.": trustResult.breakdown.conversation >= 50? "Some conversation happening — audience cares enough to reply.": "Likes without replies — classic engagement pod or bot-liker pattern.",
+ meaning: trustResult.breakdown.conversation >= 80? "Strong reply-to-like ratio indicates real discussion, not passive likes.": trustResult.breakdown.conversation >= 50? "Some conversation happening, audience cares enough to reply.": "Likes without replies, classic engagement pod or bot-liker pattern.",
  color: "#8b5cf6"},
  {
  label: "Activity Pattern",
  score: trustResult.breakdown.activity,
- meaning: trustResult.breakdown.activity >= 80? "Consistent long-term posting — established, real account.": trustResult.breakdown.activity >= 50? "Moderate activity — posting is irregular but present.": "Irregular or suspicious activity patterns detected.",
+ meaning: trustResult.breakdown.activity >= 80? "Consistent long-term posting, established, real account.": trustResult.breakdown.activity >= 50? "Moderate activity, posting is irregular but present.": "Irregular or suspicious activity patterns detected.",
  color: "#f59e0b"},
  {
  label: "Verification",
  score: trustResult.breakdown.verification,
- meaning: trustResult.breakdown.verification >= 80? "Verified account — carries weight but doesn't override other signals.": "Unverified account — no X verification trust boost.",
+ meaning: trustResult.breakdown.verification >= 80? "Verified account, carries weight but doesn't override other signals.": "Unverified account, no X verification trust boost.",
  color: "#ec4899"},
  ].map(s => (
  <div key={s.label} style={{ padding: "10px 12px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.04)"}}>
@@ -2470,7 +2470,7 @@ export default function Web3Gigs() {
  {trustResult.trustScore >= 85? "": trustResult.trustScore >= 70? "": trustResult.trustScore >= 55? "": trustResult.trustScore >= 40? "": ""}
  </span>
  <span style={{ fontSize: 13, fontWeight: 800, color: trustResult.labelColor, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>
- {trustResult.trustScore >= 85? "Premium Buy Recommendation": trustResult.trustScore >= 70? "Safe to Buy": trustResult.trustScore >= 55? "Proceed with Verification": trustResult.trustScore >= 40? "High Risk — Verify Before Buying": "Do Not Buy"}
+ {trustResult.trustScore >= 85? "Premium Buy Recommendation": trustResult.trustScore >= 70? "Safe to Buy": trustResult.trustScore >= 55? "Proceed with Verification": trustResult.trustScore >= 40? "High Risk, Verify Before Buying": "Do Not Buy"}
  </span>
  </div>
  <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.6 }}>
@@ -2593,7 +2593,7 @@ export default function Web3Gigs() {
  </div>
  <h1 style={{ fontSize: 48, fontWeight: 900, margin: 0, letterSpacing: -2, lineHeight: 1.1 }}>Don't hire <span style={{ color: C.primary }}>bots or scammers.</span>
  </h1>
- <p style={{ color: C.textSecondary, fontSize: 17, marginTop: 16, maxWidth: 560, margin: "16px auto 0", lineHeight: 1.5 }}>Every CT account gets scored 0-100 on authenticity. Trust Score gatekeeps who can apply to your jobs — catching bot followers, engagement pods, F4F rings, and fake activity before they waste your budget.
+ <p style={{ color: C.textSecondary, fontSize: 17, marginTop: 16, maxWidth: 560, margin: "16px auto 0", lineHeight: 1.5 }}>Every CT account gets scored 0-100 on authenticity. Trust Score gatekeeps who can apply to your jobs, catching bot followers, engagement pods, F4F rings, and fake activity before they waste your budget.
  </p>
  </div>
 
@@ -2648,11 +2648,11 @@ export default function Web3Gigs() {
  flag: "Red flag: <0.1% engagement rate"},
  {
  title: "Conversations", weight: "15%",
- desc: "Real audiences reply. Bots and engagement pods only drop likes. We measure the ratio of replies to likes — genuine accounts have meaningful conversations.",
+ desc: "Real audiences reply. Bots and engagement pods only drop likes. We measure the ratio of replies to likes, genuine accounts have meaningful conversations.",
  flag: "Red flag: likes but no replies"},
  {
  title: "Activity Pattern", weight: "15%",
- desc: "Brand new accounts with huge followings are suspicious — you can't grow 50k followers in a month organically. We flag rapid growth and bot-like posting frequencies.",
+ desc: "Brand new accounts with huge followings are suspicious, you can't grow 50k followers in a month organically. We flag rapid growth and bot-like posting frequencies.",
  flag: "Red flag: new account + big followers"},
  {
  title: "Verification", weight: "10%",
@@ -2686,7 +2686,7 @@ export default function Web3Gigs() {
  {[
  { rule: "Never buy anything below 40. Full stop.", color: "#ef4444"},
  { rule: "40-55 range? Run Deep Forensics on it first (CIB tab) to see the full picture.", color: "#f97316"},
- { rule: "Check the 'Why This Score?' section — specific flags tell you WHY the number is what it is.", color: "#fbbf24"},
+ { rule: "Check the 'Why This Score?' section, specific flags tell you WHY the number is what it is.", color: "#fbbf24"},
  { rule: "A 70+ with green flags for 'Healthy organic engagement' and 'Strong conversation ratio' is a solid buy.", color: "#10b981"},
  { rule: "Always check the 90-day timeline. Anomaly spikes = purchased followers. Clean lines = organic growth.", color: C.primary },
  ].map((item, i) => (
@@ -2705,9 +2705,9 @@ export default function Web3Gigs() {
  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
  {[
  "Stop buying followers. It tanks your engagement rate and flags anomalies in the 90-day timeline.",
- "Engage genuinely — reply to comments, quote tweets, join conversations. Conversations signal is weighted 15%.",
+ "Engage genuinely, reply to comments, quote tweets, join conversations. Conversations signal is weighted 15%.",
  "Post consistently for 3+ months. Activity Pattern rewards long-term organic growth.",
- "Clean your follower list — remove obvious bot accounts. Lower bot % = higher trust score.",
+ "Clean your follower list, remove obvious bot accounts. Lower bot % = higher trust score.",
  "Get vouched by other SUPREME accounts to compound your trust over time.",
  ].map((rule, i) => (
  <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start"}}>
@@ -2810,7 +2810,7 @@ export default function Web3Gigs() {
  <div style={{ fontSize: 12, color: C.textSecondary, marginTop: 2 }}>
  {leaderboardTab === "trending"&& "Top CT accounts ranked by 7-day Trust Score momentum"}
  {leaderboardTab === "rising"&& "Newly detected accounts with accelerating growth & clean signals"}
- {leaderboardTab === "suspicious"&& "Accounts flagged by our detection systems — buyer beware"}
+ {leaderboardTab === "suspicious"&& "Accounts flagged by our detection systems, buyer beware"}
  </div>
  </div>
  </div>
@@ -2863,7 +2863,7 @@ export default function Web3Gigs() {
  </div>
  )}
 
- {/* PROFILE TAB — sample public profile page */}
+ {/* PROFILE TAB, sample public profile page */}
  {tab === "profile"&& (
  <div>
  <div style={{ textAlign: "center", marginBottom: 28 }}>
@@ -2880,7 +2880,7 @@ export default function Web3Gigs() {
  <Search size={16} strokeWidth={2} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: C.textMuted }} />
  <input
  type="text"
- placeholder="@handle — preview their Web3Gigs profile"
+ placeholder="@handle, preview their Web3Gigs profile"
  value={profileSearchHandle}
  onChange={e => setProfileSearchHandle(e.target.value)}
  style={{
@@ -2968,7 +2968,7 @@ export default function Web3Gigs() {
  {/* Share Card Section */}
  <GlowCard style={{ marginBottom: 20 }}>
  <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>Share Card</div>
- <div style={{ fontSize: 13, color: C.textSecondary, marginBottom: 20 }}>Flex your score on X — auto-generated preview card that gets attached when you share your profile link.</div>
+ <div style={{ fontSize: 13, color: C.textSecondary, marginBottom: 20 }}>Flex your score on X, auto-generated preview card that gets attached when you share your profile link.</div>
 
  {/* Big Share Card Preview */}
  <div style={{
@@ -2986,7 +2986,7 @@ export default function Web3Gigs() {
 
  {/* Card content */}
  <div style={{ position: "relative", padding: "28px 28px 24px"}}>
- {/* Top row — logo + branding */}
+ {/* Top row, logo + branding */}
  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
  <div style={{ width: 32, height: 32, borderRadius: 8, background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 900, color: "#000"}}>CT</div>
@@ -3126,7 +3126,7 @@ export default function Web3Gigs() {
  </div>
 
  <div style={{ marginTop: 14, padding: "10px 12px", background: "rgba(255, 255, 255, 0.03)", borderRadius: 8, fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.5 }}>
- ℹ Share card is served as an OG image — when you paste your web3gigs.app/@handle link on X, this card auto-attaches as the preview.
+ ℹ Share card is served as an OG image, when you paste your web3gigs.app/@handle link on X, this card auto-attaches as the preview.
  </div>
  </GlowCard>
 
@@ -3171,7 +3171,7 @@ export default function Web3Gigs() {
  <h1 style={{ fontSize: 42, fontWeight: 900, margin: 0, letterSpacing: -1.5, lineHeight: 1.1 }}>Hire crypto's best.<br />
  <span style={{ color: C.primary }}>Trust-verified.</span>
  </h1>
- <p style={{ color: C.textSecondary, fontSize: 15, marginTop: 16, maxWidth: 580, margin: "16px auto 0", lineHeight: 1.5 }}>The crypto work marketplace. Hire devs, designers, auditors, and writers — or KOLs, shitposters, and Spaces hosts. Every applicant comes with a Trust Score. Public on-chain Handshakes. Escrow V2 soon.
+ <p style={{ color: C.textSecondary, fontSize: 15, marginTop: 16, maxWidth: 580, margin: "16px auto 0", lineHeight: 1.5 }}>The crypto work marketplace. Hire devs, designers, auditors, and writers, or KOLs, shitposters, and Spaces hosts. Every applicant comes with a Trust Score. Public on-chain Handshakes. Escrow V2 soon.
  </p>
 
  {/* How it works strip */}
@@ -3226,8 +3226,8 @@ export default function Web3Gigs() {
  <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
  <AlertTriangle size={20} strokeWidth={2} style={{ color: "#fbbf24", flexShrink: 0, marginTop: 2 }} />
  <div>
- <div style={{ fontSize: 13, fontWeight: 700, color: "#fbbf24", marginBottom: 4, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>V1 — Handshake Mode (No Custody)</div>
- <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.6 }}>Web3Gigs doesn't hold funds yet. V1 uses <strong style={{ color: C.primary }}>on-chain handshakes</strong> — both parties sign a public commitment. Trust scores + community reputation enforce delivery. Multisig escrow (V2) and smart contract escrow (V3) coming soon.
+ <div style={{ fontSize: 13, fontWeight: 700, color: "#fbbf24", marginBottom: 4, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>V1, Handshake Mode (No Custody)</div>
+ <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.6 }}>Web3Gigs doesn't hold funds yet. V1 uses <strong style={{ color: C.primary }}>on-chain handshakes</strong>, both parties sign a public commitment. Trust scores + community reputation enforce delivery. Multisig escrow (V2) and smart contract escrow (V3) coming soon.
  </div>
  </div>
  </div>
@@ -3403,7 +3403,7 @@ export default function Web3Gigs() {
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14 }}>
  {[
  { n: "1", title: "Post or Apply", desc: "Companies post jobs with budget, deadline, and minimum trust score. Applicants send proposals with their Trust Score credentials attached."},
- { n: "2", title: "Sign Handshake", desc: "Both parties sign a public commitment on Solana — free, gasless. Terms become tamper-proof and publicly verifiable."},
+ { n: "2", title: "Sign Handshake", desc: "Both parties sign a public commitment on Solana, free, gasless. Terms become tamper-proof and publicly verifiable."},
  { n: "3", title: "Work & Deliver", desc: "Worker delivers per the agreed deliverables. Buyer reviews. Both parties mark the handshake as complete."},
  { n: "4", title: "Reputation Compounds", desc: "Successful handshakes boost both parties' trust scores. Disputes get arbitrated publicly by the community."},
  ].map(step => (
@@ -3437,7 +3437,7 @@ export default function Web3Gigs() {
  <Search size={16} strokeWidth={2} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: C.textMuted }} />
  <input
  type="text"
- placeholder="@handle — scan for pod membership"
+ placeholder="@handle, scan for pod membership"
  value={cibSearchHandle}
  onChange={e => setCibSearchHandle(e.target.value)}
  style={{
@@ -4053,7 +4053,7 @@ export default function Web3Gigs() {
  <div style={{ marginBottom: 14 }}>
  <label style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, display: "block", marginBottom: 6 }}>Description *</label>
  <textarea
- placeholder="What's the job? Include scope, tech stack, expectations, anything weird about the project. Be specific — vague posts get rejected."
+ placeholder="What's the job? Include scope, tech stack, expectations, anything weird about the project. Be specific, vague posts get rejected."
  value={jobForm.description}
  onChange={e => setJobForm({...jobForm, description: e.target.value})}
  maxLength={1000}
@@ -4107,7 +4107,7 @@ export default function Web3Gigs() {
  <label style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, display: "block", marginBottom: 6 }}>Email *</label>
  <input
  type="email"
- placeholder="your@email.com — kept private, used for approval notification"
+ placeholder="your@email.com, kept private, used for approval notification"
  value={jobForm.email}
  onChange={e => setJobForm({...jobForm, email: e.target.value})}
  maxLength={120}
@@ -4261,7 +4261,7 @@ export default function Web3Gigs() {
  "Post trust-verified jobs (Crypto + CT)",
  "Apply to jobs with your Trust Score attached",
  "Sign on-chain Handshakes with buyers",
- "Paid in USDC — no middleman, no 20% cut",
+ "Paid in USDC, no middleman, no 20% cut",
  ].map((item, i) => (
  <div key={i} style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 12, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace"}}>
  <ArrowRight size={12} strokeWidth={2.5} style={{ color: C.primary, flexShrink: 0 }} />

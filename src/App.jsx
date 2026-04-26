@@ -2459,7 +2459,7 @@ export default function Web3Gigs() {
 
  {/* RESULT */}
  {demoResult && (
- <div style={{ marginTop: 20, padding: "20px", background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: 12 }}>
+ <div data-demo-result style={{ marginTop: 20, padding: "20px", background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: 12 }}>
  {/* Hero score */}
  <div style={{ display: "flex", alignItems: "center", gap: 18, marginBottom: 18, flexWrap: "wrap"}}>
  <div style={{
@@ -2596,8 +2596,55 @@ export default function Web3Gigs() {
  )}
 
  {!demoResult && (
- <div style={{ padding: "10px 12px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 8, fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5, lineHeight: 1.5, textAlign: "center"}}>
- Try: vitalik · 0xfoobar · cobratate · cz_binance · or any handle you're curious about
+ <div style={{ padding: "14px 16px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.04)"}}>
+ <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, marginBottom: 10, textAlign: "left"}}>Try a trending handle</div>
+ <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+ {[
+ "vitalikbuteryn",
+ "cz_binance",
+ "saylor",
+ "elonmusk",
+ "aeyakovenko",
+ "rajgokal",
+ "Naval",
+ "balajis",
+ "punk6529",
+ "cobie",
+ "GCRClassic",
+ "Ansem",
+ "FabsKebabs",
+ ].map(h => (
+ <button
+ key={h}
+ onClick={() => {
+ setDemoHandle(h);
+ setDemoLoading(true);
+ setDemoResult(null);
+ setTimeout(() => {
+ const result = generateDemoTrustScore(h);
+ setDemoResult(result);
+ setDemoLoading(false);
+ // Smooth scroll to result
+ setTimeout(() => {
+ const el = document.querySelector("[data-demo-result]");
+ if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+ }, 50);
+ }, 600);
+ }}
+ style={{
+ padding: "6px 12px", borderRadius: 16,
+ background: "rgba(212, 255, 0, 0.05)",
+ border: "1px solid rgba(212, 255, 0, 0.18)",
+ color: C.textPrimary,
+ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 600,
+ cursor: "pointer", letterSpacing: 0.3, transition: "all 0.15s",
+ }}
+ onMouseEnter={e => { e.currentTarget.style.background = "rgba(212, 255, 0, 0.12)"; e.currentTarget.style.borderColor = `${C.primary}60`; e.currentTarget.style.color = C.primary; }}
+ onMouseLeave={e => { e.currentTarget.style.background = "rgba(212, 255, 0, 0.05)"; e.currentTarget.style.borderColor = "rgba(212, 255, 0, 0.18)"; e.currentTarget.style.color = C.textPrimary; }}
+ >@{h}</button>
+ ))}
+ </div>
+ <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 10, letterSpacing: 0.5 }}>Click any handle for an instant score, or paste your own above</div>
  </div>
  )}
  </GlowCard>

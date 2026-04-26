@@ -1244,11 +1244,11 @@ export default function Web3Gigs() {
 
  const fetchWaitlistCount = async () => {
    try {
-     const { count, error } = await supabase
-       .from("waitlist")
-       .select("*", { count: "exact", head: true });
-     if (!error && typeof count === "number") {
-       setWaitlistCount(count);
+     const { data, error } = await supabase.rpc("get_waitlist_count");
+     if (!error && typeof data === "number") {
+       setWaitlistCount(data);
+     } else if (!error && data !== null && data !== undefined) {
+       setWaitlistCount(Number(data));
      }
    } catch (err) {
      console.error("Couldn't fetch waitlist count:", err);
@@ -1548,6 +1548,19 @@ export default function Web3Gigs() {
  <Mail size={14} strokeWidth={2.5} />
  <span className="w3g-waitlist-short">WL</span>
  <span className="w3g-waitlist-label">Join Waitlist</span>
+ {waitlistCount !== null && waitlistCount > 0 && (
+ <span style={{
+ display: "inline-flex", alignItems: "center", justifyContent: "center",
+ minWidth: 18, height: 18, padding: "0 5px",
+ borderRadius: 9,
+ background: "rgba(0, 0, 0, 0.85)",
+ color: C.primary,
+ fontSize: 10, fontWeight: 900,
+ fontFamily: "'JetBrains Mono', monospace",
+ letterSpacing: 0,
+ marginLeft: 2,
+ }}>{waitlistCount.toLocaleString()}</span>
+ )}
  </button>
  {/* Hamburger Menu */}
  <div style={{ position: "relative"}}>

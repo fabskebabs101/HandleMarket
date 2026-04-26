@@ -1318,6 +1318,7 @@ export default function Web3Gigs() {
          id: `live-${row.id}`,
          jobType: row.job_type,
          isNew: true,
+         featured: row.featured === true,
          title: row.title,
          category: row.category,
          poster: row.poster_name ? `@${row.poster_name.replace(/^@/, "")}` : `@${row.poster_handle}`,

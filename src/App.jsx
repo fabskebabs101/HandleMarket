@@ -2286,52 +2286,25 @@ export default function Web3Gigs() {
  <p style={{ color: C.textSecondary, fontSize: 14, maxWidth: 460, margin: "0 auto 24px", lineHeight: 1.6 }}>We're polishing the Trust Score engine before turning on live lookups. Join the waitlist for early access — first 500 signups get priority when we open the floodgates.
  </p>
 
- {!waitlistSubmitted? (
- <>
- <div style={{ display: "flex", gap: 8, maxWidth: 400, margin: "0 auto 14px", flexWrap: "wrap"}}>
- <input
- type="email"placeholder="your@email.com"value={waitlistEmail}
- onChange={e => setWaitlistEmail(e.target.value)}
- onKeyDown={e => { if (e.key === "Enter") submitWaitlist(); }}
- style={{
- flex: 1, minWidth: 200, padding: "13px 16px",
- background: "rgba(0, 0, 0, 0.9)",
- border: "1px solid rgba(255, 255, 255, 0.12)",
- borderRadius: 10, color: C.textPrimary,
- fontFamily: "'JetBrains Mono', monospace", fontSize: 13,
- outline: "none", transition: "border 0.2s",
- }}
- onFocus={e => e.target.style.borderColor = C.primary}
- onBlur={e => e.target.style.borderColor = "rgba(255, 255, 255, 0.12)"}
- />
  <button
- onClick={submitWaitlist}
- disabled={!waitlistEmail.includes("@") || waitlistLoading}
+ onClick={() => { setWaitlistSubmitted(false); setWaitlistError(""); setShowWaitlistModal(true); }}
  style={{
- padding: "13px 22px", borderRadius: 10, border: "none",
- background: (!waitlistEmail.includes("@") || waitlistLoading)? "rgba(255, 255, 255, 0.05)": `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
- color: (!waitlistEmail.includes("@") || waitlistLoading)? C.textMuted: "#000",
- fontSize: 13, fontWeight: 900,
- fontFamily: "'Outfit', sans-serif",
- cursor: (!waitlistEmail.includes("@") || waitlistLoading)? "not-allowed": "pointer",
- letterSpacing: 0.3, transition: "all 0.2s",
+ padding: "14px 32px", borderRadius: 12, border: "none",
+ background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+ color: "#000", fontSize: 14, fontWeight: 900,
+ fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+ letterSpacing: 0.5, transition: "all 0.2s",
+ boxShadow: "0 0 28px rgba(212, 255, 0, 0.3)",
+ display: "inline-flex", alignItems: "center", gap: 8,
  }}
- >{waitlistLoading? "⏳ Saving...": "Get Early Access"}</button>
+ onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 40px rgba(212, 255, 0, 0.45)"; }}
+ onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 28px rgba(212, 255, 0, 0.3)"; }}
+ >
+ <Mail size={16} strokeWidth={2.5} />
+ <span>Join the Waitlist</span>
+ </button>
+ <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 14, letterSpacing: 1 }}>No spam. One email when we go live. Unsubscribe anytime.
  </div>
- {waitlistError && (
- <div style={{ fontSize: 12, color: "#ef4444", fontFamily: "'JetBrains Mono', monospace", marginTop: 10, marginBottom: 4 }}> {waitlistError}</div>
- )}
- <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>No spam. One email when we go live. Unsubscribe anytime.
- </div>
- </>
- ): (
- <div style={{ padding: "20px", background: "rgba(16, 185, 129, 0.06)", border: "1px solid rgba(16, 185, 129, 0.25)", borderRadius: 12, maxWidth: 400, margin: "0 auto"}}>
- <div style={{ display: "flex", justifyContent: "center", marginBottom: 8, color: "#10b981"}}><Check size={28} strokeWidth={2.5} /></div>
- <div style={{ fontSize: 16, fontWeight: 800, color: "#10b981", marginBottom: 6 }}>You're on the list!</div>
- <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.5, fontFamily: "'JetBrains Mono', monospace"}}>We'll email <span style={{ color: C.primary }}>{waitlistEmail}</span> the second live lookups go live.
- </div>
- </div>
- )}
 
  {/* What you can still do */}
  <div style={{ marginTop: 32, paddingTop: 24, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>

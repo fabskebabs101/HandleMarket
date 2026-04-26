@@ -588,6 +588,112 @@ const LEADERBOARD_DATA = {
  ],
 };
 
+// ─── DEMO TRUST SCORE (Deterministic preview tool) ──────────────
+// Generates a plausible score from observable handle patterns.
+// Same handle → same score. Public demo only — real score requires X API.
+function generateDemoTrustScore(rawHandle) {
+  const h = (rawHandle || "").trim().replace(/^@/, "").toLowerCase();
+  if (!h || h.length < 1) return null;
+
+  // Hash the handle for deterministic randomness
+  let hash = 0;
+  for (let i = 0; i < h.length; i++) {
+    hash = ((hash << 5) - hash) + h.charCodeAt(i);
+    hash |= 0;
+  }
+  const seed = Math.abs(hash);
+  const rand = (offset, range) => ((seed + offset * 7919) % range);
+
+  // Heuristic signals from observable handle patterns
+  const hasNumberSuffix = /\d{2,}$/.test(h);                  // foo123 = bot tell
+  const hasSequentialNums = /(\d)\1{2,}/.test(h);             // 0000 = bot tell
+  const looksRandom = /^[a-z]+\d{4,}$/.test(h);              // user12345 = bot tell
+  const isShort = h.length < 5;                               // short = OG status
+  const isMedium = h.length >= 5 && h.length <= 12;
+  const hasUnderscore = h.includes("_");
+  const looksClean = /^[a-z][a-z0-9]+$/.test(h) && !hasNumberSuffix;
+  const hasCapsOrigin = /[A-Z]/.test(rawHandle);              // CamelCase = real person
+
+  // Build sub-scores deterministically
+  let followerScore = 50 + rand(1, 50);
+  let engagementScore = 40 + rand(2, 55);
+  let conversationScore = 35 + rand(3, 60);
+  let consistencyScore = 45 + rand(4, 50);
+  let cibScore = 50 + rand(5, 50);
+  let ageScore = 40 + rand(6, 55);
+  let nicheScore = 50 + rand(7, 45);
+
+  // Apply observable adjustments
+  if (looksRandom) { followerScore -= 25; cibScore -= 30; engagementScore -= 20; }
+  if (hasSequentialNums) { cibScore -= 25; followerScore -= 15; }
+  if (hasNumberSuffix) { cibScore -= 12; }
+  if (looksClean) { followerScore += 12; cibScore += 15; }
+  if (isShort) { ageScore += 25; followerScore += 18; }
+  if (isMedium) { ageScore += 10; }
+  if (hasUnderscore) { followerScore += 5; }
+  if (hasCapsOrigin) { engagementScore += 8; conversationScore += 10; }
+
+  // Clamp
+  const clamp = (v) => Math.max(5, Math.min(99, Math.round(v)));
+  followerScore = clamp(followerScore);
+  engagementScore = clamp(engagementScore);
+  conversationScore = clamp(conversationScore);
+  consistencyScore = clamp(consistencyScore);
+  cibScore = clamp(cibScore);
+  ageScore = clamp(ageScore);
+  nicheScore = clamp(nicheScore);
+
+  // Weighted composite
+  const overall = clamp(
+    followerScore * 0.18 +
+    engagementScore * 0.20 +
+    conversationScore * 0.15 +
+    consistencyScore * 0.12 +
+    cibScore * 0.18 +
+    ageScore * 0.10 +
+    nicheScore * 0.07
+  );
+
+  // Tier
+  let tier, tierColor;
+  if (overall >= 85) { tier = "SUPREME"; tierColor = "#10b981"; }
+  else if (overall >= 70) { tier = "CREDIBLE"; tierColor = "#34d399"; }
+  else if (overall >= 55) { tier = "NOTED"; tierColor = "#fbbf24"; }
+  else if (overall >= 40) { tier = "WATCHLIST"; tierColor = "#f97316"; }
+  else { tier = "FLAGGED"; tierColor = "#ef4444"; }
+
+  // Generate flags based on score patterns
+  const redFlags = [];
+  const greenFlags = [];
+  if (looksRandom) redFlags.push("Handle pattern looks auto-generated");
+  if (hasSequentialNums) redFlags.push("Sequential digits in handle (bot pattern)");
+  if (cibScore < 40) redFlags.push("CIB cluster signals detected");
+  if (engagementScore < 30) redFlags.push("Low engagement quality vs follower count");
+  if (looksClean && cibScore > 70) greenFlags.push("Clean handle, no bot patterns detected");
+  if (isShort) greenFlags.push("Short OG-style handle, high seniority signal");
+  if (hasCapsOrigin) greenFlags.push("Mixed-case original handle, human signal");
+  if (engagementScore > 70) greenFlags.push("Healthy engagement quality");
+  if (overall > 75) greenFlags.push("Top-tier reputation cluster");
+
+  return {
+    handle: rawHandle.replace(/^@/, ""),
+    overall,
+    tier,
+    tierColor,
+    breakdowns: [
+      { label: "Follower Quality", score: followerScore },
+      { label: "Engagement", score: engagementScore },
+      { label: "Conversation", score: conversationScore },
+      { label: "Posting Consistency", score: consistencyScore },
+      { label: "CIB Signals", score: cibScore },
+      { label: "Account Age", score: ageScore },
+      { label: "Crypto Niche", score: nicheScore },
+    ],
+    redFlags,
+    greenFlags,
+  };
+}
+
 // ─── PHASE 2: Sale History + Seller Reputation ──────────────────
 // ─── PHASE 1: Handshake Jobs Board ──────────────────────────
 const MOCK_JOBS = [
@@ -1305,6 +1411,18 @@ export default function Web3Gigs() {
    setApplyError("");
  };
 
+ const runDemoTrustScore = () => {
+   if (!demoHandle.trim()) return;
+   setDemoLoading(true);
+   setDemoResult(null);
+   // Simulate computation with a brief delay (feels real)
+   setTimeout(() => {
+     const result = generateDemoTrustScore(demoHandle);
+     setDemoResult(result);
+     setDemoLoading(false);
+   }, 800);
+ };
+
  useEffect(() => {
    fetchWaitlistCount();
  }, [tab]);
@@ -1347,6 +1465,9 @@ export default function Web3Gigs() {
  const [applySubmitting, setApplySubmitting] = useState(false);
  const [applySubmitted, setApplySubmitted] = useState(false);
  const [applyError, setApplyError] = useState("");
+ const [demoHandle, setDemoHandle] = useState("");
+ const [demoResult, setDemoResult] = useState(null);
+ const [demoLoading, setDemoLoading] = useState(false);
  const resultRef = useRef(null);
 
  const API_BASE = "http://localhost:3001"; // Change this to your deployed backend URL
@@ -2286,41 +2407,167 @@ export default function Web3Gigs() {
  </div>
  </div>
 
- {/* COMING SOON + WAITLIST */}
- <GlowCard glow style={{ maxWidth: 650, margin: "0 auto 24px", padding: "32px 28px", textAlign: "center", background: `linear-gradient(180deg, rgba(212, 255, 0, 0.04), rgba(0, 0, 0, 0.5))` }}>
- <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 12px", borderRadius: 20, background: "rgba(245, 158, 11, 0.08)", border: "1px solid rgba(245, 158, 11, 0.25)", marginBottom: 16 }}>
- <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#fbbf24", boxShadow: "0 0 8px #fbbf24", animation: "pulse 2s ease-in-out infinite"}} />
- <span style={{ fontSize: 10, color: "#fbbf24", fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700 }}>API Temporarily Paused</span>
+ {/* WORKING DEMO TOOL */}
+ <GlowCard glow style={{ maxWidth: 720, margin: "0 auto 24px", padding: "28px 24px", background: `linear-gradient(180deg, rgba(212, 255, 0, 0.03), rgba(0, 0, 0, 0.5))` }}>
+ <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
+ <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 12px", borderRadius: 20, background: "rgba(212, 255, 0, 0.08)", border: "1px solid rgba(212, 255, 0, 0.25)"}}>
+ <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", boxShadow: "0 0 8px #10b981" }} />
+ <span style={{ fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700 }}>Try the Preview</span>
+ </div>
+ <span style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>DEMO · LIVE API V1 SOON</span>
  </div>
 
- <div style={{ fontSize: 32, fontWeight: 900, letterSpacing: -1.5, marginBottom: 12 }}>Live lookup <span style={{ color: C.primary }}>opens soon.</span>
+ <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.8, marginBottom: 8 }}>Score any CT handle <span style={{ color: C.primary }}>instantly.</span></div>
+ <p style={{ color: C.textSecondary, fontSize: 13, marginBottom: 18, lineHeight: 1.5 }}>Get a Trust Score preview based on observable handle patterns. Live API at V1 will use real on-chain + X data.</p>
+
+ <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap"}}>
+ <div style={{ flex: 1, minWidth: 220, position: "relative"}}>
+ <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", fontSize: 14, fontWeight: 700 }}>@</span>
+ <input
+ type="text"
+ placeholder="handle"
+ value={demoHandle}
+ onChange={e => setDemoHandle(e.target.value.replace(/^@/, ""))}
+ onKeyDown={e => { if (e.key === "Enter") runDemoTrustScore(); }}
+ maxLength={50}
+ style={{
+ width: "100%", padding: "13px 16px 13px 30px",
+ background: "rgba(0, 0, 0, 0.9)",
+ border: "1px solid rgba(255, 255, 255, 0.12)",
+ borderRadius: 10, color: C.textPrimary,
+ fontFamily: "'JetBrains Mono', monospace", fontSize: 14, fontWeight: 700,
+ outline: "none", boxSizing: "border-box", transition: "border 0.2s",
+ }}
+ onFocus={e => e.target.style.borderColor = C.primary}
+ onBlur={e => e.target.style.borderColor = "rgba(255, 255, 255, 0.12)"}
+ />
+ </div>
+ <button
+ onClick={runDemoTrustScore}
+ disabled={!demoHandle.trim() || demoLoading}
+ style={{
+ padding: "13px 24px", borderRadius: 10, border: "none",
+ background: (!demoHandle.trim() || demoLoading) ? "rgba(255, 255, 255, 0.05)" : `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+ color: (!demoHandle.trim() || demoLoading) ? C.textMuted : "#000",
+ fontSize: 13, fontWeight: 900,
+ fontFamily: "'Outfit', sans-serif",
+ cursor: (!demoHandle.trim() || demoLoading) ? "not-allowed" : "pointer",
+ letterSpacing: 0.3, transition: "all 0.2s", whiteSpace: "nowrap",
+ }}
+ >{demoLoading ? "Analyzing..." : "Get Score"}</button>
  </div>
 
- <p style={{ color: C.textSecondary, fontSize: 14, maxWidth: 460, margin: "0 auto 24px", lineHeight: 1.6 }}>We're polishing the Trust Score engine before turning on live lookups. Join the waitlist for early access, first 500 signups get priority when we open the floodgates.
- </p>
+ {/* RESULT */}
+ {demoResult && (
+ <div style={{ marginTop: 20, padding: "20px", background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: 12 }}>
+ {/* Hero score */}
+ <div style={{ display: "flex", alignItems: "center", gap: 18, marginBottom: 18, flexWrap: "wrap"}}>
+ <div style={{
+ width: 90, height: 90, borderRadius: 16,
+ background: `linear-gradient(135deg, ${demoResult.tierColor}20, ${demoResult.tierColor}05)`,
+ border: `2px solid ${demoResult.tierColor}40`,
+ display: "flex", alignItems: "center", justifyContent: "center",
+ flexShrink: 0,
+ }}>
+ <div style={{ fontSize: 36, fontWeight: 900, color: demoResult.tierColor, fontFamily: "'JetBrains Mono', monospace", letterSpacing: -1.5 }}>{demoResult.overall}</div>
+ </div>
+ <div style={{ flex: 1, minWidth: 200, textAlign: "left"}}>
+ <div style={{ fontSize: 12, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1.5, marginBottom: 4 }}>@{demoResult.handle}</div>
+ <div style={{ fontSize: 22, fontWeight: 900, color: demoResult.tierColor, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1, marginBottom: 6 }}>{demoResult.tier}</div>
+ <div style={{ fontSize: 11, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace"}}>Trust Score / 100 · Demo Engine V0</div>
+ </div>
+ </div>
 
+ {/* Breakdowns */}
+ <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 10, marginBottom: 16 }}>
+ {demoResult.breakdowns.map(b => (
+ <div key={b.label} style={{ padding: "10px 12px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.04)"}}>
+ <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+ <span style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8, fontWeight: 700 }}>{b.label}</span>
+ <span style={{ fontSize: 13, fontWeight: 800, color: b.score >= 70 ? "#10b981" : b.score >= 50 ? "#fbbf24" : "#f97316", fontFamily: "'JetBrains Mono', monospace"}}>{b.score}</span>
+ </div>
+ <div style={{ height: 4, borderRadius: 2, background: "rgba(255, 255, 255, 0.05)", overflow: "hidden"}}>
+ <div style={{ height: "100%", width: `${b.score}%`, background: b.score >= 70 ? "#10b981" : b.score >= 50 ? "#fbbf24" : "#f97316", transition: "width 0.4s"}} />
+ </div>
+ </div>
+ ))}
+ </div>
+
+ {/* Flags */}
+ {(demoResult.greenFlags.length > 0 || demoResult.redFlags.length > 0) && (
+ <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 14 }}>
+ {demoResult.greenFlags.map((flag, i) => (
+ <div key={`g${i}`} style={{ padding: "8px 12px", background: "rgba(16, 185, 129, 0.06)", border: "1px solid rgba(16, 185, 129, 0.18)", borderRadius: 8, display: "flex", alignItems: "center", gap: 8 }}>
+ <Check size={12} strokeWidth={2.5} style={{ color: "#10b981", flexShrink: 0 }} />
+ <span style={{ fontSize: 11, color: "#6ee7b7", fontFamily: "'JetBrains Mono', monospace"}}>{flag}</span>
+ </div>
+ ))}
+ {demoResult.redFlags.map((flag, i) => (
+ <div key={`r${i}`} style={{ padding: "8px 12px", background: "rgba(239, 68, 68, 0.06)", border: "1px solid rgba(239, 68, 68, 0.2)", borderRadius: 8, display: "flex", alignItems: "center", gap: 8 }}>
+ <Flag size={12} strokeWidth={2.5} style={{ color: "#ef4444", flexShrink: 0 }} />
+ <span style={{ fontSize: 11, color: "#fca5a5", fontFamily: "'JetBrains Mono', monospace"}}>{flag}</span>
+ </div>
+ ))}
+ </div>
+ )}
+
+ {/* Demo disclaimer + CTAs */}
+ <div style={{ padding: "10px 12px", background: "rgba(251, 191, 36, 0.05)", border: "1px solid rgba(251, 191, 36, 0.18)", borderRadius: 8, marginBottom: 14, display: "flex", gap: 8, alignItems: "flex-start"}}>
+ <AlertTriangle size={12} strokeWidth={2.5} style={{ color: "#fbbf24", flexShrink: 0, marginTop: 2 }} />
+ <span style={{ fontSize: 10, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.4, letterSpacing: 0.3 }}>This is a DEMO score generated from observable handle patterns only. The real Trust Score V1 will use live X API data, on-chain reputation, and CIB cluster analysis. Join the waitlist for early access.</span>
+ </div>
+
+ <div style={{ display: "flex", gap: 8, flexWrap: "wrap"}}>
+ <button
+ onClick={() => {
+ const text = `Just got my Web3Gigs Trust Score: ${demoResult.overall}/100 (${demoResult.tier}) 🛡️\n\nTry yours at web3gigs.app`;
+ const url = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`;
+ window.open(url, "_blank");
+ }}
+ style={{
+ flex: 1, minWidth: 160, padding: "11px 16px", borderRadius: 10, border: "none",
+ background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+ color: "#000", fontSize: 12, fontWeight: 900,
+ fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+ letterSpacing: 0.3, transition: "all 0.2s",
+ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6,
+ }}
+ ><Sparkles size={13} strokeWidth={2.5} /><span>Share on X</span></button>
+ <button
+ onClick={() => { setDemoResult(null); setDemoHandle(""); }}
+ style={{
+ padding: "11px 16px", borderRadius: 10,
+ background: "transparent",
+ border: "1px solid rgba(255, 255, 255, 0.12)",
+ color: C.textSecondary, fontSize: 12, fontWeight: 700,
+ fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+ letterSpacing: 0.3, transition: "all 0.2s",
+ }}
+ >Try Another</button>
  <button
  onClick={() => { setWaitlistSubmitted(false); setWaitlistError(""); setShowWaitlistModal(true); }}
  style={{
- padding: "14px 32px", borderRadius: 12, border: "none",
- background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
- color: "#000", fontSize: 14, fontWeight: 900,
+ padding: "11px 16px", borderRadius: 10,
+ background: "transparent",
+ border: `1px solid ${C.primary}40`,
+ color: C.primary, fontSize: 12, fontWeight: 700,
  fontFamily: "'Outfit', sans-serif", cursor: "pointer",
- letterSpacing: 0.5, transition: "all 0.2s",
- boxShadow: "0 0 28px rgba(212, 255, 0, 0.3)",
- display: "inline-flex", alignItems: "center", gap: 8,
+ letterSpacing: 0.3, transition: "all 0.2s",
  }}
- onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 40px rgba(212, 255, 0, 0.45)"; }}
- onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 28px rgba(212, 255, 0, 0.3)"; }}
- >
- <Mail size={16} strokeWidth={2.5} />
- <span>Join the Waitlist</span>
- </button>
- <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 14, letterSpacing: 1 }}>No spam. One email when we go live. Unsubscribe anytime.
+ >Get V1 Access</button>
  </div>
+ </div>
+ )}
+
+ {!demoResult && (
+ <div style={{ padding: "10px 12px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 8, fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5, lineHeight: 1.5, textAlign: "center"}}>
+ Try: vitalik · 0xfoobar · cobratate · cz_binance · or any handle you're curious about
+ </div>
+ )}
+ </GlowCard>
 
  {/* What you can still do */}
- <div style={{ marginTop: 32, paddingTop: 24, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
+ <div style={{ marginTop: 32, paddingTop: 24, borderTop: "1px solid rgba(255, 255, 255, 0.06)", textAlign: "center"}}>
  <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 16 }}>Meanwhile, explore Web3Gigs</div>
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 8 }}>
  {[

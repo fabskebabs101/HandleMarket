@@ -1962,7 +1962,7 @@ export default function Web3Gigs() {
  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
  <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#10b981", boxShadow: "0 0 10px #10b981", animation: "pulse 2s ease-in-out infinite"}} />
- <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2 }}>Live Jobs · Hiring Now</div>
+ <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2 }}>{approvedJobs.length > 0 ? "Recently Posted · Live" : "Live Jobs · Hiring Now"}</div>
  </div>
  <button
  onClick={() => setTab("jobs")}
@@ -1974,38 +1974,67 @@ export default function Web3Gigs() {
  </div>
 
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
- {[
- { cat: "Dev", title: "Solana dev · Anchor escrow", budget: 2500, deadline: "2w", trust: 40, type: "CRYPTO", typeColor: "#60a5fa"},
- { cat: "Audit", title: "Smart contract audit · ERC-20", budget: 5000, deadline: "3w", trust: 40, type: "CRYPTO", typeColor: "#60a5fa"},
- { cat: "Shitpost", title: "Shitpost campaign · memecoin", budget: 500, deadline: "72h", trust: 55, type: "CT", typeColor: "#c084fc"},
- { cat: "Writing", title: "Whitepaper · L2 rollup", budget: 1500, deadline: "3w", trust: 40, type: "CRYPTO", typeColor: "#60a5fa"},
- ].map((job, i) => (
+ {(() => {
+ // Show approved jobs first (up to 4), fallback to mock preview
+ const realPreviews = approvedJobs.slice(0, 4).map(j => ({
+ cat: j.category,
+ title: j.title,
+ budget: j.budget,
+ currency: j.budgetCurrency || "USDC",
+ deadline: j.deadline,
+ trust: j.minTrustScore || 0,
+ type: j.jobType === "ct" ? "CT" : "CRYPTO",
+ typeColor: j.jobType === "ct" ? "#c084fc" : "#60a5fa",
+ isReal: true,
+ poster: j.poster,
+ jobId: j.id,
+ }));
+ const mockPreviews = [
+ { cat: "Dev", title: "Solana dev · Anchor escrow", budget: 2500, currency: "USDC", deadline: "2w", trust: 40, type: "CRYPTO", typeColor: "#60a5fa", isReal: false },
+ { cat: "Audit", title: "Smart contract audit · ERC-20", budget: 5000, currency: "USDC", deadline: "3w", trust: 40, type: "CRYPTO", typeColor: "#60a5fa", isReal: false },
+ { cat: "Shitpost", title: "Shitpost campaign · memecoin", budget: 500, currency: "USDC", deadline: "72h", trust: 55, type: "CT", typeColor: "#c084fc", isReal: false },
+ { cat: "Writing", title: "Whitepaper · L2 rollup", budget: 1500, currency: "USDC", deadline: "3w", trust: 40, type: "CRYPTO", typeColor: "#60a5fa", isReal: false },
+ ];
+ // Fill remaining slots with mocks if fewer than 4 approved
+ const combined = [...realPreviews];
+ while (combined.length < 4) {
+ const fillIdx = combined.length;
+ combined.push(mockPreviews[fillIdx]);
+ }
+ return combined.slice(0, 4).map((job, i) => (
  <div
  key={i}
  onClick={() => setTab("jobs")}
  style={{
  padding: "14px 16px", borderRadius: 12,
- background: "rgba(18, 18, 18, 0.7)",
- border: "1px solid rgba(255, 255, 255, 0.06)",
+ background: job.isReal ? "rgba(212, 255, 0, 0.04)" : "rgba(18, 18, 18, 0.7)",
+ border: `1px solid ${job.isReal ? "rgba(212, 255, 0, 0.25)" : "rgba(255, 255, 255, 0.06)"}`,
  cursor: "pointer", transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
- textAlign: "left",
+ textAlign: "left", position: "relative",
  }}
- onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(212, 255, 0, 0.3)"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.background = "rgba(30, 30, 30, 0.9)"; }}
- onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.06)"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.background = "rgba(18, 18, 18, 0.7)"; }}
+ onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(212, 255, 0, 0.5)"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.background = job.isReal ? "rgba(212, 255, 0, 0.08)" : "rgba(30, 30, 30, 0.9)"; }}
+ onMouseLeave={e => { e.currentTarget.style.borderColor = job.isReal ? "rgba(212, 255, 0, 0.25)" : "rgba(255, 255, 255, 0.06)"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.background = job.isReal ? "rgba(212, 255, 0, 0.04)" : "rgba(18, 18, 18, 0.7)"; }}
  >
+ {job.isReal && (
+ <span style={{ position: "absolute", top: 8, right: 8, padding: "2px 6px", borderRadius: 4, background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, color: "#000", fontSize: 8, fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1, boxShadow: `0 0 8px ${C.primary}40` }}>NEW</span>
+ )}
  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
- <span style={{ fontSize: 14 }}>{job.icon}</span>
  <span style={{ padding: "2px 6px", borderRadius: 4, background: `${job.typeColor}15`, color: job.typeColor, fontSize: 9, fontWeight: 800, letterSpacing: 0.8, fontFamily: "'JetBrains Mono', monospace"}}>{job.type}</span>
  <span style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>{job.cat}</span>
  </div>
- <div style={{ fontSize: 13, fontWeight: 700, color: C.textPrimary, marginBottom: 10, lineHeight: 1.3, textAlign: "left"}}>{job.title}</div>
+ <div style={{ fontSize: 13, fontWeight: 700, color: C.textPrimary, marginBottom: 10, lineHeight: 1.3, textAlign: "left", paddingRight: job.isReal ? 32 : 0 }}>{job.title}</div>
  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 11, fontFamily: "'JetBrains Mono', monospace"}}>
- <span style={{ color: C.primary, fontWeight: 800 }}>${job.budget.toLocaleString()} USDC</span>
- <span style={{ color: C.textMuted }}>⏱ {job.deadline}</span>
+ <span style={{ color: C.primary, fontWeight: 800 }}>${job.budget.toLocaleString()} {job.currency}</span>
+ <span style={{ color: C.textMuted, display: "inline-flex", alignItems: "center", gap: 3 }}>
+ <Clock size={10} strokeWidth={2} /> {job.deadline}
+ </span>
  </div>
+ {job.trust > 0 && (
  <div style={{ marginTop: 6, fontSize: 10, color: "#fbbf24", fontFamily: "'JetBrains Mono', monospace"}}>Trust {job.trust}+</div>
+ )}
  </div>
- ))}
+ ));
+ })()}
  </div>
  </div>
  </Reveal>

@@ -2520,7 +2520,43 @@ export default function Web3Gigs() {
  <div style={{ display: "flex", gap: 8, flexWrap: "wrap"}}>
  <button
  onClick={() => {
- const text = `Just got my Web3Gigs Trust Score: ${demoResult.overall}/100 (${demoResult.tier}) 🛡️\n\nTry yours at web3gigs.app`;
+ const score = demoResult.overall;
+ const tier = demoResult.tier;
+ // Tier-specific viral copy variants — picked at random for variety
+ let templates = [];
+ if (tier === "SUPREME") {
+ templates = [
+ `Web3Gigs ranked me ${score} SUPREME 👑\n\nI'm built different.\n\nRank yours at web3gigs.app`,
+ `${score}/100 SUPREME on Web3Gigs.\n\nReputation > followers.\n\nweb3gigs.app`,
+ `Just got SUPREME tier on Web3Gigs (${score}/100) 🛡️\n\nThe trust-verified hiring marketplace for crypto.\n\nweb3gigs.app`,
+ ];
+ } else if (tier === "CREDIBLE") {
+ templates = [
+ `${score}/100 CREDIBLE on Web3Gigs.\n\nBetter than 80% of CT.\n\nweb3gigs.app`,
+ `Web3Gigs scored me ${score} (CREDIBLE) 🛡️\n\nGuess I'm not a bot after all.\n\nTry yours at web3gigs.app`,
+ `Web3Gigs Trust Score: ${score}/100 — CREDIBLE.\n\nRespectable.\n\nweb3gigs.app`,
+ ];
+ } else if (tier === "NOTED") {
+ templates = [
+ `${score}/100 on Web3Gigs.\n\nMid tier. NOTED.\n\nThink I can do better.\n\nweb3gigs.app`,
+ `Got NOTED tier on Web3Gigs (${score}/100) 😐\n\nWork to do.\n\nweb3gigs.app`,
+ `Web3Gigs gave me ${score}/100.\n\nMediocre. Time to grind.\n\nweb3gigs.app`,
+ ];
+ } else if (tier === "WATCHLIST") {
+ templates = [
+ `Web3Gigs put me on the WATCHLIST 😭 (${score}/100)\n\nHow did this happen.\n\nweb3gigs.app`,
+ `${score}/100 on Web3Gigs.\n\nWATCHLIST tier. They're onto me.\n\nweb3gigs.app`,
+ `Web3Gigs flagged me as WATCHLIST 👀 (${score}/100)\n\nChecking yours: web3gigs.app`,
+ ];
+ } else {
+ // FLAGGED
+ templates = [
+ `Web3Gigs FLAGGED me 💀 (${score}/100)\n\nApparently I'm a bot.\n\nweb3gigs.app`,
+ `Brutal. Web3Gigs gave me ${score}/100 — FLAGGED.\n\nthey know.\n\nweb3gigs.app`,
+ `imagine getting FLAGGED by Web3Gigs 😭 (${score}/100)\n\nweb3gigs.app`,
+ ];
+ }
+ const text = templates[Math.floor(Math.random() * templates.length)];
  const url = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`;
  window.open(url, "_blank");
  }}

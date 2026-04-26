@@ -2414,11 +2414,13 @@ export default function Web3Gigs() {
  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", boxShadow: "0 0 8px #10b981" }} />
  <span style={{ fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700 }}>Try the Preview</span>
  </div>
- <span style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>DEMO · LIVE API V1 SOON</span>
+ <span style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "4px 10px", borderRadius: 6, background: "#fbbf24", color: "#000", fontSize: 10, fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1.5 }}>
+ <AlertTriangle size={11} strokeWidth={3} /> DEMO MODE
+ </span>
  </div>
 
  <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.8, marginBottom: 8 }}>Score any CT handle <span style={{ color: C.primary }}>instantly.</span></div>
- <p style={{ color: C.textSecondary, fontSize: 13, marginBottom: 18, lineHeight: 1.5 }}>Get a Trust Score preview based on observable handle patterns. Live API at V1 will use real on-chain + X data.</p>
+ <p style={{ color: C.textSecondary, fontSize: 13, marginBottom: 14, lineHeight: 1.5 }}>Get a Trust Score preview based on observable handle patterns. <span style={{ color: "#fbbf24", fontWeight: 700 }}>Demo only — scores are not yet real.</span> Live API at V1 will use real on-chain + X data.</p>
 
  <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap"}}>
  <div style={{ flex: 1, minWidth: 220, position: "relative"}}>
@@ -2459,7 +2461,13 @@ export default function Web3Gigs() {
 
  {/* RESULT */}
  {demoResult && (
- <div data-demo-result style={{ marginTop: 20, padding: "20px", background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: 12 }}>
+ <div data-demo-result style={{ marginTop: 20, padding: "0", background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: 12, overflow: "hidden"}}>
+ {/* Demo banner — top of result card */}
+ <div style={{ padding: "10px 16px", background: "rgba(251, 191, 36, 0.12)", borderBottom: "1px solid rgba(251, 191, 36, 0.25)", display: "flex", alignItems: "center", gap: 10 }}>
+ <AlertTriangle size={14} strokeWidth={2.5} style={{ color: "#fbbf24", flexShrink: 0 }} />
+ <span style={{ fontSize: 11, color: "#fbbf24", fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, letterSpacing: 0.5 }}>DEMO PREVIEW · Real Trust Score launches with V1</span>
+ </div>
+ <div style={{ padding: "20px"}}>
  {/* Hero score */}
  <div style={{ display: "flex", alignItems: "center", gap: 18, marginBottom: 18, flexWrap: "wrap"}}>
  <div style={{
@@ -2467,13 +2475,14 @@ export default function Web3Gigs() {
  background: `linear-gradient(135deg, ${demoResult.tierColor}20, ${demoResult.tierColor}05)`,
  border: `2px solid ${demoResult.tierColor}40`,
  display: "flex", alignItems: "center", justifyContent: "center",
- flexShrink: 0,
+ flexShrink: 0, position: "relative",
  }}>
  <div style={{ fontSize: 36, fontWeight: 900, color: demoResult.tierColor, fontFamily: "'JetBrains Mono', monospace", letterSpacing: -1.5 }}>{demoResult.overall}</div>
+ <span style={{ position: "absolute", top: -6, right: -6, padding: "2px 6px", borderRadius: 4, background: "#fbbf24", color: "#000", fontSize: 8, fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>DEMO</span>
  </div>
  <div style={{ flex: 1, minWidth: 200, textAlign: "left"}}>
  <div style={{ fontSize: 12, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1.5, marginBottom: 4 }}>@{demoResult.handle}</div>
- <div style={{ fontSize: 22, fontWeight: 900, color: demoResult.tierColor, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1, marginBottom: 6 }}>{demoResult.tier}</div>
+ <div style={{ fontSize: 22, fontWeight: 900, color: demoResult.tierColor, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1, marginBottom: 6 }}>{demoResult.tier} <span style={{ fontSize: 10, color: "#fbbf24", letterSpacing: 1.5 }}>(DEMO)</span></div>
  <div style={{ fontSize: 11, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace"}}>Trust Score / 100 · Demo Engine V0</div>
  </div>
  </div>
@@ -2591,6 +2600,7 @@ export default function Web3Gigs() {
  letterSpacing: 0.3, transition: "all 0.2s",
  }}
  >Get V1 Access</button>
+ </div>
  </div>
  </div>
  )}

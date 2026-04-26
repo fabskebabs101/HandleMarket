@@ -715,6 +715,7 @@ const MOCK_JOBS = [
  },
  {
  id: "job-003", jobType: "ct",
+ featured: true,
  title: "Thread writer · weekly alpha research",
  category: "Thread Writing",
  poster: "@AlphaResearch", posterTrust: 88, posterVerified: true,
@@ -915,6 +916,7 @@ const MOCK_JOBS = [
  },
  {
  id: "job-009", jobType: "crypto",
+ featured: true,
  title: "Smart contract audit · ERC-20 + staking",
  category: "Audits",
  poster: "@DeFiProtocol", posterTrust: 92, posterVerified: true,
@@ -3696,7 +3698,13 @@ export default function Web3Gigs() {
    }
    return true;
  })
-.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0))
+.sort((a, b) => {
+   const aFeat = a.featured ? 2 : 0;
+   const bFeat = b.featured ? 2 : 0;
+   const aNew = a.isNew ? 1 : 0;
+   const bNew = b.isNew ? 1 : 0;
+   return (bFeat + bNew) - (aFeat + aNew);
+ })
 .map(job => {
  const statusColor = job.status === "open"? "#10b981": job.status === "in_progress"? "#fbbf24": C.textMuted;
  const statusLabel = job.status === "open"? "OPEN": job.status === "in_progress"? "IN PROGRESS": "COMPLETED";
@@ -3707,14 +3715,31 @@ export default function Web3Gigs() {
  onClick={() => setSelectedJob(job)}
  style={{
  padding: 20, borderRadius: 14,
- background: "rgba(18, 18, 18, 0.7)",
- border: "1px solid rgba(255, 255, 255, 0.06)",
+ background: job.featured ? `linear-gradient(180deg, rgba(212, 255, 0, 0.06), rgba(18, 18, 18, 0.7))` : "rgba(18, 18, 18, 0.7)",
+ border: job.featured ? `1px solid ${C.primary}50` : "1px solid rgba(255, 255, 255, 0.06)",
+ boxShadow: job.featured ? `0 0 24px rgba(212, 255, 0, 0.12)` : "none",
  cursor: "pointer", transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
  display: "flex", flexDirection: "column", gap: 12,
+ position: "relative",
  }}
- onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(212, 255, 0, 0.3)"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.background = "rgba(25, 25, 25, 0.9)"; }}
- onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.06)"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.background = "rgba(18, 18, 18, 0.7)"; }}
+ onMouseEnter={e => {
+ e.currentTarget.style.borderColor = job.featured ? C.primary : "rgba(212, 255, 0, 0.3)";
+ e.currentTarget.style.transform = "translateY(-2px)";
+ e.currentTarget.style.background = job.featured ? `linear-gradient(180deg, rgba(212, 255, 0, 0.1), rgba(25, 25, 25, 0.9))` : "rgba(25, 25, 25, 0.9)";
+ e.currentTarget.style.boxShadow = job.featured ? `0 0 32px rgba(212, 255, 0, 0.25)` : "none";
+ }}
+ onMouseLeave={e => {
+ e.currentTarget.style.borderColor = job.featured ? `${C.primary}50` : "rgba(255, 255, 255, 0.06)";
+ e.currentTarget.style.transform = "translateY(0)";
+ e.currentTarget.style.background = job.featured ? `linear-gradient(180deg, rgba(212, 255, 0, 0.06), rgba(18, 18, 18, 0.7))` : "rgba(18, 18, 18, 0.7)";
+ e.currentTarget.style.boxShadow = job.featured ? `0 0 24px rgba(212, 255, 0, 0.12)` : "none";
+ }}
  >
+ {job.featured && (
+ <div style={{ position: "absolute", top: -10, left: 16, padding: "3px 10px", borderRadius: 6, background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, color: "#000", fontSize: 9, fontWeight: 900, letterSpacing: 1.5, fontFamily: "'JetBrains Mono', monospace", boxShadow: `0 0 12px ${C.primary}60`, display: "inline-flex", alignItems: "center", gap: 4 }}>
+ <Sparkles size={9} strokeWidth={3} /> FEATURED
+ </div>
+ )}
  {/* Top row: status + category */}
  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center"}}>
  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>

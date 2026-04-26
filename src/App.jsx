@@ -1613,6 +1613,58 @@ export default function Web3Gigs() {
  @media (max-width: 380px) {
 .w3g-tagline { display: none!important; }
  }
+ @keyframes auroraDrift {
+   0% { transform: translate(-10%, -5%) rotate(0deg); }
+   33% { transform: translate(8%, 6%) rotate(120deg); }
+   66% { transform: translate(-6%, 10%) rotate(240deg); }
+   100% { transform: translate(-10%, -5%) rotate(360deg); }
+ }
+ @keyframes shimmerSlide {
+   0% { background-position: -200% center; }
+   100% { background-position: 200% center; }
+ }
+ @keyframes ctaPulse {
+   0%, 100% { box-shadow: 0 0 24px rgba(212, 255, 0, 0.25); }
+   50% { box-shadow: 0 0 36px rgba(212, 255, 0, 0.45); }
+ }
+ @keyframes gridFloat {
+   0%, 100% { transform: translateY(0); }
+   50% { transform: translateY(-6px); }
+ }
+ .w3g-aurora {
+   position: absolute; pointer-events: none; z-index: 0;
+   width: 80%; height: 80%; top: 10%; left: 10%;
+   background: radial-gradient(circle at 30% 40%, rgba(212, 255, 0, 0.06) 0%, transparent 50%),
+               radial-gradient(circle at 70% 60%, rgba(0, 200, 255, 0.04) 0%, transparent 50%),
+               radial-gradient(circle at 50% 50%, rgba(212, 255, 0, 0.03) 0%, transparent 60%);
+   filter: blur(40px);
+   animation: auroraDrift 24s ease-in-out infinite;
+ }
+ .w3g-shimmer-text {
+   background: linear-gradient(90deg, #d4ff00 20%, #ffffff 45%, #d4ff00 55%, #d4ff00 80%);
+   background-size: 200% auto;
+   -webkit-background-clip: text;
+   background-clip: text;
+   -webkit-text-fill-color: transparent;
+   color: transparent;
+   animation: shimmerSlide 6s ease-in-out infinite;
+ }
+ .w3g-cta-pulse {
+   animation: ctaPulse 3s ease-in-out infinite;
+ }
+ .w3g-cta-pulse:hover {
+   animation: none;
+ }
+ .w3g-grid-bg {
+   position: absolute; pointer-events: none; z-index: 0;
+   inset: 0;
+   background-image: linear-gradient(rgba(212, 255, 0, 0.025) 1px, transparent 1px),
+                     linear-gradient(90deg, rgba(212, 255, 0, 0.025) 1px, transparent 1px);
+   background-size: 60px 60px;
+   mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
+   -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
+   animation: gridFloat 8s ease-in-out infinite;
+ }
  `}</style>
  <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "nowrap", gap: 8 }}>
  <div
@@ -1894,7 +1946,12 @@ export default function Web3Gigs() {
  </div>
 
  {/* HERO */}
- <div style={{ textAlign: "center", padding: "20px 20px 60px", position: "relative"}}>
+ <div style={{ textAlign: "center", padding: "20px 20px 60px", position: "relative", overflow: "hidden"}}>
+ {/* Animated grid bg */}
+ <div className="w3g-grid-bg" />
+ {/* Aurora glow */}
+ <div className="w3g-aurora" />
+ <div style={{ position: "relative", zIndex: 1 }}>
  {/* Badge */}
  <Reveal>
  <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 20, background: "rgba(212, 255, 0, 0.06)", border: "1px solid rgba(212, 255, 0, 0.2)", marginBottom: 24 }}>
@@ -1907,7 +1964,7 @@ export default function Web3Gigs() {
  {/* Headline */}
  <Reveal delay={100}>
  <h1 style={{ fontSize: 64, fontWeight: 900, margin: 0, letterSpacing: -3, lineHeight: 1 }}>Hire crypto's best.<br />
- <span style={{ color: C.primary }}>Trust-verified.</span>
+ <span className="w3g-shimmer-text">Trust-verified.</span>
  </h1>
  </Reveal>
  <Reveal delay={200}>
@@ -1920,16 +1977,16 @@ export default function Web3Gigs() {
  <div style={{ display: "flex", gap: 12, justifyContent: "center", marginTop: 32, flexWrap: "wrap"}}>
  <button
  onClick={() => setTab("jobs")}
+ className="w3g-cta-pulse"
  style={{
  padding: "14px 28px", borderRadius: 12, border: "none",
  background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
  color: "#000", fontSize: 14, fontWeight: 900,
  fontFamily: "'Outfit', sans-serif", cursor: "pointer",
  letterSpacing: 0.3, transition: "all 0.2s",
- boxShadow: "0 0 32px rgba(212, 255, 0, 0.25)",
  }}
- onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 40px rgba(212, 255, 0, 0.4)"; }}
- onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 32px rgba(212, 255, 0, 0.25)"; }}
+ onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 40px rgba(212, 255, 0, 0.5)"; }}
+ onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = ""; }}
  >Browse Open Jobs</button>
  <button
  onClick={() => setTab("valuate")}
@@ -2056,6 +2113,7 @@ export default function Web3Gigs() {
  ))}
  </div>
  </Reveal>
+ </div>
  </div>
 
  {/* HOW IT WORKS */}

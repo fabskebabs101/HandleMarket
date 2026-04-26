@@ -2597,7 +2597,6 @@ export default function Web3Gigs() {
  ))}
  </div>
  </div>
- </GlowCard>
 
  {result && (
  <div ref={resultRef} style={{ maxWidth: 650, margin: "0 auto"}}>

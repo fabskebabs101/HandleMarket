@@ -715,7 +715,6 @@ const MOCK_JOBS = [
  },
  {
  id: "job-003", jobType: "ct",
- featured: true,
  title: "Thread writer · weekly alpha research",
  category: "Thread Writing",
  poster: "@AlphaResearch", posterTrust: 88, posterVerified: true,
@@ -916,7 +915,6 @@ const MOCK_JOBS = [
  },
  {
  id: "job-009", jobType: "crypto",
- featured: true,
  title: "Smart contract audit · ERC-20 + staking",
  category: "Audits",
  poster: "@DeFiProtocol", posterTrust: 92, posterVerified: true,

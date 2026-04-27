@@ -1773,13 +1773,14 @@ export default function Web3Gigs() {
  {/* Dropdown Menu */}
  {menuOpen && (
  <>
- {/* Click-away overlay */}
+ {/* Click-away overlay with backdrop blur on mobile */}
  <div
+ className="w3g-menu-backdrop"
  onClick={() => setMenuOpen(false)}
  style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 50 }}
  />
  {/* Menu panel */}
- <div style={{
+ <div className="w3g-menu-panel" style={{
  position: "absolute", top: "calc(100% + 10px)", right: 0,
  minWidth: 260, zIndex: 51,
  background: "rgba(10, 10, 10, 0.98)",
@@ -1794,7 +1795,91 @@ export default function Web3Gigs() {
  from { opacity: 0; transform: translateY(-10px) scale(0.96); }
  to { opacity: 1; transform: translateY(0) scale(1); }
  }
+ @keyframes mobileMenuSlide {
+ from { transform: translateX(100%); }
+ to { transform: translateX(0); }
+ }
+ @keyframes mobileBackdropFade {
+ from { opacity: 0; }
+ to { opacity: 1; }
+ }
+ @media (max-width: 600px) {
+ .w3g-menu-backdrop {
+ background: rgba(0, 0, 0, 0.6) !important;
+ backdrop-filter: blur(8px);
+ -webkit-backdrop-filter: blur(8px);
+ animation: mobileBackdropFade 0.25s ease-out;
+ }
+ .w3g-menu-panel {
+ position: fixed !important;
+ top: 0 !important;
+ right: 0 !important;
+ bottom: 0 !important;
+ left: auto !important;
+ width: 86% !important;
+ max-width: 360px !important;
+ min-width: 0 !important;
+ height: 100vh !important;
+ height: 100dvh !important;
+ border-radius: 0 !important;
+ border: none !important;
+ border-left: 1px solid rgba(212, 255, 0, 0.15) !important;
+ padding: 16px !important;
+ padding-top: env(safe-area-inset-top, 16px) !important;
+ padding-bottom: env(safe-area-inset-bottom, 16px) !important;
+ animation: mobileMenuSlide 0.32s cubic-bezier(0.16, 1, 0.3, 1) !important;
+ box-shadow: -20px 0 60px rgba(0, 0, 0, 0.7) !important;
+ overflow-y: auto !important;
+ }
+ .w3g-menu-close {
+ display: flex !important;
+ }
+ .w3g-menu-item {
+ padding: 16px 14px !important;
+ min-height: 56px !important;
+ margin-bottom: 4px !important;
+ }
+ .w3g-menu-item-label {
+ font-size: 15px !important;
+ }
+ .w3g-menu-item-desc {
+ font-size: 11px !important;
+ }
+ .w3g-menu-item-icon-size { /* signal larger icon on mobile */ }
+ .w3g-menu-header {
+ display: flex !important;
+ }
+ }
  `}</style>
+
+ {/* Mobile-only header with close button */}
+ <div className="w3g-menu-header" style={{
+ display: "none",
+ alignItems: "center", justifyContent: "space-between",
+ padding: "8px 8px 16px", marginBottom: 8,
+ borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
+ }}>
+ <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+ <span style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, fontWeight: 700 }}>Menu</span>
+ </div>
+ <button
+ className="w3g-menu-close"
+ onClick={() => setMenuOpen(false)}
+ style={{
+ display: "none",
+ width: 36, height: 36, borderRadius: 10,
+ background: "rgba(255, 255, 255, 0.05)",
+ border: "1px solid rgba(255, 255, 255, 0.08)",
+ color: C.textPrimary, cursor: "pointer",
+ alignItems: "center", justifyContent: "center",
+ transition: "all 0.15s",
+ }}
+ onTouchStart={e => { e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)"; e.currentTarget.style.transform = "scale(0.95)"; }}
+ onTouchEnd={e => { e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)"; e.currentTarget.style.transform = "scale(1)"; }}
+ >
+ <XIcon size={18} strokeWidth={2.5} />
+ </button>
+ </div>
  {[
  ["home", Home, "Home", "Welcome + overview"],
  ["jobs", Briefcase, "Jobs", "Hire or get hired"],
@@ -1814,6 +1899,7 @@ export default function Web3Gigs() {
  onClick={() => { setTab(t); setMenuOpen(false); }}
  onMouseEnter={() => setHoveredTab(t)}
  onMouseLeave={() => setHoveredTab(null)}
+ className="w3g-menu-item"
  style={{
  width: "100%", display: "flex", alignItems: "center", gap: 12,
  padding: "12px 14px", borderRadius: 10, border: "none",
@@ -1836,13 +1922,13 @@ export default function Web3Gigs() {
  <Icon size={isHovered ? 20 : 18} strokeWidth={2} />
  </div>
  <div style={{ flex: 1 }}>
- <div style={{
+ <div className="w3g-menu-item-label" style={{
  fontSize: isHovered? 14: 13,
  fontWeight: 700,
  letterSpacing: isHovered? 0: -0.2,
  transition: "all 0.2s",
  }}>{label}</div>
- <div style={{
+ <div className="w3g-menu-item-desc" style={{
  fontSize: 10,
  color: isActive? `${C.primary}aa`: C.textMuted,
  fontFamily: "'JetBrains Mono', monospace",

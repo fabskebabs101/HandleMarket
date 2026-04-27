@@ -1765,6 +1765,7 @@ export default function Web3Gigs() {
  ["cib", "CIB"],
  ["alerts", "Alerts"],
  ["profile", "Profile"],
+ ["about", "About"],
  ].find(([t]) => t === tab)?.[1] || "Menu"}
  </span>
  </button>
@@ -1803,6 +1804,7 @@ export default function Web3Gigs() {
  ["cib", Network, "CIB", "Bot & pod detection"],
  ["alerts", Bell, "Alerts", "Real-time watchlist"],
  ["profile", User, "Profile", "Example profile preview"],
+ ["about", FileText, "About", "Why I built this"],
  ].map(([t, Icon, label, desc]) => {
  const isActive = tab === t;
  const isHovered = hoveredTab === t;
@@ -4041,6 +4043,194 @@ export default function Web3Gigs() {
  </div>
  )}
  </GlowCard>
+ </div>
+ )}
+
+ {/* ─── ABOUT TAB ─────────────────────────────────────── */}
+ {tab === "about" && (
+ <div style={{ maxWidth: 720, margin: "0 auto", padding: "0 8px"}}>
+ {/* Hero */}
+ <div style={{ textAlign: "center", marginBottom: 48, position: "relative"}}>
+ <div className="w3g-aurora" />
+ <div style={{ position: "relative", zIndex: 1 }}>
+ <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 12px", borderRadius: 20, background: "rgba(212, 255, 0, 0.06)", border: "1px solid rgba(212, 255, 0, 0.2)", marginBottom: 18 }}>
+ <FileText size={12} strokeWidth={2.5} style={{ color: C.primary }} />
+ <span style={{ fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700 }}>About Web3Gigs</span>
+ </div>
+ <h1 style={{ fontSize: 44, fontWeight: 900, margin: 0, letterSpacing: -2, lineHeight: 1.05 }}>The crypto work market is <span className="w3g-shimmer-text">broken.</span></h1>
+ </div>
+ </div>
+
+ {/* Section 1: Hook */}
+ <div style={{ marginBottom: 48 }}>
+ <p style={{ fontSize: 18, color: C.textSecondary, lineHeight: 1.65, marginBottom: 16 }}>
+ Anonymous applicants. Stolen Discord IDs. <span style={{ color: C.textPrimary, fontWeight: 600 }}>"Send me 0.5 ETH to start"</span> scams. KOLs pump and dump while real builders go unpaid.
+ </p>
+ <div style={{ padding: "16px 20px", background: "rgba(212, 255, 0, 0.04)", border: "1px solid rgba(212, 255, 0, 0.18)", borderRadius: 12, marginTop: 22 }}>
+ <p style={{ fontSize: 17, color: C.textPrimary, lineHeight: 1.6, margin: 0 }}>
+ Web3Gigs fixes this with one rule: <span style={{ color: C.primary, fontWeight: 800 }}>every applicant comes attached to a Trust Score.</span>
+ </p>
+ </div>
+ </div>
+
+ {/* Section 2: Story */}
+ <div style={{ marginBottom: 48, paddingTop: 32, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
+ <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 14, fontWeight: 700 }}>The Story</div>
+ <p style={{ fontSize: 16, color: C.textSecondary, lineHeight: 1.7, marginBottom: 16 }}>
+ I'm <a href="https://x.com/FabsKebabs" target="_blank" rel="noopener noreferrer" style={{ color: C.primary, fontWeight: 700, textDecoration: "none"}}>@FabsKebabs</a>. Solana memecoin trader, degenerate perps trader, and Crypto Twitter degenerate.
+ </p>
+ <p style={{ fontSize: 16, color: C.textSecondary, lineHeight: 1.7, marginBottom: 22 }}>
+ I've watched friends get rugged by anon devs, scammed by fake KOLs, and ghosted by "verified" influencers more times than I can count.
+ </p>
+ <div style={{ fontSize: 12, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 12, fontWeight: 700 }}>The same problems repeat:</div>
+ <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 22 }}>
+ {[
+ "You can't tell who's real.",
+ "You can't tell who delivers.",
+ "You can't tell who'll vanish with the deposit.",
+ ].map((line, i) => (
+ <div key={i} style={{ display: "flex", gap: 14, padding: "12px 16px", background: "rgba(0, 0, 0, 0.3)", border: "1px solid rgba(255, 255, 255, 0.05)", borderRadius: 10 }}>
+ <div style={{ fontSize: 16, fontWeight: 900, color: C.primary, fontFamily: "'JetBrains Mono', monospace", flexShrink: 0, width: 18 }}>{i + 1}.</div>
+ <div style={{ fontSize: 15, color: C.textPrimary, lineHeight: 1.5 }}>{line}</div>
+ </div>
+ ))}
+ </div>
+ <p style={{ fontSize: 16, color: C.textSecondary, lineHeight: 1.7 }}>
+ So I built Web3Gigs as the marketplace I wish existed: <span style={{ color: C.textPrimary, fontWeight: 600 }}>trust-first, paid in stables, no middleman fees, manually moderated.</span>
+ </p>
+ </div>
+
+ {/* Section 3: How it works */}
+ <div style={{ marginBottom: 48, paddingTop: 32, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
+ <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 18, fontWeight: 700 }}>How it works</div>
+ <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+ {[
+ { who: "For job posters", icon: Briefcase, body: "Post your job. Manually reviewed within 24h. Applicants come pre-scored. Pay direct in USDC, USDT, or SOL." },
+ { who: "For builders", icon: Code, body: "Apply with your X handle. Your Trust Score is auto-attached. No portfolio gymnastics required: your reputation does the talking. Get paid the day you ship." },
+ { who: "For the crypto economy", icon: Network, body: "A reputation graph that makes anon work safer. Bot accounts get filtered. Real builders rise. The trenches get cleaner." },
+ ].map((block, i) => (
+ <div key={i} style={{ padding: "18px 20px", background: "rgba(18, 18, 18, 0.7)", border: "1px solid rgba(255, 255, 255, 0.06)", borderRadius: 12 }}>
+ <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+ <block.icon size={16} strokeWidth={2.2} style={{ color: C.primary }} />
+ <div style={{ fontSize: 13, fontWeight: 800, color: C.textPrimary, letterSpacing: -0.2 }}>{block.who}</div>
+ </div>
+ <p style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.6, margin: 0 }}>{block.body}</p>
+ </div>
+ ))}
+ </div>
+ </div>
+
+ {/* Section 4: Today vs V1 */}
+ <div style={{ marginBottom: 48, paddingTop: 32, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
+ <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 18, fontWeight: 700 }}>What's live now vs V1</div>
+ <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14 }}>
+ <div style={{ padding: "18px 20px", background: "rgba(16, 185, 129, 0.04)", border: "1px solid rgba(16, 185, 129, 0.2)", borderRadius: 12 }}>
+ <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 12, padding: "3px 8px", borderRadius: 6, background: "rgba(16, 185, 129, 0.12)"}}>
+ <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#10b981", boxShadow: "0 0 6px #10b981" }} />
+ <span style={{ fontSize: 9, color: "#10b981", fontFamily: "'JetBrains Mono', monospace", fontWeight: 800, letterSpacing: 1.5, textTransform: "uppercase"}}>Today (Beta)</span>
+ </div>
+ {[
+ "Job submissions + manual moderation",
+ "Trust Score preview tool (Demo Engine V0)",
+ "Waitlist for early access",
+ ].map((item, i) => (
+ <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 8 }}>
+ <Check size={13} strokeWidth={2.5} style={{ color: "#10b981", flexShrink: 0, marginTop: 2 }} />
+ <span style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.5 }}>{item}</span>
+ </div>
+ ))}
+ </div>
+ <div style={{ padding: "18px 20px", background: "rgba(212, 255, 0, 0.04)", border: "1px solid rgba(212, 255, 0, 0.2)", borderRadius: 12 }}>
+ <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 12, padding: "3px 8px", borderRadius: 6, background: "rgba(212, 255, 0, 0.12)"}}>
+ <Rocket size={10} strokeWidth={2.5} style={{ color: C.primary }} />
+ <span style={{ fontSize: 9, color: C.primary, fontFamily: "'JetBrains Mono', monospace", fontWeight: 800, letterSpacing: 1.5, textTransform: "uppercase"}}>V1 Launch (Soon)</span>
+ </div>
+ {[
+ "Live Trust Score from real X + on-chain data",
+ "Public profile pages",
+ "Real-time CIB cluster detection",
+ "On-chain Handshake commitments",
+ "Multi-channel alerts",
+ ].map((item, i) => (
+ <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 8 }}>
+ <Sparkles size={12} strokeWidth={2.5} style={{ color: C.primary, flexShrink: 0, marginTop: 2 }} />
+ <span style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.5 }}>{item}</span>
+ </div>
+ ))}
+ </div>
+ </div>
+ </div>
+
+ {/* Section 5: Why now */}
+ <div style={{ marginBottom: 48, paddingTop: 32, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
+ <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 14, fontWeight: 700 }}>Why now</div>
+ <p style={{ fontSize: 16, color: C.textSecondary, lineHeight: 1.7, marginBottom: 14 }}>
+ Every protocol launch needs devs, auditors, designers, and meme warfare specialists.
+ </p>
+ <p style={{ fontSize: 16, color: C.textSecondary, lineHeight: 1.7 }}>
+ But the infrastructure is still 2014. Discord DMs, Telegram DMs, even X DMs. <span style={{ color: C.primary, fontWeight: 700 }}>2026 needs better.</span>
+ </p>
+ </div>
+
+ {/* Section 6: Behind the build */}
+ <div style={{ marginBottom: 48, paddingTop: 32, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
+ <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 14, fontWeight: 700 }}>Behind the build</div>
+ <p style={{ fontSize: 16, color: C.textSecondary, lineHeight: 1.7, marginBottom: 16 }}>
+ Built solo by <a href="https://x.com/FabsKebabs" target="_blank" rel="noopener noreferrer" style={{ color: C.primary, fontWeight: 700, textDecoration: "none"}}>@FabsKebabs</a> in Australia.
+ </p>
+ <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 18 }}>
+ {["No VC funding.", "No token.", "No NFT mint.", "No promises."].map((line, i) => (
+ <span key={i} style={{ padding: "6px 12px", borderRadius: 8, background: "rgba(0, 0, 0, 0.4)", border: "1px solid rgba(255, 255, 255, 0.08)", color: C.textPrimary, fontSize: 13, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.3, fontWeight: 600 }}>{line}</span>
+ ))}
+ </div>
+ <p style={{ fontSize: 16, color: C.textSecondary, lineHeight: 1.7, fontStyle: "italic"}}>
+ Just one builder grinding because the problem is real and the solution is overdue.
+ </p>
+ </div>
+
+ {/* Section 7: CTA */}
+ <div style={{ marginBottom: 48, paddingTop: 32, borderTop: "1px solid rgba(255, 255, 255, 0.06)", textAlign: "center"}}>
+ <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 18, fontWeight: 700 }}>Get involved</div>
+ <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap"}}>
+ <button
+ onClick={() => { setWaitlistSubmitted(false); setWaitlistError(""); setShowWaitlistModal(true); }}
+ style={{
+ padding: "14px 24px", borderRadius: 12, border: "none",
+ background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+ color: "#000", fontSize: 14, fontWeight: 900,
+ fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+ letterSpacing: 0.3, transition: "all 0.2s",
+ boxShadow: "0 0 24px rgba(212, 255, 0, 0.25)",
+ display: "inline-flex", alignItems: "center", gap: 8,
+ }}
+ onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 32px rgba(212, 255, 0, 0.4)"; }}
+ onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 24px rgba(212, 255, 0, 0.25)"; }}
+ >
+ <Mail size={14} strokeWidth={2.5} />
+ <span>Join the Waitlist</span>
+ </button>
+ <a
+ href="https://x.com/FabsKebabs"
+ target="_blank"
+ rel="noopener noreferrer"
+ style={{
+ padding: "14px 24px", borderRadius: 12,
+ border: "1px solid rgba(255, 255, 255, 0.15)",
+ background: "transparent", color: C.textPrimary,
+ fontSize: 14, fontWeight: 700, fontFamily: "'Outfit', sans-serif",
+ cursor: "pointer", letterSpacing: 0.3, textDecoration: "none",
+ transition: "all 0.2s",
+ display: "inline-flex", alignItems: "center", gap: 8,
+ }}
+ onMouseEnter={e => { e.currentTarget.style.borderColor = `${C.primary}60`; e.currentTarget.style.color = C.primary; }}
+ onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.15)"; e.currentTarget.style.color = C.textPrimary; }}
+ >
+ <MessageCircle size={14} strokeWidth={2.5} />
+ <span>DM @FabsKebabs</span>
+ </a>
+ </div>
+ <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.8, marginTop: 16 }}>First 500 signups get priority access · Questions, feedback, partnerships welcome</div>
+ </div>
  </div>
  )}
 

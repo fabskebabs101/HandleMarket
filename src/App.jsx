@@ -1200,6 +1200,7 @@ export default function Web3Gigs() {
  const [jobsType, setJobsType] = useState("crypto"); // "ct"or "crypto", default to crypto work
  const [waitlistEmail, setWaitlistEmail] = useState("");
  const [waitlistSubmitted, setWaitlistSubmitted] = useState(false);
+ const [userPosition, setUserPosition] = useState(null);
  const [waitlistError, setWaitlistError] = useState("");
  const [waitlistLoading, setWaitlistLoading] = useState(false);
 
@@ -1208,10 +1209,11 @@ export default function Web3Gigs() {
  if (!waitlistEmail.includes("@")) return;
  setWaitlistLoading(true);
  setWaitlistError("");
+ const cleanEmail = waitlistEmail.trim().toLowerCase();
  try {
  const { error } = await supabase
 .from("waitlist")
-.insert([{ email: waitlistEmail.trim().toLowerCase(), source }]);
+.insert([{ email: cleanEmail, source }]);
  if (error) {
  // Duplicate email is fine, treat as success
  if (error.code === "23505") {
@@ -1223,6 +1225,17 @@ export default function Web3Gigs() {
  } else {
  setWaitlistSubmitted(true);
  }
+ // Fetch position (works for both new and dupe signups)
+ try {
+ const { data: posData, error: posErr } = await supabase.rpc("get_waitlist_position", { user_email: cleanEmail });
+ if (!posErr && posData !== null && posData !== undefined) {
+ setUserPosition(Number(posData));
+ }
+ } catch (posCatch) {
+ console.error("Couldn't fetch position:", posCatch);
+ }
+ // Refresh total count too so it reflects the new signup
+ fetchWaitlistCount();
  } catch (err) {
  setWaitlistError("Couldn't connect. Check your internet?");
  console.error(err);
@@ -5140,11 +5153,56 @@ export default function Web3Gigs() {
  </div>
  </>
  ): (
- <div style={{ padding: "20px", background: "rgba(16, 185, 129, 0.06)", border: "1px solid rgba(16, 185, 129, 0.25)", borderRadius: 12, textAlign: "center"}}>
- <div style={{ display: "flex", justifyContent: "center", marginBottom: 10, color: "#10b981"}}><Check size={36} strokeWidth={2.5} /></div>
- <div style={{ fontSize: 18, fontWeight: 800, color: "#10b981", marginBottom: 8 }}>You're on the list!</div>
- <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.5, fontFamily: "'JetBrains Mono', monospace"}}>We'll email <span style={{ color: C.primary }}>{waitlistEmail}</span> the second Web3Gigs goes live.
+ <div style={{ padding: "24px 20px", background: "rgba(16, 185, 129, 0.06)", border: "1px solid rgba(16, 185, 129, 0.25)", borderRadius: 12, textAlign: "center"}}>
+ <div style={{ display: "flex", justifyContent: "center", marginBottom: 14, color: "#10b981"}}><Check size={40} strokeWidth={2.5} /></div>
+ {userPosition !== null ? (
+ <>
+ <div style={{ fontSize: 12, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 6, fontWeight: 700 }}>You're locked in</div>
+ <div style={{ fontSize: 14, color: "#10b981", marginBottom: 6, fontWeight: 700 }}>Your position</div>
+ <div style={{ fontSize: 56, fontWeight: 900, color: C.primary, letterSpacing: -3, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1, marginBottom: 4 }}>#{userPosition.toLocaleString()}</div>
+ {waitlistCount !== null && waitlistCount > 0 && (
+ <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5, marginBottom: 14 }}>out of {waitlistCount.toLocaleString()} on the list</div>
+ )}
+ {userPosition <= 100 && (
+ <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 20, background: "rgba(212, 255, 0, 0.08)", border: "1px solid rgba(212, 255, 0, 0.3)", marginBottom: 16 }}>
+ <Sparkles size={11} strokeWidth={2.5} style={{ color: C.primary }} />
+ <span style={{ fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 800 }}>First 100 · Priority Access</span>
  </div>
+ )}
+ {userPosition > 100 && userPosition <= 500 && (
+ <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 20, background: "rgba(212, 255, 0, 0.06)", border: "1px solid rgba(212, 255, 0, 0.2)", marginBottom: 16 }}>
+ <Trophy size={11} strokeWidth={2.5} style={{ color: C.primary }} />
+ <span style={{ fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 800 }}>First 500 · Early Access</span>
+ </div>
+ )}
+ <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.6, fontFamily: "'JetBrains Mono', monospace", marginBottom: 18 }}>We'll email <span style={{ color: C.primary }}>{waitlistEmail}</span> the moment Web3Gigs V1 launches.</div>
+
+ {/* Tell your friends button */}
+ <button
+ onClick={() => {
+ const text = `Just joined the @Web3Gigs waitlist 🛡️\n\nThe trust-verified hiring marketplace for crypto. No middleman fees. Paid in stables.\n\nweb3gigs.app`;
+ window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`, "_blank");
+ }}
+ style={{
+ width: "100%", padding: "12px 16px", borderRadius: 10, border: "none",
+ background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+ color: "#000", fontSize: 13, fontWeight: 900,
+ fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+ letterSpacing: 0.3, transition: "all 0.2s",
+ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6,
+ boxShadow: "0 0 20px rgba(212, 255, 0, 0.2)",
+ }}
+ onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 32px rgba(212, 255, 0, 0.4)"; }}
+ onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 20px rgba(212, 255, 0, 0.2)"; }}
+ ><Sparkles size={13} strokeWidth={2.5} /><span>Tell your friends on X</span></button>
+ <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5, marginTop: 10 }}>Share to help other builders find Web3Gigs</div>
+ </>
+ ) : (
+ <>
+ <div style={{ fontSize: 18, fontWeight: 800, color: "#10b981", marginBottom: 8 }}>You're on the list!</div>
+ <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.5, fontFamily: "'JetBrains Mono', monospace"}}>We'll email <span style={{ color: C.primary }}>{waitlistEmail}</span> the second Web3Gigs goes live.</div>
+ </>
+ )}
  </div>
  )}
  </div>

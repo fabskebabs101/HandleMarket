@@ -3159,6 +3159,135 @@ export default function Web3Gigs() {
  </div>
  </div>
 
+ {/* TIER DISTRIBUTION HISTOGRAM */}
+ <div style={{ marginBottom: 40 }}>
+ <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8, textAlign: "center"}}>Where most accounts land</div>
+ <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: -1, textAlign: "center", marginBottom: 8 }}>The CT <span style={{ color: C.primary }}>distribution.</span></h2>
+ <p style={{ color: C.textMuted, fontSize: 13, textAlign: "center", marginBottom: 24, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.3 }}>Estimated tier breakdown based on demo engine analysis · DEMO</p>
+
+ <div style={{ padding: "24px 20px", background: "rgba(18, 18, 18, 0.7)", border: "1px solid rgba(255, 255, 255, 0.06)", borderRadius: 14 }}>
+ {(() => {
+ const dist = [
+ { tier: "SUPREME", range: "85-100", pct: 4, color: "#10b981" },
+ { tier: "CREDIBLE", range: "70-84", pct: 11, color: "#34d399" },
+ { tier: "NOTED", range: "55-69", pct: 23, color: "#fbbf24" },
+ { tier: "UNKNOWN", range: "40-54", pct: 28, color: "#f97316" },
+ { tier: "SUSPICIOUS", range: "25-39", pct: 22, color: "#ef4444" },
+ { tier: "LIKELY BOT", range: "0-24", pct: 12, color: "#dc2626" },
+ ];
+ const maxPct = Math.max(...dist.map(d => d.pct));
+ return (
+ <>
+ <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 180, marginBottom: 18, paddingTop: 10 }}>
+ {dist.map((d, i) => {
+ const heightPct = (d.pct / maxPct) * 100;
+ return (
+ <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6, height: "100%", justifyContent: "flex-end"}}>
+ <div style={{ fontSize: 12, fontWeight: 800, color: d.color, fontFamily: "'JetBrains Mono', monospace"}}>{d.pct}%</div>
+ <div style={{
+ width: "100%", maxWidth: 56,
+ height: `${heightPct}%`,
+ background: `linear-gradient(180deg, ${d.color}, ${d.color}aa)`,
+ borderRadius: "6px 6px 2px 2px",
+ boxShadow: `0 0 12px ${d.color}40`,
+ transition: "all 0.3s",
+ minHeight: 4,
+ }} />
+ </div>
+ );
+ })}
+ </div>
+ <div style={{ display: "flex", gap: 8, paddingTop: 10, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
+ {dist.map((d, i) => (
+ <div key={i} style={{ flex: 1, textAlign: "center"}}>
+ <div style={{ fontSize: 9, fontWeight: 800, color: d.color, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.8, marginBottom: 2 }}>{d.tier}</div>
+ <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5 }}>{d.range}</div>
+ </div>
+ ))}
+ </div>
+ </>
+ );
+ })()}
+ </div>
+ <div style={{ display: "flex", gap: 12, marginTop: 16, padding: "12px 14px", background: "rgba(212, 255, 0, 0.04)", border: "1px solid rgba(212, 255, 0, 0.18)", borderRadius: 10, alignItems: "center"}}>
+ <Sparkles size={14} strokeWidth={2.5} style={{ color: C.primary, flexShrink: 0 }} />
+ <div style={{ fontSize: 12, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.3, lineHeight: 1.5 }}>Only <span style={{ color: C.primary, fontWeight: 800 }}>15%</span> of CT lands in CREDIBLE or above. The Trust Score gate filters the bottom 60% by default.</div>
+ </div>
+ </div>
+
+ {/* TIER RADAR COMPARISON */}
+ <div style={{ marginBottom: 40 }}>
+ <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8, textAlign: "center"}}>What each tier looks like</div>
+ <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: -1, textAlign: "center", marginBottom: 8 }}>SUPREME vs <span style={{ color: "#ef4444" }}>FLAGGED.</span></h2>
+ <p style={{ color: C.textMuted, fontSize: 13, textAlign: "center", marginBottom: 24, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.3 }}>Side by side · 7 trust signals · DEMO</p>
+
+ <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 }}>
+ {(() => {
+ const signals = ["Followers", "Engagement", "Conversation", "Posting", "CIB", "Age", "Niche"];
+ const supreme = [92, 89, 85, 88, 95, 91, 87];
+ const flagged = [22, 14, 12, 30, 18, 25, 20];
+
+ const renderRadar = (values, color, tierName, score) => {
+ const cx = 140, cy = 120, radius = 80;
+ const N = values.length;
+ const points = values.map((v, i) => {
+ const angle = (i / N) * 2 * Math.PI - Math.PI / 2;
+ const r = (v / 100) * radius;
+ return `${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`;
+ }).join(" ");
+ const labelPoints = signals.map((s, i) => {
+ const angle = (i / N) * 2 * Math.PI - Math.PI / 2;
+ const lr = radius + 18;
+ return { x: cx + lr * Math.cos(angle), y: cy + lr * Math.sin(angle), label: s };
+ });
+ const gridLevels = [0.25, 0.5, 0.75, 1];
+ return (
+ <div style={{ padding: "20px 16px", background: "rgba(18, 18, 18, 0.7)", border: `1px solid ${color}30`, borderRadius: 14, position: "relative"}}>
+ <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+ <div style={{ fontSize: 14, fontWeight: 900, color: color, letterSpacing: 1, fontFamily: "'JetBrains Mono', monospace"}}>{tierName}</div>
+ <div style={{ fontSize: 22, fontWeight: 900, color: color, fontFamily: "'JetBrains Mono', monospace", letterSpacing: -1 }}>{score}</div>
+ </div>
+ <svg width="100%" height="240" viewBox="0 0 280 240" style={{ display: "block"}}>
+ {gridLevels.map((lvl, gi) => {
+ const polyPoints = signals.map((_, i) => {
+ const angle = (i / N) * 2 * Math.PI - Math.PI / 2;
+ const r = lvl * radius;
+ return `${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`;
+ }).join(" ");
+ return <polygon key={gi} points={polyPoints} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />;
+ })}
+ {signals.map((_, i) => {
+ const angle = (i / N) * 2 * Math.PI - Math.PI / 2;
+ return <line key={i} x1={cx} y1={cy} x2={cx + radius * Math.cos(angle)} y2={cy + radius * Math.sin(angle)} stroke="rgba(255,255,255,0.06)" strokeWidth="1" />;
+ })}
+ <polygon points={points} fill={`${color}33`} stroke={color} strokeWidth="2" />
+ {values.map((v, i) => {
+ const angle = (i / N) * 2 * Math.PI - Math.PI / 2;
+ const r = (v / 100) * radius;
+ return <circle key={i} cx={cx + r * Math.cos(angle)} cy={cy + r * Math.sin(angle)} r="3" fill={color} />;
+ })}
+ {labelPoints.map((p, i) => (
+ <text key={i} x={p.x} y={p.y} textAnchor="middle" dominantBaseline="central" fill="#888" fontSize="9" fontFamily="JetBrains Mono, monospace" style={{ textTransform: "uppercase", letterSpacing: 0.5 }}>{p.label}</text>
+ ))}
+ </svg>
+ </div>
+ );
+ };
+
+ return (
+ <>
+ {renderRadar(supreme, "#10b981", "SUPREME · 91", 91)}
+ {renderRadar(flagged, "#ef4444", "FLAGGED · 20", 20)}
+ </>
+ );
+ })()}
+ </div>
+ <div style={{ display: "flex", gap: 12, marginTop: 16, padding: "12px 14px", background: "rgba(0, 0, 0, 0.4)", border: "1px solid rgba(255, 255, 255, 0.06)", borderRadius: 10, alignItems: "center"}}>
+ <Eye size={14} strokeWidth={2.5} style={{ color: C.textSecondary, flexShrink: 0 }} />
+ <div style={{ fontSize: 12, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.3, lineHeight: 1.5 }}>SUPREME accounts score high across all signals. FLAGGED accounts collapse on multiple — usually CIB clusters, engagement, and follow ratio.</div>
+ </div>
+ </div>
+
  {/* Signals Explained */}
  <div style={{ marginBottom: 40 }}>
  <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8, textAlign: "center"}}>The 5 Signals</div>

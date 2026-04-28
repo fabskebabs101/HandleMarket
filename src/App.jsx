@@ -4437,7 +4437,7 @@ export default function Web3Gigs() {
  <div style={{ marginBottom: 48, paddingTop: 32, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
  <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 14, fontWeight: 700 }}>The Story</div>
  <p style={{ fontSize: 16, color: C.textSecondary, lineHeight: 1.7, marginBottom: 16 }}>
- I'm <a href="https://x.com/FabsKebabs" target="_blank" rel="noopener noreferrer" style={{ color: C.primary, fontWeight: 700, textDecoration: "none"}}>@FabsKebabs</a>. Solana memecoin trader, degenerate perps trader, and Crypto Twitter degenerate.
+ I'm <a href="https://x.com/FabsKebabs" target="_blank" rel="noopener noreferrer" style={{ color: C.primary, fontWeight: 700, textDecoration: "none"}}>@FabsKebabs</a>. Solana memecoin trader, degenerate perps trader, and Crypto Twitter degenerate. Web3Gigs started as an idea from <a href="https://x.com/AZTradesReal" target="_blank" rel="noopener noreferrer" style={{ color: C.primary, fontWeight: 700, textDecoration: "none"}}>@AZTradesReal</a>, who saw the same problems I did.
  </p>
  <p style={{ fontSize: 16, color: C.textSecondary, lineHeight: 1.7, marginBottom: 22 }}>
  I've watched friends get rugged by anon devs, scammed by fake KOLs, and ghosted by "verified" influencers more times than I can count.
@@ -4458,13 +4458,6 @@ export default function Web3Gigs() {
  <p style={{ fontSize: 16, color: C.textSecondary, lineHeight: 1.7 }}>
  So I built Web3Gigs as the marketplace I wish existed: <span style={{ color: C.textPrimary, fontWeight: 600 }}>trust-first, paid in stables, no middleman fees, manually moderated.</span>
  </p>
- <div style={{ marginTop: 22, padding: "14px 16px", background: "rgba(212, 255, 0, 0.04)", border: "1px solid rgba(212, 255, 0, 0.18)", borderRadius: 10, display: "flex", gap: 12, alignItems: "flex-start"}}>
- <Sparkles size={14} strokeWidth={2.5} style={{ color: C.primary, flexShrink: 0, marginTop: 3 }} />
- <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.55 }}>
- <span style={{ color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", fontSize: 10, textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, display: "block", marginBottom: 4 }}>Credit</span>
- Shoutout to <a href="https://x.com/AZTradesReal" target="_blank" rel="noopener noreferrer" style={{ color: C.primary, fontWeight: 700, textDecoration: "none"}}>@AZTradesReal</a> for the original idea that sparked Web3Gigs. Real ones know.
- </div>
- </div>
  </div>
 
  {/* Section 3: How it works */}

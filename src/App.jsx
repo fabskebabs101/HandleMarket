@@ -3635,6 +3635,138 @@ export default function Web3Gigs() {
  </div>
  </GlowCard>
 
+ {/* TRUST SIGNAL RADAR */}
+ <GlowCard glow style={{ marginBottom: 20 }}>
+ <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, flexWrap: "wrap", gap: 8 }}>
+ <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, fontWeight: 700 }}>Trust signal breakdown</div>
+ <span style={{ padding: "3px 8px", borderRadius: 6, background: "#fbbf24", color: "#000", fontSize: 9, fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>DEMO</span>
+ </div>
+ <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 16, letterSpacing: -0.3 }}>How <span style={{ color: C.primary }}>@ExampleAnon</span> scores across all 7 signals.</div>
+
+ <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14 }}>
+ {/* Radar */}
+ <div style={{ padding: "16px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 12, border: "1px solid rgba(255, 255, 255, 0.05)"}}>
+ {(() => {
+ const signals = ["Followers", "Engagement", "Conversation", "Posting", "CIB", "Age", "Niche"];
+ const values = [88, 92, 85, 90, 94, 89, 87];
+ const cx = 140, cy = 130, radius = 80;
+ const N = values.length;
+ const points = values.map((v, i) => {
+ const angle = (i / N) * 2 * Math.PI - Math.PI / 2;
+ const r = (v / 100) * radius;
+ return `${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`;
+ }).join(" ");
+ const labelPoints = signals.map((s, i) => {
+ const angle = (i / N) * 2 * Math.PI - Math.PI / 2;
+ const lr = radius + 18;
+ return { x: cx + lr * Math.cos(angle), y: cy + lr * Math.sin(angle), label: s };
+ });
+ const gridLevels = [0.25, 0.5, 0.75, 1];
+ return (
+ <svg width="100%" height="260" viewBox="0 0 280 260" style={{ display: "block"}}>
+ {gridLevels.map((lvl, gi) => {
+ const polyPoints = signals.map((_, i) => {
+ const angle = (i / N) * 2 * Math.PI - Math.PI / 2;
+ const r = lvl * radius;
+ return `${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`;
+ }).join(" ");
+ return <polygon key={gi} points={polyPoints} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />;
+ })}
+ {signals.map((_, i) => {
+ const angle = (i / N) * 2 * Math.PI - Math.PI / 2;
+ return <line key={i} x1={cx} y1={cy} x2={cx + radius * Math.cos(angle)} y2={cy + radius * Math.sin(angle)} stroke="rgba(255,255,255,0.06)" strokeWidth="1" />;
+ })}
+ <polygon points={points} fill="rgba(16, 185, 129, 0.2)" stroke="#10b981" strokeWidth="2" />
+ {values.map((v, i) => {
+ const angle = (i / N) * 2 * Math.PI - Math.PI / 2;
+ const r = (v / 100) * radius;
+ return <circle key={i} cx={cx + r * Math.cos(angle)} cy={cy + r * Math.sin(angle)} r="3" fill="#10b981" />;
+ })}
+ {labelPoints.map((p, i) => (
+ <text key={i} x={p.x} y={p.y} textAnchor="middle" dominantBaseline="central" fill="#888" fontSize="9" fontFamily="JetBrains Mono, monospace" style={{ textTransform: "uppercase", letterSpacing: 0.5 }}>{p.label}</text>
+ ))}
+ </svg>
+ );
+ })()}
+ </div>
+
+ {/* Signal scores list */}
+ <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+ {[
+ { label: "Followers", score: 88 },
+ { label: "Engagement", score: 92 },
+ { label: "Conversation", score: 85 },
+ { label: "Posting", score: 90 },
+ { label: "CIB", score: 94 },
+ { label: "Age", score: 89 },
+ { label: "Niche", score: 87 },
+ ].map((s, i) => {
+ const color = s.score >= 85 ? "#10b981" : s.score >= 70 ? "#34d399" : s.score >= 55 ? "#fbbf24" : "#ef4444";
+ return (
+ <div key={i} style={{ padding: "10px 12px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.04)"}}>
+ <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+ <span style={{ fontSize: 11, color: C.textPrimary, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, letterSpacing: 0.3 }}>{s.label}</span>
+ <span style={{ fontSize: 13, fontWeight: 800, color: color, fontFamily: "'JetBrains Mono', monospace"}}>{s.score}</span>
+ </div>
+ <div style={{ height: 4, borderRadius: 2, background: "rgba(255, 255, 255, 0.05)", overflow: "hidden"}}>
+ <div style={{ height: "100%", width: `${s.score}%`, background: `linear-gradient(90deg, ${color}, ${color}aa)`, transition: "width 0.4s"}} />
+ </div>
+ </div>
+ );
+ })}
+ </div>
+ </div>
+ </GlowCard>
+
+ {/* TIER POSITIONING */}
+ <GlowCard style={{ marginBottom: 20 }}>
+ <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, flexWrap: "wrap", gap: 8 }}>
+ <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, fontWeight: 700 }}>Where they rank</div>
+ <span style={{ padding: "3px 8px", borderRadius: 6, background: "#fbbf24", color: "#000", fontSize: 9, fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>DEMO</span>
+ </div>
+ <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 16, letterSpacing: -0.3 }}>Top <span style={{ color: "#10b981" }}>4%</span> of all CT accounts.</div>
+
+ {/* Score line marker */}
+ <div style={{ position: "relative", marginBottom: 24, padding: "20px 0 30px"}}>
+ <div style={{ position: "relative", height: 24, borderRadius: 12, background: "linear-gradient(90deg, #dc2626 0%, #ef4444 16%, #f97316 33%, #fbbf24 50%, #34d399 70%, #10b981 100%)"}}>
+ {/* Tier markers */}
+ {[0, 25, 40, 55, 70, 85, 100].map((mark, i) => (
+ <div key={i} style={{ position: "absolute", left: `${mark}%`, top: 0, height: "100%", borderLeft: i === 0 || i === 6 ? "none" : "1px dashed rgba(0, 0, 0, 0.4)", transform: "translateX(-1px)"}} />
+ ))}
+ {/* User position pin */}
+ <div style={{ position: "absolute", left: "91%", top: -6, transform: "translateX(-50%)"}}>
+ <div style={{ width: 0, height: 0, borderLeft: "8px solid transparent", borderRight: "8px solid transparent", borderTop: "10px solid #10b981", margin: "0 auto"}} />
+ </div>
+ <div style={{ position: "absolute", left: "91%", top: "100%", transform: "translateX(-50%)", marginTop: 8 }}>
+ <div style={{ padding: "3px 10px", borderRadius: 6, background: "#10b981", color: "#000", fontSize: 11, fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5, whiteSpace: "nowrap"}}>91 · You</div>
+ </div>
+ </div>
+ <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4, fontSize: 8, fontFamily: "'JetBrains Mono', monospace", color: C.textMuted, letterSpacing: 0.5, textTransform: "uppercase"}}>
+ <span>Likely Bot</span>
+ <span>Suspicious</span>
+ <span>Unknown</span>
+ <span>Noted</span>
+ <span>Credible</span>
+ <span>Supreme</span>
+ </div>
+ </div>
+
+ {/* Comparison stats */}
+ <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10 }}>
+ {[
+ { label: "Better than", val: "96%", sub: "of all CT" },
+ { label: "Tier rank", val: "Top 4%", sub: "SUPREME tier" },
+ { label: "Trust gain", val: "+12 pts", sub: "vs 90 days ago" },
+ ].map((s, i) => (
+ <div key={i} style={{ padding: "12px 14px", background: "rgba(16, 185, 129, 0.04)", border: "1px solid rgba(16, 185, 129, 0.18)", borderRadius: 10, textAlign: "center"}}>
+ <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>{s.label}</div>
+ <div style={{ fontSize: 18, fontWeight: 900, color: "#10b981", marginTop: 4, fontFamily: "'JetBrains Mono', monospace", letterSpacing: -0.5 }}>{s.val}</div>
+ <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 2, letterSpacing: 0.3 }}>{s.sub}</div>
+ </div>
+ ))}
+ </div>
+ </GlowCard>
+
  {/* Share Card Section */}
  <GlowCard style={{ marginBottom: 20 }}>
  <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>Share Card</div>
@@ -4326,6 +4458,13 @@ export default function Web3Gigs() {
  <p style={{ fontSize: 16, color: C.textSecondary, lineHeight: 1.7 }}>
  So I built Web3Gigs as the marketplace I wish existed: <span style={{ color: C.textPrimary, fontWeight: 600 }}>trust-first, paid in stables, no middleman fees, manually moderated.</span>
  </p>
+ <div style={{ marginTop: 22, padding: "14px 16px", background: "rgba(212, 255, 0, 0.04)", border: "1px solid rgba(212, 255, 0, 0.18)", borderRadius: 10, display: "flex", gap: 12, alignItems: "flex-start"}}>
+ <Sparkles size={14} strokeWidth={2.5} style={{ color: C.primary, flexShrink: 0, marginTop: 3 }} />
+ <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.55 }}>
+ <span style={{ color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", fontSize: 10, textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, display: "block", marginBottom: 4 }}>Credit</span>
+ Shoutout to <a href="https://x.com/AZTradesReal" target="_blank" rel="noopener noreferrer" style={{ color: C.primary, fontWeight: 700, textDecoration: "none"}}>@AZTradesReal</a> for the original idea that sparked Web3Gigs. Real ones know.
+ </div>
+ </div>
  </div>
 
  {/* Section 3: How it works */}

@@ -540,6 +540,53 @@ function Pill({ text, color = C.primary }) {
  );
 }
 
+function JobCardSkeleton() {
+ return (
+ <div style={{
+ padding: 20, borderRadius: 14,
+ background: "rgba(18, 18, 18, 0.5)",
+ border: "1px solid rgba(255, 255, 255, 0.04)",
+ display: "flex", flexDirection: "column", gap: 14,
+ }}>
+ <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+ <div className="w3g-skeleton" style={{ height: 14, width: 60 }} />
+ <div className="w3g-skeleton" style={{ height: 12, width: 40 }} />
+ </div>
+ <div className="w3g-skeleton" style={{ height: 18, width: "85%" }} />
+ <div className="w3g-skeleton" style={{ height: 18, width: "65%" }} />
+ <div style={{ display: "flex", gap: 8 }}>
+ <div className="w3g-skeleton" style={{ height: 28, width: 60, borderRadius: 14 }} />
+ <div className="w3g-skeleton" style={{ height: 28, width: 80, borderRadius: 14 }} />
+ </div>
+ <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 4 }}>
+ <div className="w3g-skeleton" style={{ height: 16, width: 90 }} />
+ <div className="w3g-skeleton" style={{ height: 16, width: 50 }} />
+ </div>
+ </div>
+ );
+}
+
+function MiniJobSkeleton() {
+ return (
+ <div style={{
+ padding: "14px 16px", borderRadius: 12,
+ background: "rgba(18, 18, 18, 0.5)",
+ border: "1px solid rgba(255, 255, 255, 0.04)",
+ display: "flex", flexDirection: "column", gap: 8,
+ }}>
+ <div style={{ display: "flex", gap: 6 }}>
+ <div className="w3g-skeleton" style={{ height: 14, width: 40 }} />
+ <div className="w3g-skeleton" style={{ height: 14, width: 50 }} />
+ </div>
+ <div className="w3g-skeleton" style={{ height: 16, width: "90%" }} />
+ <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
+ <div className="w3g-skeleton" style={{ height: 12, width: 80 }} />
+ <div className="w3g-skeleton" style={{ height: 12, width: 36 }} />
+ </div>
+ </div>
+ );
+}
+
 // ─── Mock Historical Data (would come from daily snapshots DB) ──
 function generateHistory(baseFollowers, baseTrust, days = 90, anomalyDay = null) {
  const points = [];
@@ -1086,6 +1133,84 @@ const MOCK_JOBS = [
  description: "Crypto KOL streams 4-5h daily on Kick + X. Looking for a fast clipper to pull the best 30-90s moments and post within 2 hours of the live stream ending. Volume play.",
  deliverables: ["3-5 clips per stream day", "Subtitles + thumbnails", "Posted to KOL's accounts"],
  tags: ["clipping", "kol", "streaming"],
+ },
+ {
+ id: "job-026", jobType: "crypto",
+ title: "Rust dev · Solana program optimization",
+ category: "Development",
+ poster: "@SolBuilders", posterTrust: 87, posterVerified: true,
+ budget: 4500, budgetCurrency: "USDC",
+ deadline: "4w",
+ postedAgo: "3h ago",
+ proposals: 7,
+ minTrustScore: 50,
+ status: "open",
+ description: "Existing Anchor program needs compute unit optimization. Targeting 30% reduction in CU usage. Strong Rust + Solana experience required.",
+ deliverables: ["Optimized program with benchmarks", "Migration plan", "Test coverage"],
+ tags: ["rust", "solana", "anchor"],
+ requiresPortfolio: true,
+ },
+ {
+ id: "job-027", jobType: "ct",
+ title: "Spaces co-host · weekly memecoin show",
+ category: "Spaces / AMAs",
+ poster: "@PumpHQ", posterTrust: 72, posterVerified: false,
+ budget: 600, budgetCurrency: "USDC",
+ deadline: "Ongoing",
+ postedAgo: "5h ago",
+ proposals: 14,
+ minTrustScore: 40,
+ status: "open",
+ description: "Looking for a co-host for our weekly Sunday Spaces. Topic: memecoin meta, alpha calls, market commentary. Must be plugged into Solana CT.",
+ deliverables: ["1.5-2hr Spaces every Sunday", "Promotion 2x prior to show", "Active in chat during"],
+ tags: ["spaces", "memecoin", "weekly"],
+ },
+ {
+ id: "job-028", jobType: "ct",
+ title: "Meme designer · launch campaign",
+ category: "Meme Warfare",
+ poster: "@DegenLabs", posterTrust: 81, posterVerified: true,
+ budget: 1500, budgetCurrency: "USDC",
+ deadline: "1w",
+ postedAgo: "2h ago",
+ proposals: 31,
+ minTrustScore: 45,
+ status: "open",
+ description: "Token launching next week. Need 30+ launch memes in CT-native style. Mix of templates and original. Must understand current CT meta references.",
+ deliverables: ["30+ memes in 1080x1080 + 1080x1920", "Editable PSDs/Figma", "Cleared for commercial use"],
+ tags: ["meme", "launch", "design"],
+ requiresPortfolio: true,
+ },
+ {
+ id: "job-029", jobType: "crypto",
+ title: "Discord mod · 24/7 community coverage",
+ category: "Community",
+ poster: "@Web3Founders", posterTrust: 78, posterVerified: false,
+ budget: 800, budgetCurrency: "USDC",
+ deadline: "Ongoing",
+ postedAgo: "8h ago",
+ proposals: 19,
+ minTrustScore: 50,
+ status: "open",
+ description: "10k member Discord needs a senior mod for APAC timezone coverage. Spam filtering, raid response, FAQ handling, escalation to team.",
+ deliverables: ["12hr/day APAC coverage", "Weekly mod report", "Active in #help channel"],
+ tags: ["discord", "moderation", "community"],
+ },
+ {
+ id: "job-030", jobType: "ct",
+ title: "Twitter ghostwriter · founder voice",
+ category: "Thread Writing",
+ poster: "@CryptoFounder", posterTrust: 85, posterVerified: true,
+ budget: 2200, budgetCurrency: "USDC",
+ deadline: "Ongoing",
+ postedAgo: "1d ago",
+ proposals: 22,
+ minTrustScore: 60,
+ status: "open",
+ description: "Crypto founder needs ghostwriter for X. 3-5 posts daily + 1 long thread weekly. Voice is technical-but-degen, opinionated, builder-focused. NDA required.",
+ deliverables: ["3-5 posts daily", "1 long thread weekly", "Pre-launch content for V2 announce"],
+ tags: ["ghostwriting", "founder", "ongoing"],
+ requiresPortfolio: true,
  },
 ];
 
@@ -1644,6 +1769,26 @@ export default function Web3Gigs() {
    0%, 100% { transform: translateY(0); }
    50% { transform: translateY(-6px); }
  }
+ @keyframes skeletonPulse {
+   0%, 100% { background-position: -200% 0; }
+   100% { background-position: 200% 0; }
+ }
+ @keyframes skeletonShimmer {
+   0% { transform: translateX(-100%); }
+   100% { transform: translateX(100%); }
+ }
+ .w3g-skeleton {
+   position: relative;
+   overflow: hidden;
+   background: rgba(255, 255, 255, 0.04);
+   border-radius: 6px;
+ }
+ .w3g-skeleton::after {
+   content: "";
+   position: absolute; inset: 0;
+   background: linear-gradient(90deg, transparent 0%, rgba(212, 255, 0, 0.06) 50%, transparent 100%);
+   animation: skeletonShimmer 1.6s ease-in-out infinite;
+ }
  .w3g-aurora {
    position: absolute; pointer-events: none; z-index: 0;
    width: 80%; height: 80%; top: 10%; left: 10%;
@@ -2133,7 +2278,14 @@ export default function Web3Gigs() {
  </div>
 
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
- {(() => {
+ {approvedJobsLoading && approvedJobs.length === 0 ? (
+ <>
+ <MiniJobSkeleton />
+ <MiniJobSkeleton />
+ <MiniJobSkeleton />
+ <MiniJobSkeleton />
+ </>
+ ) : (() => {
  // Show approved jobs first (up to 4), fallback to mock preview
  const realPreviews = approvedJobs.slice(0, 4).map(j => ({
  cat: j.category,
@@ -2197,8 +2349,6 @@ export default function Web3Gigs() {
  </div>
  </div>
  </Reveal>
-
- {/* Social proof bar, animated counters */}
  <Reveal delay={200}>
  <div style={{ display: "flex", justifyContent: "center", gap: 32, marginTop: 56, flexWrap: "wrap"}}>
  {[
@@ -2331,8 +2481,8 @@ export default function Web3Gigs() {
  <GlowCard style={{ padding: "20px 24px", background: "rgba(0, 0, 0, 0.5)"}}>
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 12 }}>
  {[
- { label: "Open Jobs", val: "24", Icon: Briefcase },
- { label: "Total Budget", val: "$32k+", Icon: DollarSign },
+ { label: "Open Jobs", val: "30", Icon: Briefcase },
+ { label: "Total Budget", val: "$45k+", Icon: DollarSign },
  { label: "vs Fiverr Cut", val: "0%", Icon: Zap },
  { label: "Paid in", val: "USDC", Icon: Sparkles },
  { label: "Disputes", val: "0", Icon: Shield },
@@ -2532,7 +2682,7 @@ export default function Web3Gigs() {
  <div style={{ fontSize: 32, fontWeight: 900, letterSpacing: -1.5, marginBottom: 12 }}>Join <span style={{ color: C.primary }}>crypto's work marketplace.</span>
  </div>
  <div style={{ fontSize: 15, color: C.textSecondary, marginBottom: 28, maxWidth: 500, margin: "0 auto 28px"}}>
- 24+ open jobs. Zero middleman fees. Paid in USDC, USDT or SOL. Reputation-first hiring. Ship the way crypto was meant to work.
+ 30+ open jobs. Zero middleman fees. Paid in USDC, USDT or SOL. Reputation-first hiring. Ship the way crypto was meant to work.
  </div>
  <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap"}}>
  <button
@@ -5342,8 +5492,136 @@ export default function Web3Gigs() {
  </div>
  )}
 
- <div style={{ borderTop: "1px solid rgba(255, 255, 255, 0.05)", padding: "20px 24px", marginTop: 60, textAlign: "center"}}>
- <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace"}}>Web3Gigs © 2026 · Trust scores are estimates based on public metrics · Not financial advice
+ <div style={{ borderTop: "1px solid rgba(255, 255, 255, 0.06)", marginTop: 80, padding: "32px 24px 24px", background: "rgba(0, 0, 0, 0.5)"}}>
+ <div style={{ maxWidth: 1100, margin: "0 auto"}}>
+ {/* Footer Top: Brand + Links */}
+ <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 32, marginBottom: 32, paddingBottom: 28, borderBottom: "1px solid rgba(255, 255, 255, 0.04)"}}>
+ {/* Brand block */}
+ <div>
+ <div onClick={() => setTab("home")} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12, cursor: "pointer"}}>
+ <svg width="32" height="32" viewBox="0 0 80 80" style={{ flexShrink: 0 }}>
+ <defs>
+ <linearGradient id="footerLogoGrad" x1="0" y1="0" x2="1" y2="1">
+ <stop offset="0%" stopColor="#d4ff00" />
+ <stop offset="100%" stopColor="#b8e600" />
+ </linearGradient>
+ </defs>
+ <path d="M 40 10 L 66 18 L 66 45 Q 66 60 40 72 Q 14 60 14 45 L 14 18 Z" fill="none" stroke="url(#footerLogoGrad)" strokeWidth="2.5" strokeLinejoin="round" />
+ <g transform="translate(22, 24) scale(1.5)" stroke="url(#footerLogoGrad)" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round">
+ <path d="m11 17 2 2a1 1 0 1 0 3-3" />
+ <path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4" />
+ <path d="m21 3 1 11h-2" />
+ <path d="M3 3l8 8" />
+ <path d="M3 9V3h6" />
+ </g>
+ </svg>
+ <div>
+ <div style={{ fontSize: 16, fontWeight: 900, letterSpacing: -0.5, color: C.textPrimary }}>Web3Gigs</div>
+ <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1, textTransform: "uppercase"}}>Hire · Handshake · Ship</div>
+ </div>
+ </div>
+ <p style={{ fontSize: 12, color: C.textMuted, lineHeight: 1.5, margin: 0 }}>The trust-verified hiring marketplace for crypto. Every applicant comes with a reputation attached.</p>
+ </div>
+
+ {/* Product links */}
+ <div>
+ <div style={{ fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, fontWeight: 800, marginBottom: 12 }}>Product</div>
+ <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+ {[
+ ["jobs", "Browse Jobs"],
+ ["valuate", "Trust Score Demo"],
+ ["trust", "How Trust Works"],
+ ["leaderboard", "Leaderboards"],
+ ["alerts", "Alerts"],
+ ].map(([t, label]) => (
+ <button
+ key={t}
+ onClick={() => setTab(t)}
+ style={{
+ background: "transparent", border: "none", padding: 0, textAlign: "left",
+ fontSize: 13, color: C.textSecondary, cursor: "pointer",
+ fontFamily: "'Outfit', sans-serif", fontWeight: 500,
+ transition: "color 0.15s",
+ }}
+ onMouseEnter={e => e.currentTarget.style.color = C.primary}
+ onMouseLeave={e => e.currentTarget.style.color = C.textSecondary}
+ >{label}</button>
+ ))}
+ </div>
+ </div>
+
+ {/* Company links */}
+ <div>
+ <div style={{ fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, fontWeight: 800, marginBottom: 12 }}>Company</div>
+ <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+ {[
+ ["about", "About"],
+ ["profile", "Profile Demo"],
+ ["cib", "CIB Detection"],
+ ].map(([t, label]) => (
+ <button
+ key={t}
+ onClick={() => setTab(t)}
+ style={{
+ background: "transparent", border: "none", padding: 0, textAlign: "left",
+ fontSize: 13, color: C.textSecondary, cursor: "pointer",
+ fontFamily: "'Outfit', sans-serif", fontWeight: 500,
+ transition: "color 0.15s",
+ }}
+ onMouseEnter={e => e.currentTarget.style.color = C.primary}
+ onMouseLeave={e => e.currentTarget.style.color = C.textSecondary}
+ >{label}</button>
+ ))}
+ <button
+ onClick={() => { setWaitlistSubmitted(false); setWaitlistError(""); setShowWaitlistModal(true); }}
+ style={{
+ background: "transparent", border: "none", padding: 0, textAlign: "left",
+ fontSize: 13, color: C.primary, cursor: "pointer",
+ fontFamily: "'Outfit', sans-serif", fontWeight: 700,
+ transition: "color 0.15s",
+ }}
+ onMouseEnter={e => e.currentTarget.style.opacity = "0.7"}
+ onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+ >Join Waitlist →</button>
+ </div>
+ </div>
+
+ {/* Connect */}
+ <div>
+ <div style={{ fontSize: 10, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, fontWeight: 800, marginBottom: 12 }}>Connect</div>
+ <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+ <a href="https://x.com/FabsKebabs" target="_blank" rel="noopener noreferrer" style={{
+ fontSize: 13, color: C.textSecondary, textDecoration: "none",
+ fontFamily: "'Outfit', sans-serif", fontWeight: 500,
+ display: "inline-flex", alignItems: "center", gap: 6,
+ transition: "color 0.15s",
+ }}
+ onMouseEnter={e => e.currentTarget.style.color = C.primary}
+ onMouseLeave={e => e.currentTarget.style.color = C.textSecondary}
+ ><MessageCircle size={12} strokeWidth={2.2} /> @FabsKebabs</a>
+ <a href="https://x.com/AZTradesReal" target="_blank" rel="noopener noreferrer" style={{
+ fontSize: 13, color: C.textSecondary, textDecoration: "none",
+ fontFamily: "'Outfit', sans-serif", fontWeight: 500,
+ display: "inline-flex", alignItems: "center", gap: 6,
+ transition: "color 0.15s",
+ }}
+ onMouseEnter={e => e.currentTarget.style.color = C.primary}
+ onMouseLeave={e => e.currentTarget.style.color = C.textSecondary}
+ ><MessageCircle size={12} strokeWidth={2.2} /> @AZTradesReal</a>
+ <span style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 4, letterSpacing: 0.5 }}>Built in Australia 🦘</span>
+ </div>
+ </div>
+ </div>
+
+ {/* Footer Bottom */}
+ <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+ <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5 }}>Web3Gigs © 2026 · All Rights Reserved</div>
+ <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5 }}>
+ <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", boxShadow: "0 0 8px #10b981" }} />
+ <span>System Online · Beta v0</span>
+ </div>
+ <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5 }}>Not financial advice · Trust scores are estimates</div>
+ </div>
  </div>
  </div>
  </div>

@@ -1607,6 +1607,7 @@ export default function Web3Gigs() {
  const [demoHandle, setDemoHandle] = useState("");
  const [demoResult, setDemoResult] = useState(null);
  const [demoLoading, setDemoLoading] = useState(false);
+ const [profileDemoIdx, setProfileDemoIdx] = useState(0);
  const resultRef = useRef(null);
 
  const API_BASE = "http://localhost:3001"; // Change this to your deployed backend URL
@@ -3727,8 +3728,287 @@ export default function Web3Gigs() {
  <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 10, letterSpacing: 0.5 }}>Profile lookup launches with waitlist · Join for early access · Preview below</div>
  </GlowCard>
 
- {/* Sample profile card */}
+ {/* PROFILE CAROUSEL SELECTOR */}
+ {(() => {
+ const profiles = [
+ {
+ letter: "F", initial: "#d4ff00", letterColor: "#000",
+ name: "Solana Builder", handle: "@solBuilder",
+ bio: "Solana dev · On-chain analyst · CT native · Building in crypto",
+ score: 91, tier: "SUPREME", tierColor: "#10b981",
+ verified: true,
+ followers: "18.4k", engagement: "3.8%", botEst: "8%", botColor: "#10b981",
+ trackedDays: 127, niche: "Solana", history: "Clean History", historyColor: "#10b981",
+ radarValues: [88, 92, 85, 90, 94, 89, 87], lineColor: "#10b981",
+ percentile: "Top 4%", betterThan: "96%",
+ },
+ {
+ letter: "K", initial: "#34d399", letterColor: "#000",
+ name: "Crypto Founder", handle: "@cryptoFounder",
+ bio: "Building public · Web3 founder · DeFi researcher · OG since 2017",
+ score: 78, tier: "CREDIBLE", tierColor: "#34d399",
+ verified: true,
+ followers: "42.1k", engagement: "2.4%", botEst: "12%", botColor: "#34d399",
+ trackedDays: 412, niche: "DeFi", history: "Clean History", historyColor: "#10b981",
+ radarValues: [82, 75, 68, 82, 78, 95, 70], lineColor: "#34d399",
+ percentile: "Top 15%", betterThan: "85%",
+ },
+ {
+ letter: "M", initial: "#fbbf24", letterColor: "#000",
+ name: "Memecoin Caller", handle: "@memeCaller",
+ bio: "Calling early plays · Mostly right · Sometimes wrong · Always loud",
+ score: 62, tier: "NOTED", tierColor: "#fbbf24",
+ verified: false,
+ followers: "8.7k", engagement: "5.1%", botEst: "22%", botColor: "#fbbf24",
+ trackedDays: 64, niche: "Memes", history: "Mixed Signals", historyColor: "#fbbf24",
+ radarValues: [55, 78, 65, 72, 48, 50, 65], lineColor: "#fbbf24",
+ percentile: "Top 39%", betterThan: "61%",
+ },
+ {
+ letter: "X", initial: "#f97316", letterColor: "#000",
+ name: "Mystery Anon", handle: "@anon_4729",
+ bio: "Quiet account · Posts rarely · Active since last week · ?",
+ score: 47, tier: "WATCHLIST", tierColor: "#f97316",
+ verified: false,
+ followers: "2.1k", engagement: "0.6%", botEst: "44%", botColor: "#f97316",
+ trackedDays: 12, niche: "Unknown", history: "Recently Active", historyColor: "#f97316",
+ radarValues: [38, 22, 30, 65, 32, 18, 25], lineColor: "#f97316",
+ percentile: "Top 65%", betterThan: "35%",
+ },
+ {
+ letter: "B", initial: "#ef4444", letterColor: "#fff",
+ name: "Likely Bot", handle: "@user_bot_983",
+ bio: "Auto-generated bio · Reposts only · Follows 5k+ · Followed by 200",
+ score: 18, tier: "FLAGGED", tierColor: "#ef4444",
+ verified: false,
+ followers: "203", engagement: "0.1%", botEst: "89%", botColor: "#ef4444",
+ trackedDays: 8, niche: "Spam", history: "CIB Pod #C-7741", historyColor: "#ef4444",
+ radarValues: [15, 8, 5, 22, 12, 10, 18], lineColor: "#ef4444",
+ percentile: "Bottom 12%", betterThan: "8%",
+ },
+ ];
+ const p = profiles[profileDemoIdx] || profiles[0];
+
+ return (
+ <>
+ {/* Carousel selector pills */}
+ <div style={{ display: "flex", gap: 6, justifyContent: "center", marginBottom: 18, flexWrap: "wrap"}}>
+ <span style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, alignSelf: "center", marginRight: 4 }}>See:</span>
+ {profiles.map((prof, i) => {
+ const active = i === profileDemoIdx;
+ return (
+ <button
+ key={i}
+ onClick={() => setProfileDemoIdx(i)}
+ style={{
+ padding: "6px 12px", borderRadius: 16, border: "1px solid",
+ borderColor: active ? prof.tierColor : "rgba(255, 255, 255, 0.1)",
+ background: active ? `${prof.tierColor}15` : "rgba(0, 0, 0, 0.4)",
+ color: active ? prof.tierColor : C.textSecondary,
+ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, fontWeight: 800,
+ cursor: "pointer", letterSpacing: 0.8, textTransform: "uppercase",
+ transition: "all 0.15s",
+ }}
+ onMouseEnter={e => { if (!active) e.currentTarget.style.borderColor = `${prof.tierColor}80`; }}
+ onMouseLeave={e => { if (!active) e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.1)"; }}
+ >{prof.tier}</button>
+ );
+ })}
+ </div>
+
+ {/* Profile card with dynamic data */}
  <GlowCard glow style={{ marginBottom: 20 }}>
+ <div style={{ display: "flex", alignItems: "flex-start", gap: 16, marginBottom: 20, flexWrap: "wrap"}}>
+ <div style={{
+ width: 72, height: 72, borderRadius: 16,
+ background: `linear-gradient(135deg, ${p.initial}, ${p.tierColor})`,
+ display: "flex", alignItems: "center", justifyContent: "center",
+ fontSize: 28, fontWeight: 900, color: p.letterColor,
+ flexShrink: 0,
+ transition: "all 0.3s",
+ }}>{p.letter}</div>
+ <div style={{ flex: 1, minWidth: 200 }}>
+ <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap"}}>
+ <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5 }}>{p.name}</div>
+ {p.verified && <Pill text="Verified" color={C.accent} />}
+ <Pill text={`${p.tier} ${p.score}`} color={p.tierColor} />
+ </div>
+ <div style={{ fontSize: 14, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", marginTop: 4 }}>{p.handle}</div>
+ <div style={{ fontSize: 13, color: C.textSecondary, marginTop: 8, lineHeight: 1.5 }}>{p.bio}</div>
+ <div style={{ display: "flex", gap: 12, marginTop: 10, flexWrap: "wrap"}}>
+ <Pill text={`Tracked ${p.trackedDays}d`} color={C.primary} />
+ <Pill text={p.niche} color={C.accent} />
+ <Pill text={p.history} color={p.historyColor} />
+ </div>
+ </div>
+ </div>
+
+ {/* Profile stats */}
+ <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 10, marginBottom: 20 }}>
+ {[
+ ["Trust Score", String(p.score), p.tierColor],
+ ["Tier", p.tier, p.tierColor],
+ ["Followers", p.followers, C.textPrimary],
+ ["Engagement", p.engagement, C.primary],
+ ["Bot Est.", p.botEst, p.botColor],
+ ].map(([label, val, clr]) => (
+ <div key={label} style={{ padding: "12px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 10, textAlign: "center", border: "1px solid rgba(255, 255, 255, 0.05)"}}>
+ <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>{label}</div>
+ <div style={{ fontSize: 18, fontWeight: 800, color: clr, marginTop: 4, fontFamily: "'JetBrains Mono', monospace"}}>{val}</div>
+ </div>
+ ))}
+ </div>
+
+ {/* Mini timeline */}
+ <div style={{ height: 100 }}>
+ <ResponsiveContainer width="100%" height="100%">
+ <AreaChart data={generateHistory(parseInt(p.followers.replace(/[^0-9]/g, "")) * (p.followers.includes("k") ? 1000 : 1) || 5000, p.score, 90)} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+ <defs>
+ <linearGradient id={`profileGrad-${profileDemoIdx}`} x1="0" y1="0" x2="0" y2="1">
+ <stop offset="0%" stopColor={p.lineColor} stopOpacity={0.4} />
+ <stop offset="100%" stopColor={p.lineColor} stopOpacity={0} />
+ </linearGradient>
+ </defs>
+ <Area type="monotone" dataKey="followers" stroke={p.lineColor} strokeWidth={2} fill={`url(#profileGrad-${profileDemoIdx})`} />
+ </AreaChart>
+ </ResponsiveContainer>
+ </div>
+ </GlowCard>
+
+ {/* Trust Signal Radar (uses p data) */}
+ <GlowCard glow style={{ marginBottom: 20 }}>
+ <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, flexWrap: "wrap", gap: 8 }}>
+ <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, fontWeight: 700 }}>Trust signal breakdown</div>
+ <span style={{ padding: "3px 8px", borderRadius: 6, background: "#fbbf24", color: "#000", fontSize: 9, fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>DEMO</span>
+ </div>
+ <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 16, letterSpacing: -0.3 }}>How <span style={{ color: p.tierColor }}>{p.handle}</span> scores across all 7 signals.</div>
+
+ <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14 }}>
+ {/* Radar */}
+ <div style={{ padding: "16px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 12, border: "1px solid rgba(255, 255, 255, 0.05)"}}>
+ {(() => {
+ const signals = ["Followers", "Engagement", "Conversation", "Posting", "CIB", "Age", "Niche"];
+ const values = p.radarValues;
+ const cx = 140, cy = 130, radius = 80;
+ const N = values.length;
+ const points = values.map((v, i) => {
+ const angle = (i / N) * 2 * Math.PI - Math.PI / 2;
+ const r = (v / 100) * radius;
+ return `${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`;
+ }).join(" ");
+ const labelPoints = signals.map((s, i) => {
+ const angle = (i / N) * 2 * Math.PI - Math.PI / 2;
+ const lr = radius + 18;
+ return { x: cx + lr * Math.cos(angle), y: cy + lr * Math.sin(angle), label: s };
+ });
+ const gridLevels = [0.25, 0.5, 0.75, 1];
+ return (
+ <svg width="100%" height="260" viewBox="0 0 280 260" style={{ display: "block"}}>
+ {gridLevels.map((lvl, gi) => {
+ const polyPoints = signals.map((_, i) => {
+ const angle = (i / N) * 2 * Math.PI - Math.PI / 2;
+ const r = lvl * radius;
+ return `${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`;
+ }).join(" ");
+ return <polygon key={gi} points={polyPoints} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />;
+ })}
+ {signals.map((_, i) => {
+ const angle = (i / N) * 2 * Math.PI - Math.PI / 2;
+ return <line key={i} x1={cx} y1={cy} x2={cx + radius * Math.cos(angle)} y2={cy + radius * Math.sin(angle)} stroke="rgba(255,255,255,0.06)" strokeWidth="1" />;
+ })}
+ <polygon points={points} fill={`${p.tierColor}33`} stroke={p.tierColor} strokeWidth="2" />
+ {values.map((v, i) => {
+ const angle = (i / N) * 2 * Math.PI - Math.PI / 2;
+ const r = (v / 100) * radius;
+ return <circle key={i} cx={cx + r * Math.cos(angle)} cy={cy + r * Math.sin(angle)} r="3" fill={p.tierColor} />;
+ })}
+ {labelPoints.map((pt, i) => (
+ <text key={i} x={pt.x} y={pt.y} textAnchor="middle" dominantBaseline="central" fill="#888" fontSize="9" fontFamily="JetBrains Mono, monospace" style={{ textTransform: "uppercase", letterSpacing: 0.5 }}>{pt.label}</text>
+ ))}
+ </svg>
+ );
+ })()}
+ </div>
+
+ {/* Signal scores list */}
+ <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+ {[
+ { label: "Followers", score: p.radarValues[0] },
+ { label: "Engagement", score: p.radarValues[1] },
+ { label: "Conversation", score: p.radarValues[2] },
+ { label: "Posting", score: p.radarValues[3] },
+ { label: "CIB", score: p.radarValues[4] },
+ { label: "Age", score: p.radarValues[5] },
+ { label: "Niche", score: p.radarValues[6] },
+ ].map((s, i) => {
+ const color = s.score >= 85 ? "#10b981" : s.score >= 70 ? "#34d399" : s.score >= 55 ? "#fbbf24" : s.score >= 40 ? "#f97316" : "#ef4444";
+ return (
+ <div key={i} style={{ padding: "10px 12px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.04)"}}>
+ <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+ <span style={{ fontSize: 11, color: C.textPrimary, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, letterSpacing: 0.3 }}>{s.label}</span>
+ <span style={{ fontSize: 13, fontWeight: 800, color: color, fontFamily: "'JetBrains Mono', monospace"}}>{s.score}</span>
+ </div>
+ <div style={{ height: 4, borderRadius: 2, background: "rgba(255, 255, 255, 0.05)", overflow: "hidden"}}>
+ <div style={{ height: "100%", width: `${s.score}%`, background: `linear-gradient(90deg, ${color}, ${color}aa)`, transition: "width 0.4s"}} />
+ </div>
+ </div>
+ );
+ })}
+ </div>
+ </div>
+ </GlowCard>
+
+ {/* Tier Positioning (uses p) */}
+ <GlowCard style={{ marginBottom: 20 }}>
+ <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, flexWrap: "wrap", gap: 8 }}>
+ <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, fontWeight: 700 }}>Where they rank</div>
+ <span style={{ padding: "3px 8px", borderRadius: 6, background: "#fbbf24", color: "#000", fontSize: 9, fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>DEMO</span>
+ </div>
+ <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 16, letterSpacing: -0.3 }}>{p.percentile} <span style={{ color: p.tierColor }}>of all CT accounts.</span></div>
+
+ {/* Score line marker */}
+ <div style={{ position: "relative", marginBottom: 24, padding: "20px 0 30px"}}>
+ <div style={{ position: "relative", height: 24, borderRadius: 12, background: "linear-gradient(90deg, #dc2626 0%, #ef4444 16%, #f97316 33%, #fbbf24 50%, #34d399 70%, #10b981 100%)"}}>
+ {[0, 25, 40, 55, 70, 85, 100].map((mark, i) => (
+ <div key={i} style={{ position: "absolute", left: `${mark}%`, top: 0, height: "100%", borderLeft: i === 0 || i === 6 ? "none" : "1px dashed rgba(0, 0, 0, 0.4)", transform: "translateX(-1px)"}} />
+ ))}
+ <div style={{ position: "absolute", left: `${p.score}%`, top: -6, transform: "translateX(-50%)", transition: "left 0.4s"}}>
+ <div style={{ width: 0, height: 0, borderLeft: "8px solid transparent", borderRight: "8px solid transparent", borderTop: `10px solid ${p.tierColor}`, margin: "0 auto"}} />
+ </div>
+ <div style={{ position: "absolute", left: `${p.score}%`, top: "100%", transform: "translateX(-50%)", marginTop: 8, transition: "left 0.4s"}}>
+ <div style={{ padding: "3px 10px", borderRadius: 6, background: p.tierColor, color: "#000", fontSize: 11, fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5, whiteSpace: "nowrap"}}>{p.score} · {p.handle}</div>
+ </div>
+ </div>
+ <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4, fontSize: 8, fontFamily: "'JetBrains Mono', monospace", color: C.textMuted, letterSpacing: 0.5, textTransform: "uppercase"}}>
+ <span>Likely Bot</span>
+ <span>Suspicious</span>
+ <span>Unknown</span>
+ <span>Noted</span>
+ <span>Credible</span>
+ <span>Supreme</span>
+ </div>
+ </div>
+
+ <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10 }}>
+ {[
+ { label: "Better than", val: p.betterThan, sub: "of all CT" },
+ { label: "Tier rank", val: p.percentile, sub: `${p.tier} tier` },
+ { label: "Trust gain", val: p.score >= 55 ? "+12 pts" : "-8 pts", sub: "vs 90 days ago", color: p.score >= 55 ? "#10b981" : "#ef4444" },
+ ].map((s, i) => (
+ <div key={i} style={{ padding: "12px 14px", background: `${(s.color || p.tierColor)}08`, border: `1px solid ${(s.color || p.tierColor)}25`, borderRadius: 10, textAlign: "center"}}>
+ <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>{s.label}</div>
+ <div style={{ fontSize: 18, fontWeight: 900, color: s.color || p.tierColor, marginTop: 4, fontFamily: "'JetBrains Mono', monospace", letterSpacing: -0.5 }}>{s.val}</div>
+ <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 2, letterSpacing: 0.3 }}>{s.sub}</div>
+ </div>
+ ))}
+ </div>
+ </GlowCard>
+ </>
+ );
+ })()}
+
+ {/* Sample profile card OLD — DEPRECATED hidden */}
+ <GlowCard glow style={{ marginBottom: 20, display: "none"}}>
  <div style={{ display: "flex", alignItems: "flex-start", gap: 16, marginBottom: 20, flexWrap: "wrap"}}>
  <div style={{
  width: 72, height: 72, borderRadius: 16,
@@ -3785,8 +4065,8 @@ export default function Web3Gigs() {
  </div>
  </GlowCard>
 
- {/* TRUST SIGNAL RADAR */}
- <GlowCard glow style={{ marginBottom: 20 }}>
+ {/* TRUST SIGNAL RADAR — DEPRECATED hidden */}
+ <GlowCard glow style={{ marginBottom: 20, display: "none"}}>
  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, flexWrap: "wrap", gap: 8 }}>
  <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, fontWeight: 700 }}>Trust signal breakdown</div>
  <span style={{ padding: "3px 8px", borderRadius: 6, background: "#fbbf24", color: "#000", fontSize: 9, fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>DEMO</span>
@@ -3868,8 +4148,8 @@ export default function Web3Gigs() {
  </div>
  </GlowCard>
 
- {/* TIER POSITIONING */}
- <GlowCard style={{ marginBottom: 20 }}>
+ {/* TIER POSITIONING — DEPRECATED hidden */}
+ <GlowCard style={{ marginBottom: 20, display: "none"}}>
  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, flexWrap: "wrap", gap: 8 }}>
  <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, fontWeight: 700 }}>Where they rank</div>
  <span style={{ padding: "3px 8px", borderRadius: 6, background: "#fbbf24", color: "#000", fontSize: 9, fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>DEMO</span>
@@ -4368,7 +4648,64 @@ export default function Web3Gigs() {
    }
    return true;
  }).length === 0 && (
- <div style={{ textAlign: "center", padding: "40px 20px", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace"}}>No jobs in this category yet. Try "All"or <span style={{ color: C.primary, cursor: "pointer"}} onClick={() => setShowPostJob(true)}>post the first one →</span>
+ <div style={{ textAlign: "center", padding: "60px 30px", maxWidth: 480, margin: "0 auto"}}>
+ <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
+ <div style={{ width: 72, height: 72, borderRadius: 18, background: "rgba(212, 255, 0, 0.04)", border: "1px solid rgba(212, 255, 0, 0.2)", display: "flex", alignItems: "center", justifyContent: "center"}}>
+ <Search size={32} strokeWidth={1.8} style={{ color: C.primary, opacity: 0.6 }} />
+ </div>
+ </div>
+ <div style={{ fontSize: 18, fontWeight: 800, color: C.textPrimary, marginBottom: 8, letterSpacing: -0.3 }}>
+ {jobSearch.trim() ? `No matches for "${jobSearch}"` : `No ${jobsType === "ct" ? "CT" : "Crypto"} jobs in this category yet`}
+ </div>
+ <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.6, marginBottom: 22, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.3 }}>
+ {jobSearch.trim()
+ ? "Try a broader search term, or be the first to post about this."
+ : "Be the first to post in this category. Manually reviewed within 24h."}
+ </div>
+ <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap"}}>
+ {jobSearch.trim() && (
+ <button
+ onClick={() => setJobSearch("")}
+ style={{
+ padding: "10px 16px", borderRadius: 10,
+ background: "transparent", border: `1px solid ${C.borderHover}`,
+ color: C.textPrimary, fontSize: 12, fontWeight: 700,
+ fontFamily: "'Outfit', sans-serif", cursor: "pointer", letterSpacing: 0.3,
+ transition: "all 0.15s",
+ }}
+ onMouseEnter={e => e.currentTarget.style.borderColor = `${C.primary}60`}
+ onMouseLeave={e => e.currentTarget.style.borderColor = C.borderHover}
+ >Clear search</button>
+ )}
+ {jobsFilter !== "all" && !jobSearch.trim() && (
+ <button
+ onClick={() => setJobsFilter("all")}
+ style={{
+ padding: "10px 16px", borderRadius: 10,
+ background: "transparent", border: `1px solid ${C.borderHover}`,
+ color: C.textPrimary, fontSize: 12, fontWeight: 700,
+ fontFamily: "'Outfit', sans-serif", cursor: "pointer", letterSpacing: 0.3,
+ transition: "all 0.15s",
+ }}
+ onMouseEnter={e => e.currentTarget.style.borderColor = `${C.primary}60`}
+ onMouseLeave={e => e.currentTarget.style.borderColor = C.borderHover}
+ >See all jobs</button>
+ )}
+ <button
+ onClick={() => setShowPostJob(true)}
+ style={{
+ padding: "10px 16px", borderRadius: 10, border: "none",
+ background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+ color: "#000", fontSize: 12, fontWeight: 900,
+ fontFamily: "'Outfit', sans-serif", cursor: "pointer", letterSpacing: 0.3,
+ boxShadow: "0 0 16px rgba(212, 255, 0, 0.2)",
+ transition: "all 0.15s",
+ display: "inline-flex", alignItems: "center", gap: 6,
+ }}
+ onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 0 24px rgba(212, 255, 0, 0.35)"; }}
+ onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 16px rgba(212, 255, 0, 0.2)"; }}
+ ><Sparkles size={12} strokeWidth={2.5} /><span>Post the first one</span></button>
+ </div>
  </div>
  )}
 
@@ -4452,6 +4789,115 @@ export default function Web3Gigs() {
  <div style={{ fontSize: 22, fontWeight: 800, color: clr, marginTop: 4, fontFamily: "'JetBrains Mono', monospace"}}>{val}</div>
  </GlowCard>
  ))}
+ </div>
+
+ {/* CLUSTER NETWORK VIZ */}
+ <div style={{ marginBottom: 32 }}>
+ <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
+ <div>
+ <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 6, fontWeight: 700 }}>Network Graph</div>
+ <h2 style={{ fontSize: 24, fontWeight: 900, margin: 0, letterSpacing: -1 }}>Anatomy of an <span style={{ color: "#ef4444" }}>engagement pod.</span></h2>
+ </div>
+ <span style={{ padding: "3px 8px", borderRadius: 6, background: "#fbbf24", color: "#000", fontSize: 9, fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>DEMO</span>
+ </div>
+
+ <div style={{ padding: "20px", background: "rgba(18, 18, 18, 0.7)", border: "1px solid rgba(255, 255, 255, 0.06)", borderRadius: 14 }}>
+ <div style={{ position: "relative", width: "100%", height: 380 }}>
+ {(() => {
+ // Pod with 12 connected handles + 3 outsiders
+ const cx = 250, cy = 190, podRadius = 110;
+ const podMembers = [
+ "alpha_dev_99", "crypto_pump1", "shillmaster_x", "degen_sigma",
+ "sol_maxi_888", "bot_or_real", "moon_caller", "memecoin_king",
+ "based_anon", "coordinated_a", "follow4follow", "raidleader",
+ ];
+ const outsiders = ["legit_builder", "real_artist", "actual_dev"];
+
+ // Pod nodes arranged in circle
+ const podNodes = podMembers.map((h, i) => {
+ const angle = (i / podMembers.length) * 2 * Math.PI;
+ return {
+ handle: h,
+ x: cx + podRadius * Math.cos(angle),
+ y: cy + podRadius * Math.sin(angle),
+ inPod: true,
+ };
+ });
+
+ // Outsiders scattered far from cluster
+ const outsiderNodes = [
+ { handle: "legit_builder", x: 60, y: 60, inPod: false },
+ { handle: "real_artist", x: 440, y: 80, inPod: false },
+ { handle: "actual_dev", x: 60, y: 320, inPod: false },
+ ];
+
+ const allNodes = [...podNodes, ...outsiderNodes];
+
+ // Generate edges WITHIN the pod (dense cross-engagement)
+ const podEdges = [];
+ for (let i = 0; i < podNodes.length; i++) {
+ for (let j = i + 1; j < podNodes.length; j++) {
+ // 70% density
+ if (Math.abs((i * 17 + j * 23) % 10) < 7) {
+ podEdges.push([podNodes[i], podNodes[j]]);
+ }
+ }
+ }
+
+ return (
+ <svg width="100%" height="100%" viewBox="0 0 500 380" style={{ display: "block", maxWidth: 600, margin: "0 auto"}}>
+ {/* Pod cluster background highlight */}
+ <circle cx={cx} cy={cy} r={podRadius + 35} fill="rgba(239, 68, 68, 0.04)" stroke="rgba(239, 68, 68, 0.18)" strokeWidth="1" strokeDasharray="4,4" />
+ <text x={cx} y={cy + podRadius + 60} textAnchor="middle" fill="#ef4444" fontSize="10" fontFamily="JetBrains Mono, monospace" letterSpacing="1.5">CLUSTER #C-7741 · 12 handles</text>
+
+ {/* Edges within pod (red — coordinated engagement) */}
+ {podEdges.map(([a, b], i) => (
+ <line key={i} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="rgba(239, 68, 68, 0.3)" strokeWidth="1" />
+ ))}
+
+ {/* Pod nodes (red, flagged) */}
+ {podNodes.map((node, i) => (
+ <g key={`pod-${i}`}>
+ <circle cx={node.x} cy={node.y} r="8" fill="#ef4444" stroke="#fca5a5" strokeWidth="1.5" />
+ <text x={node.x} y={node.y - 14} textAnchor="middle" fill="#fca5a5" fontSize="8" fontFamily="JetBrains Mono, monospace" letterSpacing="0.3">@{node.handle}</text>
+ </g>
+ ))}
+
+ {/* Outsider nodes (green, clean) */}
+ {outsiderNodes.map((node, i) => (
+ <g key={`out-${i}`}>
+ <circle cx={node.x} cy={node.y} r="8" fill="#10b981" stroke="#6ee7b7" strokeWidth="1.5" />
+ <text x={node.x} y={node.y - 14} textAnchor="middle" fill="#6ee7b7" fontSize="8" fontFamily="JetBrains Mono, monospace" letterSpacing="0.3">@{node.handle}</text>
+ </g>
+ ))}
+
+ {/* Caption labels */}
+ <text x="250" y="20" textAnchor="middle" fill="#888" fontSize="9" fontFamily="JetBrains Mono, monospace" letterSpacing="1.5">DENSE CROSS-ENGAGEMENT = COORDINATED POD</text>
+ </svg>
+ );
+ })()}
+ </div>
+
+ {/* Legend */}
+ <div style={{ display: "flex", gap: 16, marginTop: 16, flexWrap: "wrap", justifyContent: "center"}}>
+ <div style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+ <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#ef4444" }} />
+ <span style={{ fontSize: 11, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5 }}>Pod member · flagged</span>
+ </div>
+ <div style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+ <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#10b981" }} />
+ <span style={{ fontSize: 11, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5 }}>Organic account · clean</span>
+ </div>
+ <div style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+ <div style={{ width: 16, height: 1, background: "rgba(239, 68, 68, 0.6)" }} />
+ <span style={{ fontSize: 11, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5 }}>Engagement edge</span>
+ </div>
+ </div>
+ </div>
+ <div style={{ display: "flex", gap: 12, marginTop: 14, padding: "12px 14px", background: "rgba(0, 0, 0, 0.4)", border: "1px solid rgba(255, 255, 255, 0.06)", borderRadius: 10, alignItems: "flex-start"}}>
+ <Eye size={14} strokeWidth={2.5} style={{ color: C.textSecondary, flexShrink: 0, marginTop: 2 }} />
+ <div style={{ fontSize: 12, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.3, lineHeight: 1.5 }}>The dense web of engagement edges between pod members is the smoking gun. Real accounts engage diversely. Pods engage almost exclusively with each other to manipulate algorithm signals.</div>
+ </div>
  </div>
 
  {/* Cluster cards */}
@@ -4975,6 +5421,29 @@ export default function Web3Gigs() {
  />
  </div>
 
+ {/* Live Trust Score preview */}
+ {applyForm.handle.trim().length >= 3 && (() => {
+ const liveScore = generateDemoTrustScore(applyForm.handle);
+ if (!liveScore) return null;
+ const meets = selectedJob.minTrustScore ? liveScore.overall >= selectedJob.minTrustScore : true;
+ return (
+ <div style={{ padding: "10px 12px", background: meets ? "rgba(16, 185, 129, 0.06)" : "rgba(239, 68, 68, 0.06)", border: `1px solid ${meets ? "rgba(16, 185, 129, 0.25)" : "rgba(239, 68, 68, 0.25)"}`, borderRadius: 8, marginBottom: 10, display: "flex", alignItems: "center", gap: 12 }}>
+ <div style={{ width: 36, height: 36, borderRadius: 8, background: `${liveScore.tierColor}20`, border: `1px solid ${liveScore.tierColor}50`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+ <span style={{ fontSize: 14, fontWeight: 900, color: liveScore.tierColor, fontFamily: "'JetBrains Mono', monospace"}}>{liveScore.overall}</span>
+ </div>
+ <div style={{ flex: 1, minWidth: 0 }}>
+ <div style={{ fontSize: 11, color: liveScore.tierColor, fontFamily: "'JetBrains Mono', monospace", fontWeight: 800, letterSpacing: 1 }}>{liveScore.tier} <span style={{ fontSize: 8, color: "#fbbf24", letterSpacing: 1.5 }}>(DEMO)</span></div>
+ <div style={{ fontSize: 11, color: meets ? "#6ee7b7" : "#fca5a5", fontFamily: "'JetBrains Mono', monospace", marginTop: 2 }}>
+ {meets
+ ? `Trust score will attach to your application`
+ : `Below minimum: ${selectedJob.minTrustScore}+ required`}
+ </div>
+ </div>
+ <Shield size={14} strokeWidth={2.5} style={{ color: liveScore.tierColor, flexShrink: 0 }} />
+ </div>
+ );
+ })()}
+
  <textarea
  value={applyForm.message}
  onChange={e => setApplyForm({...applyForm, message: e.target.value})}
@@ -5051,6 +5520,43 @@ export default function Web3Gigs() {
  <div style={{ fontSize: 11, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.5 }}>This job has an active handshake. Check back when it's complete to see the outcome.</div>
  </div>
  )}
+
+ {/* SIMILAR JOBS */}
+ {(() => {
+ const similar = [...approvedJobs, ...MOCK_JOBS]
+ .filter(j => j.id !== selectedJob.id && j.jobType === selectedJob.jobType && (j.category === selectedJob.category || (j.tags || []).some(t => (selectedJob.tags || []).includes(t))))
+ .slice(0, 3);
+ if (similar.length === 0) return null;
+ return (
+ <div style={{ marginTop: 24, paddingTop: 20, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
+ <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 12, fontWeight: 700 }}>Similar Jobs</div>
+ <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+ {similar.map(j => (
+ <button
+ key={j.id}
+ onClick={() => { resetApplyForm(); setSelectedJob(j); }}
+ style={{
+ width: "100%", padding: "12px 14px", borderRadius: 10,
+ background: "rgba(0, 0, 0, 0.4)",
+ border: "1px solid rgba(255, 255, 255, 0.06)",
+ cursor: "pointer", textAlign: "left",
+ transition: "all 0.15s",
+ display: "flex", alignItems: "center", gap: 10,
+ }}
+ onMouseEnter={e => { e.currentTarget.style.borderColor = `${C.primary}50`; e.currentTarget.style.background = "rgba(212, 255, 0, 0.04)"; }}
+ onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.06)"; e.currentTarget.style.background = "rgba(0, 0, 0, 0.4)"; }}
+ >
+ <div style={{ flex: 1, minWidth: 0 }}>
+ <div style={{ fontSize: 13, fontWeight: 700, color: C.textPrimary, marginBottom: 4, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}>{j.title}</div>
+ <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.3 }}>{j.poster} · ${j.budget.toLocaleString()} {j.budgetCurrency} · {j.deadline}</div>
+ </div>
+ <ArrowRight size={14} strokeWidth={2.5} style={{ color: C.primary, flexShrink: 0 }} />
+ </button>
+ ))}
+ </div>
+ </div>
+ );
+ })()}
  </div>
  </div>
  </div>

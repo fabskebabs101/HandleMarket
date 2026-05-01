@@ -921,7 +921,7 @@ const MOCK_JOBS = [
  deadline: "2w",
  postedAgo: "8h ago",
  proposals: 4,
- minTrustScore: 40,
+ minTrustScore: 0,
  status: "open",
  description: "Need a Rust/Anchor dev to modify an existing escrow contract. Add time-locked releases. Existing code + tests provided. Deliverable: PR + deployed devnet program.",
  deliverables: ["Modified Anchor program", "Unit tests", "Devnet deployment"],
@@ -937,7 +937,7 @@ const MOCK_JOBS = [
  deadline: "5d",
  postedAgo: "6h ago",
  proposals: 12,
- minTrustScore: 30,
+ minTrustScore: 0,
  status: "open",
  description: "30-second vertical video explaining our L2 protocol. Raw footage provided. Need snappy cuts, captions, and crypto-native style.",
  deliverables: ["30s vertical 9:16 video", "Captions & b-roll", "2 revisions included"],
@@ -953,7 +953,7 @@ const MOCK_JOBS = [
  deadline: "10d",
  postedAgo: "2d ago",
  proposals: 18,
- minTrustScore: 30,
+ minTrustScore: 0,
  status: "in_progress",
  description: "10 marketing memes for PFP drop. Degen-coded, shareable, original style.",
  deliverables: ["10 meme assets", "Square + vertical formats", "Source files"],
@@ -969,7 +969,7 @@ const MOCK_JOBS = [
  deadline: "3w",
  postedAgo: "1d ago",
  proposals: 3,
- minTrustScore: 40,
+ minTrustScore: 0,
  status: "open",
  description: "Pre-launch audit of ERC-20 token + staking contract on Base. ~800 LOC. Looking for auditor with prior work on comparable contracts. Report + remediations required.",
  deliverables: ["Written audit report", "Severity-graded findings", "Remediation review pass"],
@@ -985,7 +985,7 @@ const MOCK_JOBS = [
  deadline: "2w",
  postedAgo: "14h ago",
  proposals: 8,
- minTrustScore: 30,
+ minTrustScore: 0,
  status: "open",
  description: "Build analytics dashboard for our yield protocol. React + Wagmi/Viem + Tailwind. Figma provided. Must integrate with existing backend API.",
  deliverables: ["Responsive dashboard", "Wallet connection", "Data visualization"],
@@ -1001,7 +1001,7 @@ const MOCK_JOBS = [
  deadline: "3w",
  postedAgo: "2d ago",
  proposals: 6,
- minTrustScore: 40,
+ minTrustScore: 0,
  status: "open",
  description: "Write technical whitepaper for novel L2 rollup. Must understand ZK proofs, rollup architecture, and tokenomics. Previous whitepaper work required.",
  deliverables: ["25-40 page whitepaper", "Architecture diagrams", "2 revision rounds"],
@@ -1017,7 +1017,7 @@ const MOCK_JOBS = [
  deadline: "Ongoing",
  postedAgo: "3d ago",
  proposals: 22,
- minTrustScore: 35,
+ minTrustScore: 0,
  status: "open",
  description: "Part-time CM for Discord (5k members) + Telegram (3k). Handle mod, run events, escalate FUD. Monthly retainer.",
  deliverables: ["Daily presence", "Weekly events", "FUD reports"],
@@ -1032,7 +1032,7 @@ const MOCK_JOBS = [
  deadline: "10d",
  postedAgo: "16h ago",
  proposals: 14,
- minTrustScore: 30,
+ minTrustScore: 0,
  status: "open",
  description: "Complete brand identity: logo, color system, typography, basic style guide. Modern, technical, trustworthy aesthetic.",
  deliverables: ["Logo (vector)", "Brand guidelines PDF", "Social media kit"],
@@ -1048,7 +1048,7 @@ const MOCK_JOBS = [
  deadline: "Ongoing",
  postedAgo: "1d ago",
  proposals: 11,
- minTrustScore: 30,
+ minTrustScore: 0,
  status: "open",
  description: "2 deep-dive articles per month on DeFi primitives (AMMs, lending, CDPs). 1500-2500 words each, technical but accessible.",
  deliverables: ["2 articles/month", "Original research", "Edits included"],
@@ -1064,7 +1064,7 @@ const MOCK_JOBS = [
  deadline: "3w",
  postedAgo: "4h ago",
  proposals: 5,
- minTrustScore: 45,
+ minTrustScore: 0,
  status: "open",
  description: "Build an AI-driven sniper bot for Solana memecoins. Model should score new launches by liquidity, holder distribution, dev wallet behavior, and social signals. Python + on-chain integration.",
  deliverables: ["Trained classifier model", "Live inference pipeline", "Backtest report + docs"],
@@ -1080,7 +1080,7 @@ const MOCK_JOBS = [
  deadline: "2w",
  postedAgo: "9h ago",
  proposals: 7,
- minTrustScore: 40,
+ minTrustScore: 0,
  status: "open",
  description: "Wire up a Claude/GPT-based chatbot that can query our on-chain analytics API. Natural language → SQL → formatted response. RAG over existing docs. OpenAI or Anthropic API.",
  deliverables: ["Working chatbot", "RAG pipeline", "Streamlit or React demo"],
@@ -1096,7 +1096,7 @@ const MOCK_JOBS = [
  deadline: "2w",
  postedAgo: "1d ago",
  proposals: 19,
- minTrustScore: 35,
+ minTrustScore: 0,
  status: "open",
  description: "Use Stable Diffusion/Flux fine-tuning to generate 1000 unique NFT pieces based on a custom style. Trait weighting + rarity logic required.",
  deliverables: ["1000 generated assets", "Metadata JSON", "Trait rarity report"],
@@ -1112,7 +1112,7 @@ const MOCK_JOBS = [
  deadline: "Ongoing",
  postedAgo: "6h ago",
  proposals: 11,
- minTrustScore: 40,
+ minTrustScore: 0,
  status: "open",
  description: "Crypto founder running 2 Spaces per week needs a clipper to cut viral moments (alpha calls, hot takes, mic drops) into vertical shorts for X + TikTok + YouTube Shorts.",
  deliverables: ["6-10 clips per week", "Auto-captions + on-brand title cards", "Posted natively to founder's channels"],
@@ -1128,7 +1128,7 @@ const MOCK_JOBS = [
  deadline: "Ongoing",
  postedAgo: "1d ago",
  proposals: 23,
- minTrustScore: 35,
+ minTrustScore: 0,
  status: "open",
  description: "Crypto KOL streams 4-5h daily on Kick + X. Looking for a fast clipper to pull the best 30-90s moments and post within 2 hours of the live stream ending. Volume play.",
  deliverables: ["3-5 clips per stream day", "Subtitles + thumbnails", "Posted to KOL's accounts"],
@@ -1143,7 +1143,7 @@ const MOCK_JOBS = [
  deadline: "4w",
  postedAgo: "3h ago",
  proposals: 7,
- minTrustScore: 50,
+ minTrustScore: 0,
  status: "open",
  description: "Existing Anchor program needs compute unit optimization. Targeting 30% reduction in CU usage. Strong Rust + Solana experience required.",
  deliverables: ["Optimized program with benchmarks", "Migration plan", "Test coverage"],
@@ -1190,7 +1190,7 @@ const MOCK_JOBS = [
  deadline: "Ongoing",
  postedAgo: "8h ago",
  proposals: 19,
- minTrustScore: 50,
+ minTrustScore: 0,
  status: "open",
  description: "10k member Discord needs a senior mod for APAC timezone coverage. Spam filtering, raid response, FAQ handling, escalation to team.",
  deliverables: ["12hr/day APAC coverage", "Weekly mod report", "Active in #help channel"],
@@ -4682,10 +4682,14 @@ export default function Web3Gigs() {
  <div style={{ padding: "3px 8px", borderRadius: 6, background: `${posterColor}15`, border: `1px solid ${posterColor}40`, fontFamily: "'JetBrains Mono', monospace", fontSize: 10, fontWeight: 800, color: posterColor }}>{job.posterTrust}</div>
  </div>
 
- {/* Bottom: proposals + min trust */}
+ {/* Bottom: proposals + min trust (only CT) or portfolio (only Crypto) */}
  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace"}}>
  <span> {job.proposals} proposals</span>
+ {job.jobType === "ct" ? (
  <span>Min trust: {job.minTrustScore}</span>
+ ) : (
+ <span>Portfolio review</span>
+ )}
  </div>
 
  {/* Tags */}
@@ -5751,8 +5755,13 @@ export default function Web3Gigs() {
 
  {/* Requirements */}
  <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>Requirements</div>
+ {selectedJob.jobType === "ct" && selectedJob.minTrustScore > 0 ? (
  <div style={{ padding: "12px 14px", background: "rgba(212, 255, 0, 0.04)", border: "1px solid rgba(212, 255, 0, 0.15)", borderRadius: 8, fontSize: 12, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", marginBottom: 20, lineHeight: 1.6 }}>Applicants must have a Trust Score of <strong style={{ color: C.primary }}>{selectedJob.minTrustScore}+</strong> to submit a proposal.
  </div>
+ ) : (
+ <div style={{ padding: "12px 14px", background: "rgba(212, 255, 0, 0.04)", border: "1px solid rgba(212, 255, 0, 0.15)", borderRadius: 8, fontSize: 12, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", marginBottom: 20, lineHeight: 1.6 }}>Applicants are vetted by <strong style={{ color: C.primary }}>portfolio review</strong> + manual approval. Include relevant work links in your application.
+ </div>
+ )}
 
  {/* Job Poster */}
  <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>Posted By</div>
@@ -5826,8 +5835,8 @@ export default function Web3Gigs() {
  />
  </div>
 
- {/* Live Trust Score preview */}
- {applyForm.handle.trim().length >= 3 && (() => {
+ {/* Live Trust Score preview (CT jobs only) */}
+ {selectedJob.jobType === "ct" && applyForm.handle.trim().length >= 3 && (() => {
  const liveScore = generateDemoTrustScore(applyForm.handle);
  if (!liveScore) return null;
  const meets = selectedJob.minTrustScore ? liveScore.overall >= selectedJob.minTrustScore : true;
@@ -6045,7 +6054,7 @@ export default function Web3Gigs() {
  <label style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, display: "block", marginBottom: 6 }}>Type *</label>
  <select
  value={jobForm.jobType}
- onChange={e => setJobForm({...jobForm, jobType: e.target.value, category: e.target.value === "crypto" ? "Development" : "Shitposting"})}
+ onChange={e => setJobForm({...jobForm, jobType: e.target.value, category: e.target.value === "crypto" ? "Development" : "Shitposting", minTrust: e.target.value === "crypto" ? "0" : jobForm.minTrust})}
  style={{ width: "100%", padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: 8, color: C.textPrimary, fontSize: 13, fontFamily: "'JetBrains Mono', monospace", boxSizing: "border-box", outline: "none", cursor: "pointer"}}
  >
  <option value="crypto">Crypto Work</option>
@@ -6150,7 +6159,8 @@ export default function Web3Gigs() {
  />
  </div>
 
- {/* Min Trust + Email row */}
+ {/* Min Trust (CT only) + Handle row */}
+ {jobForm.jobType === "ct" ? (
  <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 10, marginBottom: 14 }}>
  <div>
  <label style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, display: "block", marginBottom: 6 }}>Min Trust</label>
@@ -6175,6 +6185,20 @@ export default function Web3Gigs() {
  />
  </div>
  </div>
+ ) : (
+ <div style={{ marginBottom: 14 }}>
+ <label style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, display: "block", marginBottom: 6 }}>Your X Handle *</label>
+ <input
+ type="text"
+ placeholder="@yourhandle"
+ value={jobForm.contact}
+ onChange={e => setJobForm({...jobForm, contact: e.target.value})}
+ maxLength={50}
+ style={{ width: "100%", padding: "10px 12px", background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: 8, color: C.textPrimary, fontSize: 13, fontFamily: "'JetBrains Mono', monospace", boxSizing: "border-box", outline: "none"}}
+ />
+ <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 6, letterSpacing: 0.3 }}>For crypto work, applicants are vetted via portfolio + manual review (no Trust Score required)</div>
+ </div>
+ )}
 
  {/* Email */}
  <div style={{ marginBottom: 16 }}>

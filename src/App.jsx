@@ -1562,6 +1562,66 @@ export default function Web3Gigs() {
    }, 800);
  };
 
+ const runCibScan = () => {
+   const h = cibSearchHandle.trim().replace(/^@/, "");
+   if (!h || h.length < 2) return;
+   setCibScanning(true);
+   setCibScanResult(null);
+   // Simulate API + analysis delay
+   setTimeout(() => {
+     const trust = generateDemoTrustScore(h);
+     if (!trust) { setCibScanning(false); return; }
+     // Derive CIB intensity from inverse Trust Score
+     // Lower trust → higher CIB flags
+     const cibScore = trust.breakdowns.find(b => b.label === "CIB Signals")?.score || 50;
+     const inauthenticity = Math.max(2, Math.min(98, Math.round((100 - cibScore) * 0.85)));
+     const tweetsAnalyzed = 50;
+     const totalReplies = 800 + Math.round((100 - trust.overall) * 12);
+     const suspiciousReplies = Math.round(totalReplies * (inauthenticity / 100) * 0.85);
+     const newAccountReplies = Math.round(totalReplies * (inauthenticity / 100) * 0.32);
+     const templateReplies = Math.round(totalReplies * (inauthenticity / 100) * 0.22);
+     const velocityAnomalies = Math.max(0, Math.round((inauthenticity / 100) * 24));
+
+     // Generate realistic-looking pod members (deterministic from handle)
+     let hash = 0;
+     for (let i = 0; i < h.length; i++) hash = ((hash << 5) - hash) + h.charCodeAt(i);
+     const seed = Math.abs(hash);
+     const podPool = ["alpha_dev", "shillmaster", "moon_caller", "degen_sigma", "sol_maxi", "follow4follow", "based_anon", "memecoin_king", "crypto_pump", "raidleader", "bot_or_real", "coordinated_a"];
+     const podMembers = podPool.slice(0, Math.min(12, Math.max(3, Math.round(inauthenticity / 8))))
+       .map((p, i) => `${p}_${(seed + i * 7919) % 1000}`);
+
+     // Tier-based message
+     let verdict, verdictColor;
+     if (inauthenticity >= 60) { verdict = "HIGH RISK · LIKELY POD MEMBER"; verdictColor = "#ef4444"; }
+     else if (inauthenticity >= 35) { verdict = "ELEVATED · COORDINATION SIGNALS"; verdictColor = "#f97316"; }
+     else if (inauthenticity >= 18) { verdict = "WATCH · MIXED SIGNALS"; verdictColor = "#fbbf24"; }
+     else { verdict = "CLEAN · NO POD ACTIVITY"; verdictColor = "#10b981"; }
+
+     setCibScanResult({
+       handle: h,
+       inauthenticity,
+       verdict,
+       verdictColor,
+       trust: trust.overall,
+       trustTier: trust.tier,
+       trustColor: trust.tierColor,
+       tweetsAnalyzed,
+       totalReplies,
+       suspiciousReplies,
+       newAccountReplies,
+       templateReplies,
+       velocityAnomalies,
+       podMembers,
+     });
+     setCibScanning(false);
+     // Smooth-scroll to result
+     setTimeout(() => {
+       const el = document.querySelector("[data-cib-result]");
+       if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+     }, 50);
+   }, 1200);
+ };
+
  useEffect(() => {
    fetchWaitlistCount();
  }, [tab]);
@@ -1583,6 +1643,8 @@ export default function Web3Gigs() {
  const [menuOpen, setMenuOpen] = useState(false);
  const [hoveredTab, setHoveredTab] = useState(null);
  const [cibSearchHandle, setCibSearchHandle] = useState("");
+ const [cibScanResult, setCibScanResult] = useState(null);
+ const [cibScanning, setCibScanning] = useState(false);
  const [profileSearchHandle, setProfileSearchHandle] = useState("");
  const [openFaqIndex, setOpenFaqIndex] = useState(0);
  const [jobForm, setJobForm] = useState({
@@ -4752,6 +4814,8 @@ export default function Web3Gigs() {
  placeholder="@handle, scan for pod membership"
  value={cibSearchHandle}
  onChange={e => setCibSearchHandle(e.target.value)}
+ onKeyDown={e => { if (e.key === "Enter") runCibScan(); }}
+ maxLength={50}
  style={{
  width: "100%", padding: "12px 14px 12px 40px", borderRadius: 10,
  background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.1)",
@@ -4763,18 +4827,102 @@ export default function Web3Gigs() {
  />
  </div>
  <button
- onClick={() => { setWaitlistSubmitted(false); setWaitlistError(""); setShowWaitlistModal(true); }}
+ onClick={runCibScan}
+ disabled={!cibSearchHandle.trim() || cibScanning}
  style={{
  padding: "12px 18px", borderRadius: 10, border: "none",
+ background: (!cibSearchHandle.trim() || cibScanning) ? "rgba(255, 255, 255, 0.05)" : `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+ color: (!cibSearchHandle.trim() || cibScanning) ? C.textMuted : "#000",
+ fontSize: 12, fontWeight: 900,
+ fontFamily: "'Outfit', sans-serif",
+ cursor: (!cibSearchHandle.trim() || cibScanning) ? "not-allowed" : "pointer",
+ letterSpacing: 0.5, whiteSpace: "nowrap", transition: "all 0.2s",
+ }}
+ >{cibScanning ? "Scanning..." : "Scan"}</button>
+ </div>
+ <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10, gap: 8, flexWrap: "wrap"}}>
+ <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5 }}>Live API on V1 launch · Demo scoring active for testing</div>
+ <span style={{ padding: "3px 8px", borderRadius: 6, background: "#fbbf24", color: "#000", fontSize: 9, fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>DEMO</span>
+ </div>
+ </GlowCard>
+
+ {/* CIB SCAN RESULT */}
+ {cibScanResult && (
+ <div data-cib-result style={{ marginBottom: 28 }}>
+ <GlowCard glow style={{ borderColor: `${cibScanResult.verdictColor}40`, background: `linear-gradient(180deg, ${cibScanResult.verdictColor}06, rgba(0, 0, 0, 0.5))` }}>
+ {/* Header */}
+ <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16, gap: 10, flexWrap: "wrap"}}>
+ <div>
+ <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4, fontWeight: 700 }}>Scan Result</div>
+ <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.5 }}>@{cibScanResult.handle}</div>
+ <div style={{ fontSize: 13, fontWeight: 800, color: cibScanResult.verdictColor, fontFamily: "'JetBrains Mono', monospace", marginTop: 6, letterSpacing: 0.5 }}>{cibScanResult.verdict}</div>
+ </div>
+ <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap"}}>
+ <span style={{ padding: "3px 8px", borderRadius: 6, background: "#fbbf24", color: "#000", fontSize: 9, fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>DEMO</span>
+ <span style={{ padding: "5px 12px", borderRadius: 8, background: `${cibScanResult.verdictColor}15`, color: cibScanResult.verdictColor, fontSize: 14, fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5, border: `1px solid ${cibScanResult.verdictColor}40` }}>{cibScanResult.inauthenticity}% INAUTHENTIC</span>
+ </div>
+ </div>
+
+ {/* Stats grid */}
+ <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 8, marginBottom: 16 }}>
+ {[
+ ["Trust Score", cibScanResult.trust, cibScanResult.trustColor],
+ ["Tweets Analyzed", cibScanResult.tweetsAnalyzed, C.textPrimary],
+ ["Total Replies", cibScanResult.totalReplies.toLocaleString(), C.textPrimary],
+ ["Suspicious", cibScanResult.suspiciousReplies, cibScanResult.verdictColor],
+ ["New Accounts", cibScanResult.newAccountReplies, cibScanResult.verdictColor],
+ ["Velocity Hits", cibScanResult.velocityAnomalies, cibScanResult.verdictColor],
+ ].map(([label, val, clr]) => (
+ <div key={label} style={{ padding: "10px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 8, textAlign: "center"}}>
+ <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8 }}>{label}</div>
+ <div style={{ fontSize: 16, fontWeight: 800, color: clr, marginTop: 3, fontFamily: "'JetBrains Mono', monospace"}}>{val}</div>
+ </div>
+ ))}
+ </div>
+
+ {/* Pod members preview */}
+ {cibScanResult.podMembers.length > 0 && cibScanResult.inauthenticity >= 25 && (
+ <div style={{ paddingTop: 14, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
+ <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10, fontWeight: 700 }}>Detected Pod Members ({cibScanResult.podMembers.length})</div>
+ <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+ {cibScanResult.podMembers.map((p, i) => (
+ <span key={i} style={{ padding: "5px 10px", borderRadius: 14, background: "rgba(239, 68, 68, 0.06)", border: "1px solid rgba(239, 68, 68, 0.2)", fontSize: 10, color: "#fca5a5", fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.3 }}>@{p}</span>
+ ))}
+ </div>
+ </div>
+ )}
+
+ {/* Action row */}
+ <div style={{ display: "flex", gap: 8, marginTop: 18, flexWrap: "wrap"}}>
+ <button
+ onClick={() => {
+ const text = cibScanResult.inauthenticity >= 50
+ ? `Web3Gigs CIB scan flagged @${cibScanResult.handle} as ${cibScanResult.inauthenticity}% inauthentic 🚩\n\nDetected ${cibScanResult.podMembers.length} pod members.\n\nweb3gigs.app`
+ : `@${cibScanResult.handle} just got a clean CIB scan on Web3Gigs · ${cibScanResult.inauthenticity}% inauthentic 🛡️\n\nweb3gigs.app`;
+ window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`, "_blank");
+ }}
+ style={{
+ flex: 1, minWidth: 140, padding: "10px 14px", borderRadius: 10, border: "none",
  background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
  color: "#000", fontSize: 12, fontWeight: 900,
  fontFamily: "'Outfit', sans-serif", cursor: "pointer",
- letterSpacing: 0.5, whiteSpace: "nowrap",
+ letterSpacing: 0.3, transition: "all 0.2s",
+ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6,
  }}
- >Scan</button>
+ ><Sparkles size={12} strokeWidth={2.5} /><span>Share on X</span></button>
+ <button
+ onClick={() => { setCibScanResult(null); setCibSearchHandle(""); }}
+ style={{
+ padding: "10px 14px", borderRadius: 10,
+ background: "transparent", border: "1px solid rgba(255, 255, 255, 0.12)",
+ color: C.textSecondary, fontSize: 12, fontWeight: 700,
+ fontFamily: "'Outfit', sans-serif", cursor: "pointer", letterSpacing: 0.3,
+ }}
+ >Scan another</button>
  </div>
- <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 10, letterSpacing: 0.5 }}>CIB lookup launches with waitlist · Join for early access</div>
  </GlowCard>
+ </div>
+ )}
 
  {/* Detection stats */}
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10, marginBottom: 24 }}>

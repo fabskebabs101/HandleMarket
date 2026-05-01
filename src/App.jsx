@@ -5099,37 +5099,50 @@ export default function Web3Gigs() {
  {/* Forensics Report Section */}
  <div style={{ fontSize: 13, fontWeight: 700, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1, marginBottom: 12 }}>Deep Forensics</div>
  <GlowCard>
- {!forensicsRun? (
+ {!cibScanResult ? (
  <div style={{ textAlign: "center", padding: "40px 20px"}}>
  <div style={{ display: "flex", justifyContent: "center", marginBottom: 16, color: C.primary }}><Search size={40} strokeWidth={1.8} /></div>
- <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>Run Deep Forensics Scan</div>
- <div style={{ fontSize: 13, color: C.textSecondary, marginBottom: 20, maxWidth: 400, margin: "0 auto 20px"}}>Deep-scan the last 50 tweets for engagement manipulation, template replies, bot velocity patterns, and fake reply authors.</div>
- <button onClick={() => setForensicsRun(true)} style={{
- padding: "12px 28px", borderRadius: 10, border: "none",
- background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
- color: "#000", fontSize: 13, fontWeight: 800,
- fontFamily: "'Outfit', sans-serif", cursor: "pointer",
- }}>Run Scan · 50 API calls</button>
+ <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>Search a handle above to run a scan</div>
+ <div style={{ fontSize: 13, color: C.textSecondary, marginBottom: 20, maxWidth: 440, margin: "0 auto 20px"}}>Type any X handle in the "Check an account" search at the top, then hit Scan. The full forensics report (velocity timeline, pod engagers, account ages, template phrases, and baseline comparison) will appear here.</div>
+ <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap"}}>
+ {["vitalikbuteryn", "elonmusk", "bot12345", "shillmaster_x"].map(h => (
+ <button
+ key={h}
+ onClick={() => { setCibSearchHandle(h); setTimeout(() => runCibScan(), 50); }}
+ style={{
+ padding: "6px 12px", borderRadius: 16,
+ background: "rgba(212, 255, 0, 0.05)",
+ border: "1px solid rgba(212, 255, 0, 0.18)",
+ color: C.textPrimary,
+ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 600,
+ cursor: "pointer", letterSpacing: 0.3, transition: "all 0.15s",
+ }}
+ onMouseEnter={e => { e.currentTarget.style.background = "rgba(212, 255, 0, 0.12)"; e.currentTarget.style.color = C.primary; }}
+ onMouseLeave={e => { e.currentTarget.style.background = "rgba(212, 255, 0, 0.05)"; e.currentTarget.style.color = C.textPrimary; }}
+ >@{h}</button>
+ ))}
  </div>
- ): (
+ <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 14, letterSpacing: 0.5 }}>Or click any handle above to try it instantly</div>
+ </div>
+ ) : (
  <div>
  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
- <div style={{ fontSize: 14, fontWeight: 700 }}>Forensics Report · @ExampleAnon</div>
+ <div style={{ fontSize: 14, fontWeight: 700 }}>Forensics Report · @{cibScanResult.handle}</div>
  <div style={{ display: "flex", gap: 8, alignItems: "center"}}>
  <span style={{ padding: "3px 8px", borderRadius: 6, background: "#fbbf24", color: "#000", fontSize: 9, fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>DEMO</span>
- <Pill text={`${FORENSICS_REPORT.suspiciousPct}% FLAGGED`} color={FORENSICS_REPORT.suspiciousPct > 20? "#ef4444": FORENSICS_REPORT.suspiciousPct > 10? "#f59e0b": "#10b981"} />
+ <Pill text={`${cibScanResult.inauthenticity}% FLAGGED`} color={cibScanResult.verdictColor} />
  </div>
  </div>
 
  {/* SUMMARY STATS */}
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 8, marginBottom: 24 }}>
  {[
- ["Tweets Analyzed", FORENSICS_REPORT.tweetsAnalyzed],
- ["Total Replies", FORENSICS_REPORT.totalReplies.toLocaleString()],
- ["Suspicious", FORENSICS_REPORT.suspiciousReplies],
- ["New Account Replies", FORENSICS_REPORT.repliesFromNewAccounts],
- ["Template Replies", FORENSICS_REPORT.repliesWithTemplates],
- ["Velocity Anomalies", FORENSICS_REPORT.velocityAnomalies],
+ ["Tweets Analyzed", cibScanResult.tweetsAnalyzed],
+ ["Total Replies", cibScanResult.totalReplies.toLocaleString()],
+ ["Suspicious", cibScanResult.suspiciousReplies],
+ ["New Account Replies", cibScanResult.newAccountReplies],
+ ["Template Replies", cibScanResult.templateReplies],
+ ["Velocity Anomalies", cibScanResult.velocityAnomalies],
  ].map(([l, v]) => (
  <div key={l} style={{ padding: "10px", background: "rgba(0, 0, 0, 0.5)", borderRadius: 8, textAlign: "center"}}>
  <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8 }}>{l}</div>
@@ -5138,17 +5151,18 @@ export default function Web3Gigs() {
  ))}
  </div>
 
- {/* SECTION 1: INAUTHENTICITY BREAKDOWN */}
+ {/* SECTION 1: INAUTHENTICITY BREAKDOWN — derived from inauthenticity score */}
  <div style={{ marginBottom: 28, paddingTop: 18, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
  <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 }}>1 · Inauthenticity Breakdown</div>
- <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14, letterSpacing: -0.3 }}>What contributed to the <span style={{ color: "#ef4444" }}>14.9% flag.</span></div>
+ <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14, letterSpacing: -0.3 }}>What contributed to the <span style={{ color: cibScanResult.verdictColor }}>{cibScanResult.inauthenticity}% flag.</span></div>
  {(() => {
+ const intensity = cibScanResult.inauthenticity / 100;
  const factors = [
- { label: "Pod engagement patterns", pct: 38, color: "#ef4444" },
- { label: "Template/copy-paste replies", pct: 24, color: "#f97316" },
- { label: "New account replies (< 30d old)", pct: 18, color: "#fbbf24" },
- { label: "Reply velocity anomalies", pct: 12, color: "#fbbf24" },
- { label: "Cross-pod referrals", pct: 8, color: "#f97316" },
+ { label: "Pod engagement patterns", pct: Math.round(38 * intensity * 1.2), color: cibScanResult.verdictColor },
+ { label: "Template/copy-paste replies", pct: Math.round(24 * intensity * 1.1), color: "#f97316" },
+ { label: "New account replies (< 30d old)", pct: Math.round(18 * intensity * 1.3), color: "#fbbf24" },
+ { label: "Reply velocity anomalies", pct: Math.round(12 * intensity * 1.4), color: "#fbbf24" },
+ { label: "Cross-pod referrals", pct: Math.round(8 * intensity * 1.5), color: "#f97316" },
  ];
  return (
  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -5159,7 +5173,7 @@ export default function Web3Gigs() {
  <span style={{ fontSize: 13, fontWeight: 800, color: f.color, fontFamily: "'JetBrains Mono', monospace"}}>{f.pct}%</span>
  </div>
  <div style={{ height: 4, borderRadius: 2, background: "rgba(255, 255, 255, 0.05)", overflow: "hidden"}}>
- <div style={{ height: "100%", width: `${f.pct * 2.5}%`, background: `linear-gradient(90deg, ${f.color}, ${f.color}aa)`, transition: "width 0.4s"}} />
+ <div style={{ height: "100%", width: `${Math.min(100, f.pct * 2.5)}%`, background: `linear-gradient(90deg, ${f.color}, ${f.color}aa)`, transition: "width 0.4s"}} />
  </div>
  </div>
  ))}
@@ -5168,22 +5182,28 @@ export default function Web3Gigs() {
  })()}
  </div>
 
- {/* SECTION 2: ENGAGEMENT VELOCITY TIMELINE */}
+ {/* SECTION 2: VELOCITY TIMELINE — scaled by inauthenticity */}
  <div style={{ marginBottom: 28, paddingTop: 18, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
  <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 }}>2 · Reply Velocity Timeline</div>
- <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14, letterSpacing: -0.3 }}>Replies hitting in <span style={{ color: "#ef4444" }}>0-30 seconds.</span></div>
+ <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14, letterSpacing: -0.3 }}>Replies hitting in <span style={{ color: cibScanResult.verdictColor }}>0-30 seconds.</span></div>
  {(() => {
+ // Scale early-bucket counts by inauthenticity (clean = trickle in, dirty = burst at 0-30s)
+ const intensity = cibScanResult.inauthenticity / 100;
  const buckets = [
- { label: "0-5s", count: 47, color: "#ef4444", flag: true },
- { label: "5-10s", count: 38, color: "#ef4444", flag: true },
- { label: "10-30s", count: 31, color: "#f97316", flag: true },
- { label: "30-60s", count: 18, color: "#fbbf24", flag: false },
- { label: "1-5m", count: 22, color: "#34d399", flag: false },
- { label: "5-30m", count: 14, color: "#10b981", flag: false },
- { label: "30m+", count: 8, color: "#10b981", flag: false },
+ { label: "0-5s", count: Math.round(50 * intensity), color: cibScanResult.verdictColor, flag: intensity > 0.3 },
+ { label: "5-10s", count: Math.round(40 * intensity), color: cibScanResult.verdictColor, flag: intensity > 0.3 },
+ { label: "10-30s", count: Math.round(33 * intensity), color: "#f97316", flag: intensity > 0.3 },
+ { label: "30-60s", count: Math.round(20 + 20 * (1 - intensity)), color: "#fbbf24", flag: false },
+ { label: "1-5m", count: Math.round(22 + 30 * (1 - intensity)), color: "#34d399", flag: false },
+ { label: "5-30m", count: Math.round(14 + 40 * (1 - intensity)), color: "#10b981", flag: false },
+ { label: "30m+", count: Math.round(8 + 30 * (1 - intensity)), color: "#10b981", flag: false },
  ];
- const max = Math.max(...buckets.map(b => b.count));
+ const max = Math.max(...buckets.map(b => b.count), 1);
+ const earlyTotal = buckets.slice(0, 3).reduce((sum, b) => sum + b.count, 0);
+ const total = buckets.reduce((sum, b) => sum + b.count, 0);
+ const earlyPct = total > 0 ? Math.round((earlyTotal / total) * 100) : 0;
  return (
+ <>
  <div style={{ padding: "16px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.04)"}}>
  <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 120, marginBottom: 12 }}>
  {buckets.map((b, i) => (
@@ -5196,34 +5216,38 @@ export default function Web3Gigs() {
  <div style={{ display: "flex", gap: 6, paddingTop: 8, borderTop: "1px solid rgba(255, 255, 255, 0.05)"}}>
  {buckets.map((b, i) => (
  <div key={i} style={{ flex: 1, textAlign: "center"}}>
- <div style={{ fontSize: 9, color: b.flag ? "#ef4444" : C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5, fontWeight: b.flag ? 800 : 500 }}>{b.label}</div>
+ <div style={{ fontSize: 9, color: b.flag ? cibScanResult.verdictColor : C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5, fontWeight: b.flag ? 800 : 500 }}>{b.label}</div>
  </div>
  ))}
  </div>
  </div>
+ <div style={{ marginTop: 10, padding: "10px 12px", background: intensity > 0.3 ? "rgba(239, 68, 68, 0.05)" : "rgba(16, 185, 129, 0.05)", border: `1px solid ${intensity > 0.3 ? "rgba(239, 68, 68, 0.18)" : "rgba(16, 185, 129, 0.18)"}`, borderRadius: 8, display: "flex", gap: 8, alignItems: "flex-start"}}>
+ {intensity > 0.3 ? <Flag size={12} strokeWidth={2.5} style={{ color: "#ef4444", flexShrink: 0, marginTop: 2 }} /> : <Check size={12} strokeWidth={2.5} style={{ color: "#10b981", flexShrink: 0, marginTop: 2 }} />}
+ <span style={{ fontSize: 11, color: intensity > 0.3 ? "#fca5a5" : "#6ee7b7", fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.4 }}>
+ {intensity > 0.3
+ ? `${earlyTotal} replies (${earlyPct}%) hit within 30 seconds. Real organic replies trickle in over hours, not seconds.`
+ : `Reply distribution looks organic. Most replies trickle in over hours/days, consistent with a real audience.`}
+ </span>
+ </div>
+ </>
  );
  })()}
- <div style={{ marginTop: 10, padding: "10px 12px", background: "rgba(239, 68, 68, 0.05)", border: "1px solid rgba(239, 68, 68, 0.18)", borderRadius: 8, display: "flex", gap: 8, alignItems: "flex-start"}}>
- <Flag size={12} strokeWidth={2.5} style={{ color: "#ef4444", flexShrink: 0, marginTop: 2 }} />
- <span style={{ fontSize: 11, color: "#fca5a5", fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.4 }}>116 replies (62%) hit within 30 seconds. Real organic replies trickle in over hours, not seconds.</span>
- </div>
  </div>
 
- {/* SECTION 3: TOP POD ENGAGERS */}
+ {/* SECTION 3: TOP POD ENGAGERS — uses cibScanResult.podMembers */}
+ {cibScanResult.podMembers.length > 0 && cibScanResult.inauthenticity >= 18 && (
  <div style={{ marginBottom: 28, paddingTop: 18, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
  <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 }}>3 · Top Pod Engagers</div>
- <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14, letterSpacing: -0.3 }}>Accounts engaging on <span style={{ color: "#ef4444" }}>almost every post.</span></div>
+ <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14, letterSpacing: -0.3 }}>Accounts engaging on <span style={{ color: cibScanResult.verdictColor }}>almost every post.</span></div>
  {(() => {
- const podders = [
- { handle: "alpha_dev_99", replies: 47, age: "23d", risk: 92 },
- { handle: "shillmaster_x", replies: 44, age: "18d", risk: 89 },
- { handle: "moon_caller_777", replies: 41, age: "31d", risk: 86 },
- { handle: "degen_sigma", replies: 38, age: "12d", risk: 91 },
- { handle: "sol_maxi_888", replies: 36, age: "44d", risk: 78 },
- { handle: "follow4follow", replies: 33, age: "8d", risk: 95 },
- { handle: "based_anon_42", replies: 31, age: "67d", risk: 72 },
- { handle: "memecoin_king", replies: 28, age: "55d", risk: 74 },
- ];
+ // Use the deterministic podMembers from cibScanResult, generate stats per member
+ const baseReplies = 28 + Math.round(cibScanResult.inauthenticity / 4);
+ const podders = cibScanResult.podMembers.slice(0, 8).map((handle, i) => ({
+ handle,
+ replies: baseReplies - i * 2,
+ age: `${8 + (i * 7) % 60}d`,
+ risk: Math.max(60, 95 - i * 3),
+ }));
  return (
  <div style={{ padding: "12px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.04)"}}>
  <div style={{ display: "grid", gridTemplateColumns: "1fr 80px 70px 70px", gap: 8, paddingBottom: 8, borderBottom: "1px solid rgba(255, 255, 255, 0.05)", marginBottom: 8 }}>
@@ -5244,23 +5268,29 @@ export default function Web3Gigs() {
  );
  })()}
  </div>
+ )}
 
- {/* SECTION 4: ACCOUNT AGE DISTRIBUTION */}
+ {/* SECTION 4: ACCOUNT AGE — scales with inauthenticity */}
  <div style={{ marginBottom: 28, paddingTop: 18, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
  <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 }}>4 · Engager Account Age</div>
- <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14, letterSpacing: -0.3 }}>Most engagers were created in the <span style={{ color: "#ef4444" }}>last 30 days.</span></div>
+ <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14, letterSpacing: -0.3 }}>{cibScanResult.inauthenticity > 35 ? <>Most engagers were created in the <span style={{ color: cibScanResult.verdictColor }}>last 30 days.</span></> : <>Engager age looks <span style={{ color: "#10b981" }}>healthily distributed.</span></>}</div>
  {(() => {
+ const intensity = cibScanResult.inauthenticity / 100;
+ // Higher inauthenticity → skew younger
  const ages = [
- { label: "0-7d", count: 28, color: "#ef4444", flag: true },
- { label: "7-30d", count: 41, color: "#ef4444", flag: true },
- { label: "30-90d", count: 22, color: "#f97316", flag: true },
- { label: "90-180d", count: 14, color: "#fbbf24", flag: false },
- { label: "180-365d", count: 9, color: "#34d399", flag: false },
- { label: "1-2y", count: 5, color: "#10b981", flag: false },
- { label: "2y+", count: 2, color: "#10b981", flag: false },
+ { label: "0-7d", count: Math.round(28 * intensity * 1.3), color: cibScanResult.verdictColor, flag: intensity > 0.3 },
+ { label: "7-30d", count: Math.round(41 * intensity * 1.2), color: cibScanResult.verdictColor, flag: intensity > 0.3 },
+ { label: "30-90d", count: Math.round(22 * intensity * 1.1), color: "#f97316", flag: intensity > 0.3 },
+ { label: "90-180d", count: Math.round(14 + 8 * (1 - intensity)), color: "#fbbf24", flag: false },
+ { label: "180-365d", count: Math.round(9 + 18 * (1 - intensity)), color: "#34d399", flag: false },
+ { label: "1-2y", count: Math.round(5 + 30 * (1 - intensity)), color: "#10b981", flag: false },
+ { label: "2y+", count: Math.round(2 + 35 * (1 - intensity)), color: "#10b981", flag: false },
  ];
- const max = Math.max(...ages.map(a => a.count));
+ const max = Math.max(...ages.map(a => a.count), 1);
+ const newTotal = ages.slice(0, 2).reduce((sum, a) => sum + a.count, 0);
+ const total = ages.reduce((sum, a) => sum + a.count, 0);
  return (
+ <>
  <div style={{ padding: "16px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.04)"}}>
  <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 100, marginBottom: 10 }}>
  {ages.map((a, i) => (
@@ -5273,34 +5303,39 @@ export default function Web3Gigs() {
  <div style={{ display: "flex", gap: 6, paddingTop: 6, borderTop: "1px solid rgba(255, 255, 255, 0.05)"}}>
  {ages.map((a, i) => (
  <div key={i} style={{ flex: 1, textAlign: "center"}}>
- <div style={{ fontSize: 8, color: a.flag ? "#ef4444" : C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5, fontWeight: a.flag ? 800 : 500 }}>{a.label}</div>
+ <div style={{ fontSize: 8, color: a.flag ? cibScanResult.verdictColor : C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5, fontWeight: a.flag ? 800 : 500 }}>{a.label}</div>
  </div>
  ))}
  </div>
  </div>
- );
- })()}
+ {intensity > 0.3 && (
  <div style={{ marginTop: 10, padding: "10px 12px", background: "rgba(239, 68, 68, 0.05)", border: "1px solid rgba(239, 68, 68, 0.18)", borderRadius: 8, display: "flex", gap: 8, alignItems: "flex-start"}}>
  <Flag size={12} strokeWidth={2.5} style={{ color: "#ef4444", flexShrink: 0, marginTop: 2 }} />
- <span style={{ fontSize: 11, color: "#fca5a5", fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.4 }}>69 of 91 engagers (76%) joined X within the last 30 days. Suggests a coordinated account batch.</span>
+ <span style={{ fontSize: 11, color: "#fca5a5", fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.4 }}>{newTotal} of {total} engagers ({total > 0 ? Math.round((newTotal / total) * 100) : 0}%) joined X within the last 30 days. Suggests a coordinated account batch.</span>
  </div>
+ )}
+ </>
+ );
+ })()}
  </div>
 
- {/* SECTION 5: TEMPLATE PHRASE FREQUENCY */}
+ {/* SECTION 5: TEMPLATE PHRASES — only show if inauthenticity meaningful */}
+ {cibScanResult.inauthenticity >= 25 && (
  <div style={{ marginBottom: 28, paddingTop: 18, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
  <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 }}>5 · Template Phrase Detection</div>
- <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14, letterSpacing: -0.3 }}>Repeated phrases across <span style={{ color: "#ef4444" }}>different replies.</span></div>
+ <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14, letterSpacing: -0.3 }}>Repeated phrases across <span style={{ color: cibScanResult.verdictColor }}>different replies.</span></div>
  {(() => {
+ const intensity = cibScanResult.inauthenticity / 100;
  const phrases = [
- { phrase: "GM frens", count: 47 },
- { phrase: "Bullish AF", count: 38 },
- { phrase: "This is the way", count: 31 },
- { phrase: "LFG 🚀", count: 28 },
- { phrase: "WAGMI", count: 24 },
- { phrase: "100x soon", count: 19 },
- { phrase: "Based and crypto-pilled", count: 17 },
- { phrase: "Diamond hands 💎", count: 14 },
- ];
+ { phrase: "GM frens", count: Math.round(47 * intensity) },
+ { phrase: "Bullish AF", count: Math.round(38 * intensity) },
+ { phrase: "This is the way", count: Math.round(31 * intensity) },
+ { phrase: "LFG 🚀", count: Math.round(28 * intensity) },
+ { phrase: "WAGMI", count: Math.round(24 * intensity) },
+ { phrase: "100x soon", count: Math.round(19 * intensity) },
+ { phrase: "Based and crypto-pilled", count: Math.round(17 * intensity) },
+ { phrase: "Diamond hands 💎", count: Math.round(14 * intensity) },
+ ].filter(p => p.count >= 3);
  return (
  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
  {phrases.map((p, i) => (
@@ -5313,32 +5348,39 @@ export default function Web3Gigs() {
  );
  })()}
  </div>
+ )}
 
- {/* SECTION 6: COMPARISON BASELINE */}
+ {/* SECTION 6: BASELINE COMPARISON — driven by cibScanResult */}
  <div style={{ marginBottom: 24, paddingTop: 18, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
  <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 }}>6 · Organic vs This Account</div>
- <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14, letterSpacing: -0.3 }}>How does this <span style={{ color: "#ef4444" }}>compare to baseline.</span></div>
+ <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14, letterSpacing: -0.3 }}>How does <span style={{ color: cibScanResult.verdictColor }}>@{cibScanResult.handle}</span> compare to baseline.</div>
  {(() => {
+ const intensity = cibScanResult.inauthenticity / 100;
+ const replyTime = intensity > 0.5 ? "12s" : intensity > 0.3 ? "1m 8s" : intensity > 0.15 ? "5m 22s" : "12m 40s";
+ const uniqueRepliers = Math.round(320 * (1 - intensity * 0.7));
+ const repeatPct = Math.round(8 + intensity * 60);
+ const newAcctPct = Math.round(12 + intensity * 65);
+ const templatePct = Math.round(5 + intensity * 28);
  const metrics = [
- { label: "Avg reply time", organic: "8m 24s", flagged: "12s", worse: true },
- { label: "Unique repliers / 50 posts", organic: "320+", flagged: "91", worse: true },
- { label: "Repeat engager %", organic: "< 8%", flagged: "67%", worse: true },
- { label: "New account replies", organic: "< 12%", flagged: "76%", worse: true },
- { label: "Template phrase rate", organic: "< 5%", flagged: "31%", worse: true },
+ { label: "Avg reply time", organic: "8m 24s", flagged: replyTime, worse: intensity > 0.3 },
+ { label: "Unique repliers / 50 posts", organic: "320+", flagged: String(uniqueRepliers), worse: intensity > 0.3 },
+ { label: "Repeat engager %", organic: "< 8%", flagged: `${repeatPct}%`, worse: repeatPct > 12 },
+ { label: "New account replies", organic: "< 12%", flagged: `${newAcctPct}%`, worse: newAcctPct > 18 },
+ { label: "Template phrase rate", organic: "< 5%", flagged: `${templatePct}%`, worse: templatePct > 8 },
  ];
  return (
  <div style={{ padding: "12px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.04)"}}>
  <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr 30px", gap: 8, paddingBottom: 8, borderBottom: "1px solid rgba(255, 255, 255, 0.05)", marginBottom: 8 }}>
  <span style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1, fontWeight: 700 }}>Metric</span>
  <span style={{ fontSize: 9, color: "#10b981", fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1, fontWeight: 700, textAlign: "center"}}>Organic Baseline</span>
- <span style={{ fontSize: 9, color: "#ef4444", fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1, fontWeight: 700, textAlign: "center"}}>This Account</span>
+ <span style={{ fontSize: 9, color: cibScanResult.verdictColor, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1, fontWeight: 700, textAlign: "center"}}>This Account</span>
  <span style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1, fontWeight: 700, textAlign: "center"}}>?</span>
  </div>
  {metrics.map((m, i) => (
  <div key={i} style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr 30px", gap: 8, padding: "10px 0", borderBottom: i < metrics.length - 1 ? "1px solid rgba(255, 255, 255, 0.03)" : "none", alignItems: "center"}}>
  <span style={{ fontSize: 12, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace"}}>{m.label}</span>
  <span style={{ fontSize: 12, fontWeight: 700, color: "#10b981", fontFamily: "'JetBrains Mono', monospace", textAlign: "center"}}>{m.organic}</span>
- <span style={{ fontSize: 12, fontWeight: 700, color: "#ef4444", fontFamily: "'JetBrains Mono', monospace", textAlign: "center"}}>{m.flagged}</span>
+ <span style={{ fontSize: 12, fontWeight: 700, color: m.worse ? "#ef4444" : "#10b981", fontFamily: "'JetBrains Mono', monospace", textAlign: "center"}}>{m.flagged}</span>
  <span style={{ textAlign: "center", color: m.worse ? "#ef4444" : "#10b981"}}>{m.worse ? "✗" : "✓"}</span>
  </div>
  ))}
@@ -5347,18 +5389,17 @@ export default function Web3Gigs() {
  })()}
  </div>
 
- {/* FLAGGED TWEETS (kept from original) */}
- <div style={{ paddingTop: 18, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
- <div style={{ fontSize: 11, fontWeight: 700, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>Sample Flagged Tweets</div>
- {FORENSICS_REPORT.flaggedTweets.map((t, i) => (
- <div key={i} style={{ padding: "12px 14px", background: "rgba(239, 68, 68, 0.06)", border: "1px solid rgba(239, 68, 68, 0.2)", borderRadius: 8, marginBottom: 8 }}>
- <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, gap: 12 }}>
- <div style={{ fontSize: 13, fontStyle: "italic"}}>"{t.tweet}"</div>
- <Pill text={`${t.suspiciousPct}%`} color="#ef4444"/>
- </div>
- <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace"}}>{t.replies} replies · {t.flag}</div>
- </div>
- ))}
+ {/* Reset / share row */}
+ <div style={{ paddingTop: 18, borderTop: "1px solid rgba(255, 255, 255, 0.06)", display: "flex", gap: 8, flexWrap: "wrap"}}>
+ <button
+ onClick={() => { setCibScanResult(null); setCibSearchHandle(""); }}
+ style={{
+ padding: "10px 14px", borderRadius: 10,
+ background: "transparent", border: "1px solid rgba(255, 255, 255, 0.12)",
+ color: C.textPrimary, fontSize: 12, fontWeight: 700,
+ fontFamily: "'Outfit', sans-serif", cursor: "pointer", letterSpacing: 0.3,
+ }}
+ >Scan another handle</button>
  </div>
  </div>
  )}

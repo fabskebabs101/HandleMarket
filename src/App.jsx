@@ -4965,12 +4965,16 @@ export default function Web3Gigs() {
  </div>
  ): (
  <div>
- <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+ <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
  <div style={{ fontSize: 14, fontWeight: 700 }}>Forensics Report · @ExampleAnon</div>
+ <div style={{ display: "flex", gap: 8, alignItems: "center"}}>
+ <span style={{ padding: "3px 8px", borderRadius: 6, background: "#fbbf24", color: "#000", fontSize: 9, fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1 }}>DEMO</span>
  <Pill text={`${FORENSICS_REPORT.suspiciousPct}% FLAGGED`} color={FORENSICS_REPORT.suspiciousPct > 20? "#ef4444": FORENSICS_REPORT.suspiciousPct > 10? "#f59e0b": "#10b981"} />
  </div>
+ </div>
 
- <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 8, marginBottom: 20 }}>
+ {/* SUMMARY STATS */}
+ <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 8, marginBottom: 24 }}>
  {[
  ["Tweets Analyzed", FORENSICS_REPORT.tweetsAnalyzed],
  ["Total Replies", FORENSICS_REPORT.totalReplies.toLocaleString()],
@@ -4986,16 +4990,228 @@ export default function Web3Gigs() {
  ))}
  </div>
 
- <div style={{ fontSize: 11, fontWeight: 700, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>Flagged Tweets</div>
+ {/* SECTION 1: INAUTHENTICITY BREAKDOWN */}
+ <div style={{ marginBottom: 28, paddingTop: 18, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
+ <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 }}>1 · Inauthenticity Breakdown</div>
+ <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14, letterSpacing: -0.3 }}>What contributed to the <span style={{ color: "#ef4444" }}>14.9% flag.</span></div>
+ {(() => {
+ const factors = [
+ { label: "Pod engagement patterns", pct: 38, color: "#ef4444" },
+ { label: "Template/copy-paste replies", pct: 24, color: "#f97316" },
+ { label: "New account replies (< 30d old)", pct: 18, color: "#fbbf24" },
+ { label: "Reply velocity anomalies", pct: 12, color: "#fbbf24" },
+ { label: "Cross-pod referrals", pct: 8, color: "#f97316" },
+ ];
+ return (
+ <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+ {factors.map((f, i) => (
+ <div key={i} style={{ padding: "10px 12px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.04)"}}>
+ <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+ <span style={{ fontSize: 12, color: C.textPrimary, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600 }}>{f.label}</span>
+ <span style={{ fontSize: 13, fontWeight: 800, color: f.color, fontFamily: "'JetBrains Mono', monospace"}}>{f.pct}%</span>
+ </div>
+ <div style={{ height: 4, borderRadius: 2, background: "rgba(255, 255, 255, 0.05)", overflow: "hidden"}}>
+ <div style={{ height: "100%", width: `${f.pct * 2.5}%`, background: `linear-gradient(90deg, ${f.color}, ${f.color}aa)`, transition: "width 0.4s"}} />
+ </div>
+ </div>
+ ))}
+ </div>
+ );
+ })()}
+ </div>
+
+ {/* SECTION 2: ENGAGEMENT VELOCITY TIMELINE */}
+ <div style={{ marginBottom: 28, paddingTop: 18, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
+ <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 }}>2 · Reply Velocity Timeline</div>
+ <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14, letterSpacing: -0.3 }}>Replies hitting in <span style={{ color: "#ef4444" }}>0-30 seconds.</span></div>
+ {(() => {
+ const buckets = [
+ { label: "0-5s", count: 47, color: "#ef4444", flag: true },
+ { label: "5-10s", count: 38, color: "#ef4444", flag: true },
+ { label: "10-30s", count: 31, color: "#f97316", flag: true },
+ { label: "30-60s", count: 18, color: "#fbbf24", flag: false },
+ { label: "1-5m", count: 22, color: "#34d399", flag: false },
+ { label: "5-30m", count: 14, color: "#10b981", flag: false },
+ { label: "30m+", count: 8, color: "#10b981", flag: false },
+ ];
+ const max = Math.max(...buckets.map(b => b.count));
+ return (
+ <div style={{ padding: "16px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.04)"}}>
+ <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 120, marginBottom: 12 }}>
+ {buckets.map((b, i) => (
+ <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4, height: "100%", justifyContent: "flex-end"}}>
+ <div style={{ fontSize: 11, fontWeight: 800, color: b.color, fontFamily: "'JetBrains Mono', monospace"}}>{b.count}</div>
+ <div style={{ width: "100%", height: `${(b.count / max) * 100}%`, background: `linear-gradient(180deg, ${b.color}, ${b.color}aa)`, borderRadius: "4px 4px 1px 1px", boxShadow: b.flag ? `0 0 8px ${b.color}40` : "none", minHeight: 4, transition: "all 0.3s"}} />
+ </div>
+ ))}
+ </div>
+ <div style={{ display: "flex", gap: 6, paddingTop: 8, borderTop: "1px solid rgba(255, 255, 255, 0.05)"}}>
+ {buckets.map((b, i) => (
+ <div key={i} style={{ flex: 1, textAlign: "center"}}>
+ <div style={{ fontSize: 9, color: b.flag ? "#ef4444" : C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5, fontWeight: b.flag ? 800 : 500 }}>{b.label}</div>
+ </div>
+ ))}
+ </div>
+ </div>
+ );
+ })()}
+ <div style={{ marginTop: 10, padding: "10px 12px", background: "rgba(239, 68, 68, 0.05)", border: "1px solid rgba(239, 68, 68, 0.18)", borderRadius: 8, display: "flex", gap: 8, alignItems: "flex-start"}}>
+ <Flag size={12} strokeWidth={2.5} style={{ color: "#ef4444", flexShrink: 0, marginTop: 2 }} />
+ <span style={{ fontSize: 11, color: "#fca5a5", fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.4 }}>116 replies (62%) hit within 30 seconds. Real organic replies trickle in over hours, not seconds.</span>
+ </div>
+ </div>
+
+ {/* SECTION 3: TOP POD ENGAGERS */}
+ <div style={{ marginBottom: 28, paddingTop: 18, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
+ <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 }}>3 · Top Pod Engagers</div>
+ <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14, letterSpacing: -0.3 }}>Accounts engaging on <span style={{ color: "#ef4444" }}>almost every post.</span></div>
+ {(() => {
+ const podders = [
+ { handle: "alpha_dev_99", replies: 47, age: "23d", risk: 92 },
+ { handle: "shillmaster_x", replies: 44, age: "18d", risk: 89 },
+ { handle: "moon_caller_777", replies: 41, age: "31d", risk: 86 },
+ { handle: "degen_sigma", replies: 38, age: "12d", risk: 91 },
+ { handle: "sol_maxi_888", replies: 36, age: "44d", risk: 78 },
+ { handle: "follow4follow", replies: 33, age: "8d", risk: 95 },
+ { handle: "based_anon_42", replies: 31, age: "67d", risk: 72 },
+ { handle: "memecoin_king", replies: 28, age: "55d", risk: 74 },
+ ];
+ return (
+ <div style={{ padding: "12px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.04)"}}>
+ <div style={{ display: "grid", gridTemplateColumns: "1fr 80px 70px 70px", gap: 8, paddingBottom: 8, borderBottom: "1px solid rgba(255, 255, 255, 0.05)", marginBottom: 8 }}>
+ <span style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1, fontWeight: 700 }}>Handle</span>
+ <span style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1, fontWeight: 700, textAlign: "center"}}>Replies</span>
+ <span style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1, fontWeight: 700, textAlign: "center"}}>Age</span>
+ <span style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1, fontWeight: 700, textAlign: "center"}}>Risk</span>
+ </div>
+ {podders.map((p, i) => (
+ <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 80px 70px 70px", gap: 8, padding: "8px 0", borderBottom: i < podders.length - 1 ? "1px solid rgba(255, 255, 255, 0.03)" : "none", alignItems: "center"}}>
+ <span style={{ fontSize: 12, color: C.textPrimary, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600 }}>@{p.handle}</span>
+ <span style={{ fontSize: 12, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", textAlign: "center"}}>{p.replies}</span>
+ <span style={{ fontSize: 12, color: "#fbbf24", fontFamily: "'JetBrains Mono', monospace", textAlign: "center"}}>{p.age}</span>
+ <span style={{ fontSize: 12, fontWeight: 800, color: p.risk >= 85 ? "#ef4444" : "#f97316", fontFamily: "'JetBrains Mono', monospace", textAlign: "center"}}>{p.risk}</span>
+ </div>
+ ))}
+ </div>
+ );
+ })()}
+ </div>
+
+ {/* SECTION 4: ACCOUNT AGE DISTRIBUTION */}
+ <div style={{ marginBottom: 28, paddingTop: 18, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
+ <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 }}>4 · Engager Account Age</div>
+ <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14, letterSpacing: -0.3 }}>Most engagers were created in the <span style={{ color: "#ef4444" }}>last 30 days.</span></div>
+ {(() => {
+ const ages = [
+ { label: "0-7d", count: 28, color: "#ef4444", flag: true },
+ { label: "7-30d", count: 41, color: "#ef4444", flag: true },
+ { label: "30-90d", count: 22, color: "#f97316", flag: true },
+ { label: "90-180d", count: 14, color: "#fbbf24", flag: false },
+ { label: "180-365d", count: 9, color: "#34d399", flag: false },
+ { label: "1-2y", count: 5, color: "#10b981", flag: false },
+ { label: "2y+", count: 2, color: "#10b981", flag: false },
+ ];
+ const max = Math.max(...ages.map(a => a.count));
+ return (
+ <div style={{ padding: "16px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.04)"}}>
+ <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 100, marginBottom: 10 }}>
+ {ages.map((a, i) => (
+ <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4, height: "100%", justifyContent: "flex-end"}}>
+ <div style={{ fontSize: 10, fontWeight: 800, color: a.color, fontFamily: "'JetBrains Mono', monospace"}}>{a.count}</div>
+ <div style={{ width: "100%", height: `${(a.count / max) * 100}%`, background: `linear-gradient(180deg, ${a.color}, ${a.color}aa)`, borderRadius: "4px 4px 1px 1px", minHeight: 3, transition: "all 0.3s"}} />
+ </div>
+ ))}
+ </div>
+ <div style={{ display: "flex", gap: 6, paddingTop: 6, borderTop: "1px solid rgba(255, 255, 255, 0.05)"}}>
+ {ages.map((a, i) => (
+ <div key={i} style={{ flex: 1, textAlign: "center"}}>
+ <div style={{ fontSize: 8, color: a.flag ? "#ef4444" : C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5, fontWeight: a.flag ? 800 : 500 }}>{a.label}</div>
+ </div>
+ ))}
+ </div>
+ </div>
+ );
+ })()}
+ <div style={{ marginTop: 10, padding: "10px 12px", background: "rgba(239, 68, 68, 0.05)", border: "1px solid rgba(239, 68, 68, 0.18)", borderRadius: 8, display: "flex", gap: 8, alignItems: "flex-start"}}>
+ <Flag size={12} strokeWidth={2.5} style={{ color: "#ef4444", flexShrink: 0, marginTop: 2 }} />
+ <span style={{ fontSize: 11, color: "#fca5a5", fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.4 }}>69 of 91 engagers (76%) joined X within the last 30 days. Suggests a coordinated account batch.</span>
+ </div>
+ </div>
+
+ {/* SECTION 5: TEMPLATE PHRASE FREQUENCY */}
+ <div style={{ marginBottom: 28, paddingTop: 18, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
+ <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 }}>5 · Template Phrase Detection</div>
+ <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14, letterSpacing: -0.3 }}>Repeated phrases across <span style={{ color: "#ef4444" }}>different replies.</span></div>
+ {(() => {
+ const phrases = [
+ { phrase: "GM frens", count: 47 },
+ { phrase: "Bullish AF", count: 38 },
+ { phrase: "This is the way", count: 31 },
+ { phrase: "LFG 🚀", count: 28 },
+ { phrase: "WAGMI", count: 24 },
+ { phrase: "100x soon", count: 19 },
+ { phrase: "Based and crypto-pilled", count: 17 },
+ { phrase: "Diamond hands 💎", count: 14 },
+ ];
+ return (
+ <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+ {phrases.map((p, i) => (
+ <div key={i} style={{ padding: "8px 14px", borderRadius: 20, background: "rgba(239, 68, 68, 0.06)", border: "1px solid rgba(239, 68, 68, 0.2)", display: "inline-flex", alignItems: "center", gap: 8 }}>
+ <span style={{ fontSize: 12, color: C.textPrimary, fontStyle: "italic", fontFamily: "'JetBrains Mono', monospace"}}>"{p.phrase}"</span>
+ <span style={{ fontSize: 11, fontWeight: 800, color: "#ef4444", fontFamily: "'JetBrains Mono', monospace", padding: "2px 6px", borderRadius: 4, background: "rgba(239, 68, 68, 0.15)"}}>×{p.count}</span>
+ </div>
+ ))}
+ </div>
+ );
+ })()}
+ </div>
+
+ {/* SECTION 6: COMPARISON BASELINE */}
+ <div style={{ marginBottom: 24, paddingTop: 18, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
+ <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 4 }}>6 · Organic vs This Account</div>
+ <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14, letterSpacing: -0.3 }}>How does this <span style={{ color: "#ef4444" }}>compare to baseline.</span></div>
+ {(() => {
+ const metrics = [
+ { label: "Avg reply time", organic: "8m 24s", flagged: "12s", worse: true },
+ { label: "Unique repliers / 50 posts", organic: "320+", flagged: "91", worse: true },
+ { label: "Repeat engager %", organic: "< 8%", flagged: "67%", worse: true },
+ { label: "New account replies", organic: "< 12%", flagged: "76%", worse: true },
+ { label: "Template phrase rate", organic: "< 5%", flagged: "31%", worse: true },
+ ];
+ return (
+ <div style={{ padding: "12px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.04)"}}>
+ <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr 30px", gap: 8, paddingBottom: 8, borderBottom: "1px solid rgba(255, 255, 255, 0.05)", marginBottom: 8 }}>
+ <span style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1, fontWeight: 700 }}>Metric</span>
+ <span style={{ fontSize: 9, color: "#10b981", fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1, fontWeight: 700, textAlign: "center"}}>Organic Baseline</span>
+ <span style={{ fontSize: 9, color: "#ef4444", fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1, fontWeight: 700, textAlign: "center"}}>This Account</span>
+ <span style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1, fontWeight: 700, textAlign: "center"}}>?</span>
+ </div>
+ {metrics.map((m, i) => (
+ <div key={i} style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr 30px", gap: 8, padding: "10px 0", borderBottom: i < metrics.length - 1 ? "1px solid rgba(255, 255, 255, 0.03)" : "none", alignItems: "center"}}>
+ <span style={{ fontSize: 12, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace"}}>{m.label}</span>
+ <span style={{ fontSize: 12, fontWeight: 700, color: "#10b981", fontFamily: "'JetBrains Mono', monospace", textAlign: "center"}}>{m.organic}</span>
+ <span style={{ fontSize: 12, fontWeight: 700, color: "#ef4444", fontFamily: "'JetBrains Mono', monospace", textAlign: "center"}}>{m.flagged}</span>
+ <span style={{ textAlign: "center", color: m.worse ? "#ef4444" : "#10b981"}}>{m.worse ? "✗" : "✓"}</span>
+ </div>
+ ))}
+ </div>
+ );
+ })()}
+ </div>
+
+ {/* FLAGGED TWEETS (kept from original) */}
+ <div style={{ paddingTop: 18, borderTop: "1px solid rgba(255, 255, 255, 0.06)"}}>
+ <div style={{ fontSize: 11, fontWeight: 700, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>Sample Flagged Tweets</div>
  {FORENSICS_REPORT.flaggedTweets.map((t, i) => (
  <div key={i} style={{ padding: "12px 14px", background: "rgba(239, 68, 68, 0.06)", border: "1px solid rgba(239, 68, 68, 0.2)", borderRadius: 8, marginBottom: 8 }}>
- <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+ <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, gap: 12 }}>
  <div style={{ fontSize: 13, fontStyle: "italic"}}>"{t.tweet}"</div>
  <Pill text={`${t.suspiciousPct}%`} color="#ef4444"/>
  </div>
  <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace"}}>{t.replies} replies · {t.flag}</div>
  </div>
  ))}
+ </div>
  </div>
  )}
  </GlowCard>

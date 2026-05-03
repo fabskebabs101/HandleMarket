@@ -5651,10 +5651,32 @@ export default function Web3Gigs() {
  {/* ─── PHASE 4: ALERTS TAB ───────────────────────────── */}
  {tab === "alerts"&& (
  <div>
- <div style={{ textAlign: "center", marginBottom: 32 }}>
+ <div style={{ textAlign: "center", marginBottom: 24 }}>
  <h1 style={{ fontSize: 38, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>Real-Time <span style={{ color: C.primary }}>Alerts</span>
  </h1>
  <p style={{ color: C.textSecondary, fontSize: 15, marginTop: 8 }}>Watch any CT account · Get notified the instant something changes</p>
+ </div>
+
+ {/* V1 banner */}
+ <div style={{ padding: "14px 18px", background: "rgba(251, 191, 36, 0.06)", border: "1px solid rgba(251, 191, 36, 0.2)", borderRadius: 12, marginBottom: 24, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap"}}>
+ <Bell size={18} strokeWidth={2.5} style={{ color: "#fbbf24", flexShrink: 0 }} />
+ <div style={{ flex: 1, minWidth: 200 }}>
+ <div style={{ fontSize: 13, fontWeight: 800, color: "#fbbf24", marginBottom: 2 }}>Watchlist + Alerts launch with V1</div>
+ <div style={{ fontSize: 12, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.3, lineHeight: 1.4 }}>Preview the experience below · Join the waitlist for early access</div>
+ </div>
+ <button
+ onClick={() => { setWaitlistSubmitted(false); setWaitlistError(""); setShowWaitlistModal(true); }}
+ style={{
+ padding: "8px 14px", borderRadius: 8, border: "none",
+ background: "#fbbf24",
+ color: "#000", fontSize: 11, fontWeight: 900,
+ fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+ letterSpacing: 0.3, transition: "all 0.15s",
+ whiteSpace: "nowrap",
+ }}
+ onMouseEnter={e => e.currentTarget.style.transform = "translateY(-1px)"}
+ onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
+ >Join Waitlist</button>
  </div>
 
  {/* Your Watchlist */}
@@ -5684,11 +5706,17 @@ export default function Web3Gigs() {
  </div>
  </GlowCard>
  ))}
- <button style={{
+ <button
+ onClick={() => { setWaitlistSubmitted(false); setWaitlistError(""); setShowWaitlistModal(true); }}
+ style={{
  padding: "14px 20px", borderRadius: 12, border: `1px dashed ${C.primary}40`,
  background: "transparent", color: C.primary,
  fontFamily: "'JetBrains Mono', monospace", fontSize: 13, fontWeight: 600, cursor: "pointer",
- }}>+ Add Account to Watchlist</button>
+ transition: "all 0.15s",
+ }}
+ onMouseEnter={e => { e.currentTarget.style.borderColor = `${C.primary}80`; e.currentTarget.style.background = "rgba(212, 255, 0, 0.04)"; }}
+ onMouseLeave={e => { e.currentTarget.style.borderColor = `${C.primary}40`; e.currentTarget.style.background = "transparent"; }}
+ >+ Add Account to Watchlist</button>
  </div>
 
  {/* Available Alert Types */}

@@ -1212,10 +1212,59 @@ const MOCK_JOBS = [
  tags: ["ghostwriting", "founder", "ongoing"],
  requiresPortfolio: true,
  },
+ {
+ id: "job-031", jobType: "ct",
+ title: "KOL ambassador · 3 month DeFi protocol partnership",
+ category: "Partnership",
+ poster: "@LiquidProtocol", posterTrust: 84, posterVerified: true,
+ budget: 12000, budgetCurrency: "USDC",
+ deadline: "3 months",
+ postedAgo: "5h ago",
+ proposals: 18,
+ minTrustScore: 70,
+ status: "open",
+ description: "DeFi protocol seeking KOL ambassador for 3-month launch + growth campaign. 4 posts per week, 2 spaces per month, exclusive alpha drops to your audience. Long-term relationship with potential extension. Must have crypto-native audience of 5k+ engaged followers.",
+ deliverables: ["4 posts/week throughout campaign", "2 Spaces appearances per month", "Quarterly performance review", "Optional: token unlock incentive on launch"],
+ tags: ["partnership", "ambassador", "defi", "long-term"],
+ requiresPortfolio: true,
+ },
+ {
+ id: "job-032", jobType: "ct",
+ title: "Performance-based shill partnership · per-post payout",
+ category: "Partnership",
+ poster: "@MemeFi", posterTrust: 71, posterVerified: false,
+ budget: 50, budgetCurrency: "SOL",
+ deadline: "Ongoing",
+ postedAgo: "1d ago",
+ proposals: 27,
+ minTrustScore: 55,
+ status: "open",
+ description: "Memecoin project running pay-per-post partnership. 1.5 SOL per organic-feeling shill post, bonus 0.5 SOL if it goes viral (50k+ impressions). Up to 30 posts over 60 days. No bot pods, must be authentic engagement.",
+ deliverables: ["Up to 30 posts over 60 days", "Tagged + tracking link", "Min 5k followers verified"],
+ tags: ["partnership", "performance", "memecoin"],
+ requiresPortfolio: false,
+ },
+ {
+ id: "job-033", jobType: "ct",
+ title: "6 month brand ambassador · L2 ecosystem",
+ category: "Partnership",
+ poster: "@L2Builder", posterTrust: 88, posterVerified: true,
+ budget: 24000, budgetCurrency: "USDC",
+ deadline: "6 months",
+ postedAgo: "2d ago",
+ proposals: 12,
+ minTrustScore: 75,
+ status: "open",
+ description: "Looking for a serious crypto KOL to be the face of our L2 ecosystem campaign. Bi-weekly threads, monthly community AMAs, presence at one IRL event (we cover travel). Full creative freedom on content as long as core narrative aligns.",
+ deliverables: ["Bi-weekly long-form threads", "Monthly community AMA", "1 IRL event appearance", "Quarterly creative review"],
+ tags: ["partnership", "ambassador", "L2", "long-term"],
+ requiresPortfolio: true,
+ },
 ];
 
 const JOB_CATEGORIES_CT = [
  { id: "all", label: "All CT Jobs", Icon: Globe },
+ { id: "Partnership", label: "Partnerships", Icon: Handshake },
  { id: "Shitposting", label: "Shitposting", Icon: Smile },
  { id: "Thread Writing", label: "Threads", Icon: Hash },
  { id: "KOL / Raids", label: "Raids", Icon: Megaphone },
@@ -2544,8 +2593,8 @@ export default function Web3Gigs() {
  <GlowCard style={{ padding: "20px 24px", background: "rgba(0, 0, 0, 0.5)"}}>
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 12 }}>
  {[
- { label: "Open Jobs", val: "30", Icon: Briefcase },
- { label: "Total Budget", val: "$45k+", Icon: DollarSign },
+ { label: "Open Jobs", val: "33", Icon: Briefcase },
+ { label: "Total Budget", val: "$80k+", Icon: DollarSign },
  { label: "vs Fiverr Cut", val: "0%", Icon: Zap },
  { label: "Paid in", val: "USDC", Icon: Sparkles },
  { label: "Disputes", val: "0", Icon: Shield },
@@ -2745,7 +2794,7 @@ export default function Web3Gigs() {
  <div style={{ fontSize: 32, fontWeight: 900, letterSpacing: -1.5, marginBottom: 12 }}>Join <span style={{ color: C.primary }}>crypto's work marketplace.</span>
  </div>
  <div style={{ fontSize: 15, color: C.textSecondary, marginBottom: 28, maxWidth: 500, margin: "0 auto 28px"}}>
- 30+ open jobs. Zero middleman fees. Paid in USDC, USDT or SOL. Reputation-first hiring. Ship the way crypto was meant to work.
+ 33+ open jobs. Zero middleman fees. Paid in USDC, USDT or SOL. Reputation-first hiring. Ship the way crypto was meant to work.
  </div>
  <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap"}}>
  <button
@@ -6081,6 +6130,7 @@ export default function Web3Gigs() {
  </>
  ) : (
  <>
+ <option value="Partnership">Partnership · Long-term / Retainer</option>
  <option value="Shitposting">Shitposting</option>
  <option value="Thread Writing">Thread Writing</option>
  <option value="KOL / Raids">KOL / Raids</option>

@@ -2400,7 +2400,8 @@ export default function Web3Gigs() {
  </>
  ) : (() => {
  // Show approved jobs first (up to 4), fallback to mock preview
- const realPreviews = approvedJobs.slice(0, 4).map(j => ({
+ // Only show OPEN jobs on home preview (not in_progress or completed)
+ const realPreviews = approvedJobs.filter(j => j.status === "open").slice(0, 4).map(j => ({
  cat: j.category,
  title: j.title,
  budget: j.budget,

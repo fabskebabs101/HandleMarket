@@ -1372,6 +1372,7 @@ export default function Web3Gigs() {
  const [forensicsRun, setForensicsRun] = useState(false);
  const [jobsFilter, setJobsFilter] = useState("all");
  const [jobsType, setJobsType] = useState("crypto"); // "ct"or "crypto", default to crypto work
+ const [jobsStatus, setJobsStatus] = useState("all"); // all | open | in_progress | completed
  const [waitlistEmail, setWaitlistEmail] = useState("");
  const [waitlistSubmitted, setWaitlistSubmitted] = useState(false);
  const [userPosition, setUserPosition] = useState(null);
@@ -1484,7 +1485,7 @@ export default function Web3Gigs() {
      const { data, error } = await supabase
        .from("job_submissions")
        .select("*")
-       .eq("status", "approved")
+       .in("status", ["approved", "in_progress", "completed"])
        .order("created_at", { ascending: false });
      if (error) {
        console.error("Failed to fetch approved jobs:", error);
@@ -1502,7 +1503,7 @@ export default function Web3Gigs() {
        return {
          id: `live-${row.id}`,
          jobType: row.job_type,
-         isNew: true,
+         isNew: row.status === "approved",
          featured: row.featured === true,
          title: row.title,
          category: row.category,
@@ -1515,7 +1516,7 @@ export default function Web3Gigs() {
          postedAgo,
          proposals: 0,
          minTrustScore: row.min_trust_score || 0,
-         status: "open",
+         status: row.status === "in_progress" ? "in_progress" : row.status === "completed" ? "completed" : "open",
          description: row.description,
          deliverables: row.deliverables ? row.deliverables.split("\n").filter(Boolean) : [],
          tags: ["new"],
@@ -4645,12 +4646,50 @@ export default function Web3Gigs() {
  >+ Post a Job</button>
  </div>
 
+ {/* Status filter pills */}
+ <div style={{ display: "flex", gap: 8, marginBottom: 18, flexWrap: "wrap", alignItems: "center"}}>
+ <span style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, marginRight: 4 }}>Status:</span>
+ {[
+ { id: "all", label: "All", color: C.primary },
+ { id: "open", label: "Open", color: "#10b981", dot: true },
+ { id: "in_progress", label: "In Progress", color: "#fbbf24", dot: true },
+ { id: "completed", label: "Completed", color: C.primary, dot: true },
+ ].map(s => {
+ const active = jobsStatus === s.id;
+ const count = s.id === "all"
+ ? [...approvedJobs, ...MOCK_JOBS].filter(j => j.jobType === jobsType).length
+ : [...approvedJobs, ...MOCK_JOBS].filter(j => j.jobType === jobsType && (j.status || "open") === s.id).length;
+ return (
+ <button
+ key={s.id}
+ onClick={() => setJobsStatus(s.id)}
+ style={{
+ padding: "6px 12px", borderRadius: 16, border: "1px solid",
+ borderColor: active ? s.color : "rgba(255, 255, 255, 0.1)",
+ background: active ? `${s.color}15` : "rgba(0, 0, 0, 0.4)",
+ color: active ? s.color : C.textSecondary,
+ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 700,
+ cursor: "pointer", letterSpacing: 0.5, transition: "all 0.15s",
+ display: "inline-flex", alignItems: "center", gap: 6,
+ }}
+ onMouseEnter={e => { if (!active) e.currentTarget.style.borderColor = `${s.color}80`; }}
+ onMouseLeave={e => { if (!active) e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.1)"; }}
+ >
+ {s.dot && <span style={{ width: 6, height: 6, borderRadius: "50%", background: s.color, boxShadow: active ? `0 0 6px ${s.color}80` : "none" }} />}
+ <span>{s.label}</span>
+ <span style={{ fontSize: 9, opacity: 0.7, marginLeft: 2 }}>· {count}</span>
+ </button>
+ );
+ })}
+ </div>
+
  {/* Jobs grid */}
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 14, marginBottom: 40 }}>
  {[...approvedJobs, ...MOCK_JOBS]
 .filter(j => {
    if (j.jobType !== jobsType) return false;
    if (jobsFilter !== "all" && j.category !== jobsFilter) return false;
+   if (jobsStatus !== "all" && (j.status || "open") !== jobsStatus) return false;
    if (jobSearch.trim()) {
      const q = jobSearch.toLowerCase().trim();
      const haystack = `${j.title} ${j.description || ""} ${j.poster || ""} ${(j.tags || []).join(" ")} ${j.category}`.toLowerCase();
@@ -4659,6 +4698,12 @@ export default function Web3Gigs() {
    return true;
  })
 .sort((a, b) => {
+   // Status priority: open (3), in_progress (2), completed (1)
+   const statusRank = (s) => s === "open" ? 3 : s === "in_progress" ? 2 : 1;
+   const aStatus = statusRank(a.status || "open");
+   const bStatus = statusRank(b.status || "open");
+   if (aStatus !== bStatus) return bStatus - aStatus;
+   // Then featured + new
    const aFeat = a.featured ? 2 : 0;
    const bFeat = b.featured ? 2 : 0;
    const aNew = a.isNew ? 1 : 0;
@@ -4666,8 +4711,8 @@ export default function Web3Gigs() {
    return (bFeat + bNew) - (aFeat + aNew);
  })
 .map(job => {
- const statusColor = job.status === "open"? "#10b981": job.status === "in_progress"? "#fbbf24": C.textMuted;
- const statusLabel = job.status === "open"? "OPEN": job.status === "in_progress"? "IN PROGRESS": "COMPLETED";
+ const statusColor = job.status === "open" ? "#10b981" : job.status === "in_progress" ? "#fbbf24" : job.status === "completed" ? C.primary : C.textMuted;
+ const statusLabel = job.status === "open" ? "OPEN" : job.status === "in_progress" ? "IN PROGRESS" : job.status === "completed" ? "COMPLETED" : (job.status || "OPEN").toUpperCase();
  const posterColor = job.posterTrust >= 85? "#10b981": job.posterTrust >= 70? "#34d399": job.posterTrust >= 55? "#fbbf24": "#f97316";
  return (
  <div
@@ -4756,6 +4801,7 @@ export default function Web3Gigs() {
  {[...approvedJobs, ...MOCK_JOBS].filter(j => {
    if (j.jobType !== jobsType) return false;
    if (jobsFilter !== "all" && j.category !== jobsFilter) return false;
+   if (jobsStatus !== "all" && (j.status || "open") !== jobsStatus) return false;
    if (jobSearch.trim()) {
      const q = jobSearch.toLowerCase().trim();
      const haystack = `${j.title} ${j.description || ""} ${j.poster || ""} ${(j.tags || []).join(" ")} ${j.category}`.toLowerCase();
@@ -5762,8 +5808,8 @@ export default function Web3Gigs() {
  {/* ─── JOB DETAIL MODAL ─────────────────────────────── */}
  {selectedJob && (() => {
  const posterColor = selectedJob.posterTrust >= 85? "#10b981": selectedJob.posterTrust >= 70? "#34d399": selectedJob.posterTrust >= 55? "#fbbf24": "#f97316";
- const statusColor = selectedJob.status === "open"? "#10b981": selectedJob.status === "in_progress"? "#fbbf24": C.textMuted;
- const statusLabel = selectedJob.status === "open"? "OPEN": selectedJob.status === "in_progress"? "IN PROGRESS": "COMPLETED";
+ const statusColor = selectedJob.status === "open" ? "#10b981" : selectedJob.status === "in_progress" ? "#fbbf24" : selectedJob.status === "completed" ? C.primary : C.textMuted;
+ const statusLabel = selectedJob.status === "open" ? "OPEN" : selectedJob.status === "in_progress" ? "IN PROGRESS" : selectedJob.status === "completed" ? "COMPLETED" : (selectedJob.status || "OPEN").toUpperCase();
  return (
  <div
  onClick={() => { setSelectedJob(null); setProposalText(""); resetApplyForm(); }}
@@ -6009,6 +6055,14 @@ export default function Web3Gigs() {
  <div style={{ padding: "16px 18px", background: "rgba(251, 191, 36, 0.06)", border: "1px solid rgba(251, 191, 36, 0.2)", borderRadius: 10, textAlign: "center"}}>
  <div style={{ fontSize: 13, color: "#fbbf24", fontWeight: 800, marginBottom: 4 }}>Already in progress</div>
  <div style={{ fontSize: 11, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.5 }}>This job has an active handshake. Check back when it's complete to see the outcome.</div>
+ </div>
+ )}
+
+ {selectedJob.status === "completed" && (
+ <div style={{ padding: "16px 18px", background: "rgba(212, 255, 0, 0.06)", border: "1px solid rgba(212, 255, 0, 0.25)", borderRadius: 10, textAlign: "center"}}>
+ <div style={{ display: "flex", justifyContent: "center", marginBottom: 6, color: C.primary }}><Check size={20} strokeWidth={2.5} /></div>
+ <div style={{ fontSize: 13, color: C.primary, fontWeight: 800, marginBottom: 4 }}>Completed</div>
+ <div style={{ fontSize: 11, color: C.textSecondary, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.5 }}>This job was successfully shipped and paid out via Web3Gigs. No longer accepting applications.</div>
  </div>
  )}
 

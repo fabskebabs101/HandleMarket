@@ -2526,7 +2526,7 @@ export default function Web3Gigs() {
  // ─── ADMIN ROUTE HANDLER ────────────────────────────────────
  // The admin password is a non-secret hash check (basic obfuscation only)
  // Real password is set via env or just hardcoded here for V0
- const ADMIN_PASSWORD = "fabskebabs2026";
+ const ADMIN_PASSWORD = "Web3Gigs-9suzka-kirrot";
 
  if (isAdminRoute) {
    if (!adminAuthed) {

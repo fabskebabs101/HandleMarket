@@ -1434,6 +1434,40 @@ function AdminDashboard({ C, onSignOut }) {
    }
  };
 
+ const deleteJob = async (jobId, jobTitle) => {
+   if (!window.confirm(`Permanently delete "${jobTitle}"?\n\nThis cannot be undone. Applications linked to this job will remain in the database but will reference a deleted job.`)) return;
+   const { error } = await supabase.from("job_submissions").delete().eq("id", jobId);
+   if (error) {
+     showToast(`Delete failed: ${error.message}`, "#ef4444");
+   } else {
+     showToast("Job deleted", "#ef4444");
+     setSelectedAdminJob(null);
+     fetchAdminData();
+   }
+ };
+
+ const deleteApplication = async (appId) => {
+   if (!window.confirm("Permanently delete this application?\n\nThis cannot be undone.")) return;
+   const { error } = await supabase.from("job_applications").delete().eq("id", appId);
+   if (error) {
+     showToast(`Delete failed: ${error.message}`, "#ef4444");
+   } else {
+     showToast("Application deleted", "#ef4444");
+     fetchAdminData();
+   }
+ };
+
+ const deleteWaitlistEntry = async (entryId) => {
+   if (!window.confirm("Permanently remove this email from the waitlist?")) return;
+   const { error } = await supabase.from("waitlist").delete().eq("id", entryId);
+   if (error) {
+     showToast(`Delete failed: ${error.message}`, "#ef4444");
+   } else {
+     showToast("Removed from waitlist", "#ef4444");
+     fetchAdminData();
+   }
+ };
+
  const updateApplicationStatus = async (appId, newStatus) => {
    const { error } = await supabase.from("job_applications").update({ status: newStatus }).eq("id", appId);
    if (error) {
@@ -1679,6 +1713,12 @@ function AdminDashboard({ C, onSignOut }) {
                          border: "1px solid rgba(255, 255, 255, 0.1)", fontSize: 10,
                          fontFamily: "'Outfit', sans-serif",
                        }}>👁</button>
+                       <button onClick={() => deleteJob(j.id, j.title)} title="Delete permanently" style={{
+                         padding: "6px 10px", borderRadius: 6, cursor: "pointer",
+                         background: "rgba(239, 68, 68, 0.15)", color: "#ef4444",
+                         border: "1px solid rgba(239, 68, 68, 0.4)", fontSize: 10, fontWeight: 800,
+                         fontFamily: "'Outfit', sans-serif",
+                       }}>🗑</button>
                      </div>
                    </div>
                  );
@@ -1755,6 +1795,12 @@ function AdminDashboard({ C, onSignOut }) {
                          border: `1px solid ${j.featured ? C.primary : "rgba(255, 255, 255, 0.1)"}`,
                          fontSize: 9, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
                        }}>★</button>
+                       <button onClick={() => deleteJob(j.id, j.title)} title="Delete permanently" style={{
+                         padding: "5px 8px", borderRadius: 6, cursor: "pointer",
+                         background: "rgba(239, 68, 68, 0.15)", color: "#ef4444",
+                         border: "1px solid rgba(239, 68, 68, 0.4)",
+                         fontSize: 9, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                       }}>🗑</button>
                      </div>
                    </div>
                  );
@@ -1802,6 +1848,12 @@ function AdminDashboard({ C, onSignOut }) {
                        border: "1px solid rgba(239, 68, 68, 0.3)",
                        fontSize: 10, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
                      }}>✗ Reject</button>
+                     <button onClick={() => deleteApplication(a.id)} title="Delete permanently" style={{
+                       padding: "5px 10px", borderRadius: 6, cursor: "pointer",
+                       background: "rgba(239, 68, 68, 0.15)", color: "#ef4444",
+                       border: "1px solid rgba(239, 68, 68, 0.4)",
+                       fontSize: 10, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                     }}>🗑 Delete</button>
                    </div>
                  </div>
                ))}
@@ -1827,15 +1879,21 @@ function AdminDashboard({ C, onSignOut }) {
                  <div style={{ padding: 40, textAlign: "center", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", fontSize: 12 }}>No signups yet.</div>
                ) : waitlistEntries.slice(0, 100).map((w, i) => (
                  <div key={w.id} style={{
-                   display: "grid", gridTemplateColumns: "60px 1fr 100px 120px",
-                   gap: 12, padding: "10px 12px", borderRadius: 8, marginBottom: 4,
+                   display: "grid", gridTemplateColumns: "50px 1fr 90px 110px 40px",
+                   gap: 10, padding: "10px 12px", borderRadius: 8, marginBottom: 4,
                    background: "rgba(0, 0, 0, 0.3)", border: "1px solid rgba(255, 255, 255, 0.04)",
                    alignItems: "center",
                  }}>
                    <div style={{ fontSize: 11, color: C.primary, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace" }}>#{waitlistEntries.length - i}</div>
-                   <div style={{ fontSize: 12, fontFamily: "'JetBrains Mono', monospace" }}>{w.email}</div>
+                   <div style={{ fontSize: 12, fontFamily: "'JetBrains Mono', monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{w.email}</div>
                    <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8 }}>{w.source || "unknown"}</div>
                    <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textAlign: "right" }}>{timeAgo(w.created_at)}</div>
+                   <button onClick={() => deleteWaitlistEntry(w.id)} title="Remove from waitlist" style={{
+                     padding: "5px 8px", borderRadius: 6, cursor: "pointer",
+                     background: "transparent", color: "#ef4444",
+                     border: "1px solid rgba(239, 68, 68, 0.25)",
+                     fontSize: 10, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                   }}>🗑</button>
                  </div>
                ))}
                {waitlistEntries.length > 100 && (
@@ -1942,6 +2000,12 @@ function AdminDashboard({ C, onSignOut }) {
                  background: "rgba(239, 68, 68, 0.1)", color: "#ef4444",
                  border: "1px solid rgba(239, 68, 68, 0.3)", fontSize: 11, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
                }}>✗ Reject</button>
+               <button onClick={() => deleteJob(selectedAdminJob.id, selectedAdminJob.title)} style={{
+                 padding: "8px 14px", borderRadius: 8, cursor: "pointer",
+                 background: "rgba(239, 68, 68, 0.2)", color: "#ef4444",
+                 border: "1px solid rgba(239, 68, 68, 0.5)", fontSize: 11, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                 marginLeft: "auto",
+               }}>🗑 Delete Permanently</button>
              </div>
            </div>
          </div>

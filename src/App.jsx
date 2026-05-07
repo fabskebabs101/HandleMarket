@@ -1352,8 +1352,632 @@ const WATCHLIST = [
  { handle: "@CompetitorX", score: 76, alerts: ["follower-spike", "listing", "cluster"], lastAlert: "Yesterday, flagged in cluster-003"},
 ];
 
+// ─── ADMIN DASHBOARD COMPONENT ──────────────────────────────────
+function AdminDashboard({ C, onSignOut }) {
+ const [adminTab, setAdminTab] = useState("pending");
+ const [pendingJobs, setPendingJobs] = useState([]);
+ const [allJobs, setAllJobs] = useState([]);
+ const [allApplications, setAllApplications] = useState([]);
+ const [waitlistEntries, setWaitlistEntries] = useState([]);
+ const [stats, setStats] = useState({ pending: 0, live: 0, applications: 0, waitlist: 0, completed: 0, totalPaid: 0 });
+ const [adminLoading, setAdminLoading] = useState(true);
+ const [adminSearch, setAdminSearch] = useState("");
+ const [adminTypeFilter, setAdminTypeFilter] = useState("all");
+ const [adminToast, setAdminToast] = useState(null);
+ const [selectedAdminJob, setSelectedAdminJob] = useState(null);
+
+ // Fetch all admin data
+ const fetchAdminData = async () => {
+   setAdminLoading(true);
+   try {
+     // 1. Job submissions (all statuses, for admin)
+     const { data: jobsData } = await supabase.from("job_submissions").select("*").order("created_at", { ascending: false });
+     // 2. Applications
+     const { data: appsData } = await supabase.from("job_applications").select("*").order("created_at", { ascending: false });
+     // 3. Waitlist
+     const { data: wlData } = await supabase.from("waitlist").select("*").order("created_at", { ascending: false });
+     const jobs = jobsData || [];
+     const apps = appsData || [];
+     const wl = wlData || [];
+     setPendingJobs(jobs.filter(j => j.status === "pending"));
+     setAllJobs(jobs.filter(j => ["approved", "in_progress", "completed"].includes(j.status)));
+     setAllApplications(apps);
+     setWaitlistEntries(wl);
+     // Compute stats
+     const completedJobs = jobs.filter(j => j.status === "completed");
+     const totalPaid = completedJobs.reduce((sum, j) => sum + (Number(j.budget) || 0), 0);
+     setStats({
+       pending: jobs.filter(j => j.status === "pending").length,
+       live: jobs.filter(j => ["approved", "in_progress"].includes(j.status)).length,
+       applications: apps.length,
+       waitlist: wl.length,
+       completed: completedJobs.length,
+       totalPaid,
+     });
+   } catch (err) {
+     console.error("Admin fetch error:", err);
+   } finally {
+     setAdminLoading(false);
+   }
+ };
+
+ useEffect(() => {
+   fetchAdminData();
+   // Auto-refresh every 30s
+   const interval = setInterval(fetchAdminData, 30000);
+   return () => clearInterval(interval);
+ }, []);
+
+ const showToast = (msg, color = "#10b981") => {
+   setAdminToast({ msg, color });
+   setTimeout(() => setAdminToast(null), 3000);
+ };
+
+ // Action handlers
+ const updateJobStatus = async (jobId, newStatus) => {
+   const { error } = await supabase.from("job_submissions").update({ status: newStatus }).eq("id", jobId);
+   if (error) {
+     showToast(`Error: ${error.message}`, "#ef4444");
+   } else {
+     showToast(`Status changed to ${newStatus}`, "#10b981");
+     fetchAdminData();
+   }
+ };
+
+ const toggleFeatured = async (jobId, currentFeatured) => {
+   const { error } = await supabase.from("job_submissions").update({ featured: !currentFeatured }).eq("id", jobId);
+   if (error) {
+     showToast(`Error: ${error.message}`, "#ef4444");
+   } else {
+     showToast(currentFeatured ? "Removed from featured" : "Added to featured ⭐", "#d4ff00");
+     fetchAdminData();
+   }
+ };
+
+ const updateApplicationStatus = async (appId, newStatus) => {
+   const { error } = await supabase.from("job_applications").update({ status: newStatus }).eq("id", appId);
+   if (error) {
+     showToast(`Error: ${error.message}`, "#ef4444");
+   } else {
+     showToast(`Application: ${newStatus}`, "#10b981");
+     fetchAdminData();
+   }
+ };
+
+ const exportWaitlistCSV = () => {
+   const csv = ["email,source,joined_at"]
+     .concat(waitlistEntries.map(w => `${w.email},${w.source || "unknown"},${w.created_at}`))
+     .join("\n");
+   const blob = new Blob([csv], { type: "text/csv" });
+   const url = URL.createObjectURL(blob);
+   const a = document.createElement("a");
+   a.href = url;
+   a.download = `web3gigs-waitlist-${new Date().toISOString().split("T")[0]}.csv`;
+   a.click();
+   URL.revokeObjectURL(url);
+ };
+
+ // Time ago helper
+ const timeAgo = (dateStr) => {
+   const diff = (new Date() - new Date(dateStr)) / 1000;
+   if (diff < 60) return "Just now";
+   if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+   if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+   return `${Math.floor(diff / 86400)}d ago`;
+ };
+
+ const adminStyle = {
+   minHeight: "100vh",
+   background: "#0a0a0a",
+   color: C.textPrimary,
+   fontFamily: "'Outfit', sans-serif",
+   padding: 20,
+   backgroundImage: `radial-gradient(circle at 20% 0%, rgba(212,255,0,0.04) 0%, transparent 40%), radial-gradient(circle at 80% 100%, rgba(212,255,0,0.03) 0%, transparent 40%)`,
+ };
+
+ return (
+   <div style={adminStyle}>
+     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+     <meta name="robots" content="noindex, nofollow" />
+     <style>{`
+       @media (max-width: 768px) {
+         .admin-stats { grid-template-columns: repeat(2, 1fr) !important; }
+         .admin-tabs { overflow-x: auto; flex-wrap: nowrap !important; padding-bottom: 4px; }
+         .admin-tabs button { white-space: nowrap; flex-shrink: 0; }
+         .admin-job-row { grid-template-columns: 1fr !important; gap: 8px !important; }
+         .admin-job-actions { justify-content: flex-start !important; flex-wrap: wrap; }
+         .admin-bottom-row { grid-template-columns: 1fr !important; }
+       }
+     `}</style>
+
+     <div style={{ maxWidth: 1400, margin: "0 auto" }}>
+
+       {/* Toast */}
+       {adminToast && (
+         <div style={{
+           position: "fixed", top: 20, right: 20, zIndex: 1000,
+           padding: "12px 18px", borderRadius: 10,
+           background: `${adminToast.color}15`, border: `1px solid ${adminToast.color}`,
+           color: adminToast.color, fontSize: 13, fontWeight: 800,
+           fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5,
+           boxShadow: `0 8px 24px ${adminToast.color}40`,
+         }}>{adminToast.msg}</div>
+       )}
+
+       {/* Header */}
+       <div style={{
+         display: "flex", justifyContent: "space-between", alignItems: "center",
+         padding: "16px 20px", borderRadius: 14, flexWrap: "wrap", gap: 12,
+         background: "rgba(18, 18, 18, 0.7)",
+         border: "1px solid rgba(212, 255, 0, 0.15)",
+         marginBottom: 24,
+       }}>
+         <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+           <div style={{
+             width: 40, height: 40, borderRadius: 10,
+             background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+             display: "flex", alignItems: "center", justifyContent: "center",
+             color: "#000", fontWeight: 900, fontSize: 18,
+           }}>🛡</div>
+           <div>
+             <div style={{ fontSize: 20, fontWeight: 900, letterSpacing: -0.5 }}>Web3Gigs Admin</div>
+             <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1.5, textTransform: "uppercase", marginTop: 2 }}>Internal · Founder Console</div>
+           </div>
+           <span style={{
+             padding: "5px 12px", borderRadius: 6,
+             background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.3)",
+             color: "#ef4444", fontSize: 10, fontWeight: 800,
+             fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1.5,
+           }}>ADMIN ONLY</span>
+         </div>
+         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+           <span style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
+             Signed in as <strong style={{ color: C.primary }}>@FabsKebabs</strong>
+           </span>
+           <button onClick={onSignOut} style={{
+             padding: "8px 14px", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.1)",
+             background: "transparent", color: C.textSecondary, fontSize: 11, cursor: "pointer",
+             fontFamily: "'JetBrains Mono', monospace",
+           }}>Sign Out</button>
+         </div>
+       </div>
+
+       {/* Stats grid */}
+       <div className="admin-stats" style={{
+         display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, marginBottom: 24,
+       }}>
+         {[
+           { label: "Pending Review", val: stats.pending, urgent: stats.pending > 0, sub: stats.pending > 0 ? `${stats.pending} awaiting` : "All clear" },
+           { label: "Live Jobs", val: stats.live, sub: "approved + in progress" },
+           { label: "Applications", val: stats.applications, sub: "all time" },
+           { label: "Waitlist", val: stats.waitlist, sub: "total signups" },
+           { label: "Completed", val: stats.completed, sub: stats.totalPaid > 0 ? `$${stats.totalPaid.toLocaleString()} paid` : "No completed yet" },
+         ].map((s, i) => (
+           <div key={i} style={{
+             padding: "16px 18px", borderRadius: 12,
+             background: s.urgent ? "rgba(239, 68, 68, 0.05)" : "rgba(18, 18, 18, 0.7)",
+             border: s.urgent ? "1px solid rgba(239, 68, 68, 0.2)" : "1px solid rgba(255, 255, 255, 0.06)",
+           }}>
+             <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.2, fontWeight: 700 }}>{s.label}</div>
+             <div style={{ fontSize: 26, fontWeight: 900, marginTop: 6, letterSpacing: -1, fontFamily: "'JetBrains Mono', monospace", color: s.urgent ? "#ef4444" : C.textPrimary }}>{s.val}</div>
+             <div style={{ fontSize: 10, color: s.urgent ? "#ef4444" : "#10b981", fontFamily: "'JetBrains Mono', monospace", marginTop: 4 }}>{s.sub}</div>
+           </div>
+         ))}
+       </div>
+
+       {/* Tabs */}
+       <div className="admin-tabs" style={{ display: "flex", gap: 8, marginBottom: 18, flexWrap: "wrap" }}>
+         {[
+           { id: "pending", label: "Pending Submissions", count: stats.pending, icon: "📋" },
+           { id: "jobs", label: "All Jobs", count: stats.live + stats.completed, icon: "💼" },
+           { id: "apps", label: "Applications", count: stats.applications, icon: "📨" },
+           { id: "waitlist", label: "Waitlist", count: stats.waitlist, icon: "📧" },
+           { id: "reports", label: "Reports", count: 0, icon: "🚩" },
+         ].map(t => {
+           const active = adminTab === t.id;
+           return (
+             <button key={t.id} onClick={() => setAdminTab(t.id)} style={{
+               padding: "8px 14px", borderRadius: 10,
+               border: active ? `1px solid ${C.primary}` : "1px solid rgba(255, 255, 255, 0.08)",
+               background: active ? "rgba(212, 255, 0, 0.1)" : "rgba(18, 18, 18, 0.7)",
+               color: active ? C.primary : C.textSecondary,
+               fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 700,
+               cursor: "pointer", letterSpacing: 0.5,
+               display: "inline-flex", alignItems: "center", gap: 6,
+             }}>
+               <span>{t.icon} {t.label}</span>
+               <span style={{
+                 padding: "1px 6px", borderRadius: 4,
+                 background: active ? "rgba(212, 255, 0, 0.2)" : "rgba(255, 255, 255, 0.05)",
+                 fontSize: 9,
+               }}>{t.count}</span>
+             </button>
+           );
+         })}
+       </div>
+
+       {/* Tab Content */}
+       {adminLoading ? (
+         <div style={{ padding: 60, textAlign: "center", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>Loading admin data...</div>
+       ) : (
+         <>
+           {/* TAB: PENDING SUBMISSIONS */}
+           {adminTab === "pending" && (
+             <div style={{
+               padding: 22, borderRadius: 14, marginBottom: 18,
+               background: "rgba(18, 18, 18, 0.7)", border: "1px solid rgba(255, 255, 255, 0.06)",
+             }}>
+               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, flexWrap: "wrap", gap: 10 }}>
+                 <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: -0.3, display: "flex", alignItems: "center", gap: 8 }}>
+                   {stats.pending > 0 && <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#fbbf24", boxShadow: "0 0 8px #fbbf24", animation: "pulse 1.5s ease-in-out infinite" }} />}
+                   Pending Submissions · Awaiting Review
+                 </div>
+                 <input type="text" placeholder="Search title, poster..." value={adminSearch} onChange={e => setAdminSearch(e.target.value)} style={{
+                   padding: "8px 12px", borderRadius: 8, background: "rgba(0, 0, 0, 0.5)",
+                   border: "1px solid rgba(255, 255, 255, 0.1)", color: "#fff",
+                   fontSize: 11, fontFamily: "'JetBrains Mono', monospace", width: 220, outline: "none",
+                 }} />
+               </div>
+
+               {pendingJobs.length === 0 ? (
+                 <div style={{ padding: 40, textAlign: "center", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
+                   <Check size={32} strokeWidth={2} style={{ color: "#10b981", marginBottom: 10 }} />
+                   <div style={{ fontSize: 14, fontWeight: 700, color: "#10b981", marginBottom: 4 }}>All caught up</div>
+                   <div style={{ fontSize: 11 }}>No pending submissions awaiting review</div>
+                 </div>
+               ) : pendingJobs.filter(j => {
+                 if (!adminSearch.trim()) return true;
+                 const q = adminSearch.toLowerCase();
+                 return (j.title || "").toLowerCase().includes(q) || (j.poster_handle || "").toLowerCase().includes(q) || (j.category || "").toLowerCase().includes(q);
+               }).map(j => {
+                 const ageHours = (new Date() - new Date(j.created_at)) / 3600000;
+                 const urgent = ageHours > 24;
+                 return (
+                   <div key={j.id} className="admin-job-row" style={{
+                     display: "grid", gridTemplateColumns: "60px 1fr 90px 100px 90px 240px",
+                     gap: 12, padding: "14px 12px", borderRadius: 10,
+                     background: urgent ? "rgba(251, 191, 36, 0.04)" : "rgba(0, 0, 0, 0.3)",
+                     border: urgent ? "1px solid rgba(251, 191, 36, 0.25)" : "1px solid rgba(255, 255, 255, 0.04)",
+                     alignItems: "center", marginBottom: 8,
+                   }}>
+                     <div style={{ fontSize: 10, color: "#666", fontFamily: "'JetBrains Mono', monospace" }}>#{j.id.substring(0, 6)}</div>
+                     <div>
+                       <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4 }}>{j.title}</div>
+                       <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
+                         <span style={{ color: C.primary }}>{j.poster_handle || j.poster_name}</span> · {j.category}
+                       </div>
+                     </div>
+                     <div style={{
+                       padding: "3px 8px", borderRadius: 4,
+                       background: j.job_type === "ct" ? "rgba(192, 132, 252, 0.1)" : "rgba(96, 165, 250, 0.1)",
+                       color: j.job_type === "ct" ? "#c084fc" : "#60a5fa",
+                       fontSize: 9, fontWeight: 800, letterSpacing: 1,
+                       fontFamily: "'JetBrains Mono', monospace", textAlign: "center",
+                     }}>{(j.job_type || "crypto").toUpperCase()}</div>
+                     <div style={{ fontSize: 12, color: C.primary, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", textAlign: "center" }}>${Number(j.budget || 0).toLocaleString()}</div>
+                     <div style={{ fontSize: 10, color: urgent ? "#fbbf24" : "#10b981", fontFamily: "'JetBrains Mono', monospace", textAlign: "center" }}>{timeAgo(j.created_at)}{urgent ? " ⚠" : ""}</div>
+                     <div className="admin-job-actions" style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
+                       <button onClick={() => updateJobStatus(j.id, "approved")} style={{
+                         padding: "6px 10px", borderRadius: 6, border: "none", cursor: "pointer",
+                         background: "#10b981", color: "#000", fontSize: 10, fontWeight: 800,
+                         fontFamily: "'Outfit', sans-serif",
+                       }}>✓ Approve</button>
+                       <button onClick={() => { updateJobStatus(j.id, "approved"); toggleFeatured(j.id, false); }} style={{
+                         padding: "6px 10px", borderRadius: 6, border: "none", cursor: "pointer",
+                         background: C.primary, color: "#000", fontSize: 10, fontWeight: 800,
+                         fontFamily: "'Outfit', sans-serif",
+                       }}>★ Feature</button>
+                       <button onClick={() => updateJobStatus(j.id, "rejected")} style={{
+                         padding: "6px 10px", borderRadius: 6, cursor: "pointer",
+                         background: "rgba(239, 68, 68, 0.1)", color: "#ef4444",
+                         border: "1px solid rgba(239, 68, 68, 0.3)", fontSize: 10, fontWeight: 800,
+                         fontFamily: "'Outfit', sans-serif",
+                       }}>✗ Reject</button>
+                       <button onClick={() => setSelectedAdminJob(j)} style={{
+                         padding: "6px 10px", borderRadius: 6, cursor: "pointer",
+                         background: "transparent", color: C.textSecondary,
+                         border: "1px solid rgba(255, 255, 255, 0.1)", fontSize: 10,
+                         fontFamily: "'Outfit', sans-serif",
+                       }}>👁</button>
+                     </div>
+                   </div>
+                 );
+               })}
+             </div>
+           )}
+
+           {/* TAB: ALL JOBS */}
+           {adminTab === "jobs" && (
+             <div style={{
+               padding: 22, borderRadius: 14, marginBottom: 18,
+               background: "rgba(18, 18, 18, 0.7)", border: "1px solid rgba(255, 255, 255, 0.06)",
+             }}>
+               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, flexWrap: "wrap", gap: 10 }}>
+                 <div style={{ fontSize: 16, fontWeight: 800 }}>All Live Jobs</div>
+                 <input type="text" placeholder="Search..." value={adminSearch} onChange={e => setAdminSearch(e.target.value)} style={{
+                   padding: "8px 12px", borderRadius: 8, background: "rgba(0, 0, 0, 0.5)",
+                   border: "1px solid rgba(255, 255, 255, 0.1)", color: "#fff",
+                   fontSize: 11, fontFamily: "'JetBrains Mono', monospace", width: 220, outline: "none",
+                 }} />
+               </div>
+
+               {allJobs.length === 0 ? (
+                 <div style={{ padding: 40, textAlign: "center", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", fontSize: 12 }}>No live jobs yet. Approve some pending submissions to see them here.</div>
+               ) : allJobs.filter(j => {
+                 if (!adminSearch.trim()) return true;
+                 const q = adminSearch.toLowerCase();
+                 return (j.title || "").toLowerCase().includes(q) || (j.poster_handle || "").toLowerCase().includes(q);
+               }).map(j => {
+                 const statusColor = j.status === "approved" ? "#10b981" : j.status === "in_progress" ? "#fbbf24" : C.primary;
+                 const statusLabel = j.status === "approved" ? "OPEN" : j.status === "in_progress" ? "IN PROGRESS" : "COMPLETED";
+                 const appsCount = allApplications.filter(a => a.job_id === j.id).length;
+                 return (
+                   <div key={j.id} className="admin-job-row" style={{
+                     display: "grid", gridTemplateColumns: "1fr 100px 70px 90px 200px",
+                     gap: 12, padding: "14px 12px", borderRadius: 10,
+                     background: "rgba(0, 0, 0, 0.3)",
+                     border: "1px solid rgba(255, 255, 255, 0.04)",
+                     alignItems: "center", marginBottom: 8,
+                   }}>
+                     <div>
+                       <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4 }}>{j.title} {j.featured && <span style={{ color: C.primary }}>★</span>}</div>
+                       <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
+                         <span style={{ color: C.primary }}>{j.poster_handle || j.poster_name}</span> · {j.category} · {appsCount} apps
+                       </div>
+                     </div>
+                     <div style={{
+                       padding: "3px 8px", borderRadius: 4,
+                       background: `${statusColor}15`, color: statusColor,
+                       fontSize: 9, fontWeight: 800, letterSpacing: 1,
+                       fontFamily: "'JetBrains Mono', monospace", textAlign: "center",
+                     }}>{statusLabel}</div>
+                     <div style={{ fontSize: 11, color: C.primary, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", textAlign: "center" }}>${Number(j.budget || 0).toLocaleString()}</div>
+                     <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textAlign: "center" }}>{timeAgo(j.created_at)}</div>
+                     <div className="admin-job-actions" style={{ display: "flex", gap: 4, flexWrap: "wrap", justifyContent: "flex-end" }}>
+                       {j.status === "approved" && (
+                         <button onClick={() => updateJobStatus(j.id, "in_progress")} style={{
+                           padding: "5px 8px", borderRadius: 6, border: "none", cursor: "pointer",
+                           background: "rgba(251, 191, 36, 0.15)", color: "#fbbf24",
+                           fontSize: 9, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                         }}>→ In Progress</button>
+                       )}
+                       {j.status === "in_progress" && (
+                         <button onClick={() => updateJobStatus(j.id, "completed")} style={{
+                           padding: "5px 8px", borderRadius: 6, border: "none", cursor: "pointer",
+                           background: `${C.primary}30`, color: C.primary,
+                           fontSize: 9, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                         }}>✓ Complete</button>
+                       )}
+                       <button onClick={() => toggleFeatured(j.id, j.featured)} style={{
+                         padding: "5px 8px", borderRadius: 6, border: "none", cursor: "pointer",
+                         background: j.featured ? `${C.primary}30` : "transparent",
+                         color: j.featured ? C.primary : C.textSecondary,
+                         border: `1px solid ${j.featured ? C.primary : "rgba(255, 255, 255, 0.1)"}`,
+                         fontSize: 9, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                       }}>★</button>
+                     </div>
+                   </div>
+                 );
+               })}
+             </div>
+           )}
+
+           {/* TAB: APPLICATIONS */}
+           {adminTab === "apps" && (
+             <div style={{
+               padding: 22, borderRadius: 14, marginBottom: 18,
+               background: "rgba(18, 18, 18, 0.7)", border: "1px solid rgba(255, 255, 255, 0.06)",
+             }}>
+               <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 18 }}>All Applications</div>
+               {allApplications.length === 0 ? (
+                 <div style={{ padding: 40, textAlign: "center", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", fontSize: 12 }}>No applications yet.</div>
+               ) : allApplications.map(a => (
+                 <div key={a.id} style={{
+                   padding: "14px 16px", borderRadius: 10, marginBottom: 8,
+                   background: "rgba(0, 0, 0, 0.3)", border: "1px solid rgba(255, 255, 255, 0.04)",
+                 }}>
+                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap: "wrap", gap: 8 }}>
+                     <div>
+                       <span style={{ fontSize: 13, fontWeight: 700, color: C.primary, fontFamily: "'JetBrains Mono', monospace" }}>{a.applicant_handle}</span>
+                       <span style={{ fontSize: 11, color: C.textMuted, marginLeft: 8 }}>· {a.applicant_email}</span>
+                     </div>
+                     <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>{timeAgo(a.created_at)}</div>
+                   </div>
+                   <div style={{ fontSize: 11, color: C.textSecondary, marginBottom: 6 }}>Applied to: <strong>{a.job_title}</strong> @ <span style={{ color: C.primary }}>{a.job_poster}</span></div>
+                   {a.message && <div style={{ fontSize: 11, color: C.textSecondary, padding: "8px 10px", background: "rgba(0, 0, 0, 0.3)", borderRadius: 6, marginBottom: 8, fontStyle: "italic", lineHeight: 1.4 }}>"{a.message}"</div>}
+                   <div style={{ display: "flex", gap: 12, fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", flexWrap: "wrap" }}>
+                     {a.portfolio_url && <a href={a.portfolio_url} target="_blank" rel="noopener noreferrer" style={{ color: C.primary }}>📁 Portfolio</a>}
+                     {a.expected_pay && <span>💰 Expected: {a.expected_pay}</span>}
+                     <span>Status: <strong style={{ color: a.status === "accepted" ? "#10b981" : a.status === "rejected" ? "#ef4444" : "#fbbf24" }}>{a.status || "pending"}</strong></span>
+                   </div>
+                   <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
+                     <button onClick={() => updateApplicationStatus(a.id, "forwarded")} style={{
+                       padding: "5px 10px", borderRadius: 6, border: "none", cursor: "pointer",
+                       background: "rgba(251, 191, 36, 0.15)", color: "#fbbf24",
+                       fontSize: 10, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                     }}>→ Mark Forwarded</button>
+                     <button onClick={() => updateApplicationStatus(a.id, "rejected")} style={{
+                       padding: "5px 10px", borderRadius: 6, cursor: "pointer",
+                       background: "rgba(239, 68, 68, 0.1)", color: "#ef4444",
+                       border: "1px solid rgba(239, 68, 68, 0.3)",
+                       fontSize: 10, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                     }}>✗ Reject</button>
+                   </div>
+                 </div>
+               ))}
+             </div>
+           )}
+
+           {/* TAB: WAITLIST */}
+           {adminTab === "waitlist" && (
+             <div style={{
+               padding: 22, borderRadius: 14, marginBottom: 18,
+               background: "rgba(18, 18, 18, 0.7)", border: "1px solid rgba(255, 255, 255, 0.06)",
+             }}>
+               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, flexWrap: "wrap", gap: 10 }}>
+                 <div style={{ fontSize: 16, fontWeight: 800 }}>Waitlist · {waitlistEntries.length} signups</div>
+                 <button onClick={exportWaitlistCSV} style={{
+                   padding: "8px 14px", borderRadius: 8, border: "none", cursor: "pointer",
+                   background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+                   color: "#000", fontSize: 11, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                   letterSpacing: 0.3,
+                 }}>📥 Export CSV</button>
+               </div>
+               {waitlistEntries.length === 0 ? (
+                 <div style={{ padding: 40, textAlign: "center", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", fontSize: 12 }}>No signups yet.</div>
+               ) : waitlistEntries.slice(0, 100).map((w, i) => (
+                 <div key={w.id} style={{
+                   display: "grid", gridTemplateColumns: "60px 1fr 100px 120px",
+                   gap: 12, padding: "10px 12px", borderRadius: 8, marginBottom: 4,
+                   background: "rgba(0, 0, 0, 0.3)", border: "1px solid rgba(255, 255, 255, 0.04)",
+                   alignItems: "center",
+                 }}>
+                   <div style={{ fontSize: 11, color: C.primary, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace" }}>#{waitlistEntries.length - i}</div>
+                   <div style={{ fontSize: 12, fontFamily: "'JetBrains Mono', monospace" }}>{w.email}</div>
+                   <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8 }}>{w.source || "unknown"}</div>
+                   <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textAlign: "right" }}>{timeAgo(w.created_at)}</div>
+                 </div>
+               ))}
+               {waitlistEntries.length > 100 && (
+                 <div style={{ padding: 12, textAlign: "center", color: C.textMuted, fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}>Showing first 100 · Export CSV for full list</div>
+               )}
+             </div>
+           )}
+
+           {/* TAB: REPORTS */}
+           {adminTab === "reports" && (
+             <div style={{
+               padding: 60, borderRadius: 14, marginBottom: 18,
+               background: "rgba(18, 18, 18, 0.7)", border: "1px solid rgba(255, 255, 255, 0.06)",
+               textAlign: "center",
+             }}>
+               <Flag size={36} strokeWidth={2} style={{ color: C.textMuted, marginBottom: 12 }} />
+               <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 6 }}>No reports yet</div>
+               <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", maxWidth: 400, margin: "0 auto", lineHeight: 1.5 }}>
+                 User-submitted spam/abuse reports will appear here. V1.5 feature — once user accounts launch, applicants and posters can flag suspicious activity.
+               </div>
+             </div>
+           )}
+
+           {/* Bottom row: Recent apps + Activity feed (always visible) */}
+           <div className="admin-bottom-row" style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 18 }}>
+             <div style={{
+               padding: 22, borderRadius: 14,
+               background: "rgba(18, 18, 18, 0.7)", border: "1px solid rgba(255, 255, 255, 0.06)",
+             }}>
+               <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 14 }}>📨 Recent Applications</div>
+               {allApplications.slice(0, 8).map(a => (
+                 <div key={a.id} style={{
+                   padding: "10px 12px", borderRadius: 8, marginBottom: 6,
+                   background: "rgba(0, 0, 0, 0.3)", border: "1px solid rgba(255, 255, 255, 0.04)",
+                 }}>
+                   <div style={{ fontSize: 11, marginBottom: 3 }}>
+                     <strong style={{ color: C.primary }}>{a.applicant_handle}</strong>{" "}
+                     applied to <strong>{a.job_title}</strong>
+                   </div>
+                   <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>{timeAgo(a.created_at)} · {a.applicant_email}</div>
+                 </div>
+               ))}
+               {allApplications.length === 0 && (
+                 <div style={{ padding: 24, textAlign: "center", color: C.textMuted, fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}>No applications yet</div>
+               )}
+             </div>
+             <div style={{
+               padding: 22, borderRadius: 14,
+               background: "rgba(18, 18, 18, 0.7)", border: "1px solid rgba(255, 255, 255, 0.06)",
+             }}>
+               <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 14 }}>⚡ Live Activity</div>
+               {[
+                 ...waitlistEntries.slice(0, 3).map(w => ({ icon: "+", color: "#10b981", text: "New waitlist signup", time: w.created_at })),
+                 ...allApplications.slice(0, 2).map(a => ({ icon: "📤", color: "#60a5fa", text: `New application: ${a.applicant_handle}`, time: a.created_at })),
+                 ...pendingJobs.slice(0, 2).map(j => ({ icon: "📋", color: "#fbbf24", text: `New job submission: ${j.title}`, time: j.created_at })),
+               ].sort((a, b) => new Date(b.time) - new Date(a.time)).slice(0, 8).map((act, i) => (
+                 <div key={i} style={{
+                   padding: "8px 10px", borderRadius: 8, marginBottom: 5,
+                   background: "rgba(0, 0, 0, 0.3)", border: "1px solid rgba(255, 255, 255, 0.04)",
+                   display: "flex", gap: 8, alignItems: "flex-start",
+                 }}>
+                   <div style={{ fontSize: 12, color: act.color, flexShrink: 0 }}>{act.icon}</div>
+                   <div style={{ flex: 1 }}>
+                     <div style={{ fontSize: 11, color: C.textPrimary, lineHeight: 1.3 }}>{act.text}</div>
+                     <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 2 }}>{timeAgo(act.time)}</div>
+                   </div>
+                 </div>
+               ))}
+             </div>
+           </div>
+         </>
+       )}
+
+       {/* Job Details Modal */}
+       {selectedAdminJob && (
+         <div onClick={() => setSelectedAdminJob(null)} style={{
+           position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)",
+           display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20,
+         }}>
+           <div onClick={e => e.stopPropagation()} style={{
+             maxWidth: 600, width: "100%", maxHeight: "85vh", overflow: "auto",
+             padding: 28, borderRadius: 14,
+             background: "#0a0a0a", border: `1px solid ${C.primary}40`,
+           }}>
+             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+               <div style={{ fontSize: 18, fontWeight: 800 }}>{selectedAdminJob.title}</div>
+               <button onClick={() => setSelectedAdminJob(null)} style={{ background: "transparent", border: "none", color: C.textMuted, fontSize: 20, cursor: "pointer" }}>×</button>
+             </div>
+             <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 16 }}>{selectedAdminJob.poster_handle} · {selectedAdminJob.category} · ${Number(selectedAdminJob.budget).toLocaleString()} {selectedAdminJob.currency}</div>
+             <div style={{ fontSize: 13, color: C.textSecondary, marginBottom: 16, lineHeight: 1.6 }}>{selectedAdminJob.description}</div>
+             {selectedAdminJob.deliverables && (
+               <>
+                 <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, marginBottom: 8, textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'JetBrains Mono', monospace" }}>Deliverables</div>
+                 <div style={{ fontSize: 12, color: C.textSecondary, marginBottom: 16, lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{selectedAdminJob.deliverables}</div>
+               </>
+             )}
+             <div style={{ display: "flex", gap: 8, marginTop: 20, flexWrap: "wrap" }}>
+               <button onClick={() => { updateJobStatus(selectedAdminJob.id, "approved"); setSelectedAdminJob(null); }} style={{
+                 padding: "8px 14px", borderRadius: 8, border: "none", cursor: "pointer",
+                 background: "#10b981", color: "#000", fontSize: 11, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+               }}>✓ Approve</button>
+               <button onClick={() => { updateJobStatus(selectedAdminJob.id, "rejected"); setSelectedAdminJob(null); }} style={{
+                 padding: "8px 14px", borderRadius: 8, cursor: "pointer",
+                 background: "rgba(239, 68, 68, 0.1)", color: "#ef4444",
+                 border: "1px solid rgba(239, 68, 68, 0.3)", fontSize: 11, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+               }}>✗ Reject</button>
+             </div>
+           </div>
+         </div>
+       )}
+
+     </div>
+   </div>
+ );
+}
+
 
 export default function Web3Gigs() {
+ // Admin route detection (?admin=1 or /admin path)
+ const [isAdminRoute, setIsAdminRoute] = useState(false);
+ const [adminAuthed, setAdminAuthed] = useState(false);
+ const [adminPassword, setAdminPassword] = useState("");
+ const [adminPasswordError, setAdminPasswordError] = useState("");
+
+ useEffect(() => {
+   // Check URL on mount
+   if (typeof window !== "undefined") {
+     const hash = window.location.hash;
+     const search = window.location.search;
+     const path = window.location.pathname;
+     if (path === "/admin" || hash === "#admin" || search.includes("admin=1")) {
+       setIsAdminRoute(true);
+       // Check if already authed in session
+       try {
+         if (sessionStorage.getItem("w3g_admin_auth") === "1") {
+           setAdminAuthed(true);
+         }
+       } catch (e) {}
+     }
+   }
+ }, []);
+
  const [tab, setTab] = useState("home");
  const [form, setForm] = useState({
  followers: "", avgLikes: "", avgRetweets: "", avgReplies: "",
@@ -1834,6 +2458,96 @@ export default function Web3Gigs() {
  textTransform: "uppercase",
  letterSpacing: 1.2,
  };
+
+ // ─── ADMIN ROUTE HANDLER ────────────────────────────────────
+ // The admin password is a non-secret hash check (basic obfuscation only)
+ // Real password is set via env or just hardcoded here for V0
+ const ADMIN_PASSWORD = "fabskebabs2026";
+
+ if (isAdminRoute) {
+   if (!adminAuthed) {
+     // Password gate
+     return (
+       <div style={{
+         minHeight: "100vh",
+         background: "#0a0a0a",
+         color: C.textPrimary,
+         fontFamily: "'Outfit', sans-serif",
+         display: "flex",
+         alignItems: "center",
+         justifyContent: "center",
+         padding: 20,
+       }}>
+         <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+         <meta name="robots" content="noindex, nofollow" />
+         <div style={{
+           maxWidth: 400, width: "100%", padding: "32px 28px",
+           background: "rgba(18, 18, 18, 0.8)",
+           border: "1px solid rgba(212, 255, 0, 0.15)",
+           borderRadius: 14,
+           textAlign: "center",
+         }}>
+           <div style={{ display: "flex", justifyContent: "center", marginBottom: 16, color: "#ef4444" }}><Lock size={36} strokeWidth={2.5} /></div>
+           <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.5, marginBottom: 6 }}>Admin Access</div>
+           <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 24 }}>Web3Gigs · Founder Console</div>
+           <input
+             type="password"
+             placeholder="Password"
+             value={adminPassword}
+             onChange={e => { setAdminPassword(e.target.value); setAdminPasswordError(""); }}
+             onKeyDown={e => {
+               if (e.key === "Enter") {
+                 if (adminPassword === ADMIN_PASSWORD) {
+                   try { sessionStorage.setItem("w3g_admin_auth", "1"); } catch (er) {}
+                   setAdminAuthed(true);
+                 } else {
+                   setAdminPasswordError("Incorrect password");
+                 }
+               }
+             }}
+             autoFocus
+             style={{
+               width: "100%", padding: "12px 14px", borderRadius: 10,
+               background: "rgba(0, 0, 0, 0.5)",
+               border: `1px solid ${adminPasswordError ? "#ef4444" : "rgba(255, 255, 255, 0.1)"}`,
+               color: C.textPrimary, fontSize: 14, fontFamily: "'JetBrains Mono', monospace",
+               outline: "none", boxSizing: "border-box", marginBottom: 12,
+             }}
+           />
+           {adminPasswordError && (
+             <div style={{ fontSize: 11, color: "#ef4444", fontFamily: "'JetBrains Mono', monospace", marginBottom: 12 }}>{adminPasswordError}</div>
+           )}
+           <button
+             onClick={() => {
+               if (adminPassword === ADMIN_PASSWORD) {
+                 try { sessionStorage.setItem("w3g_admin_auth", "1"); } catch (er) {}
+                 setAdminAuthed(true);
+               } else {
+                 setAdminPasswordError("Incorrect password");
+               }
+             }}
+             style={{
+               width: "100%", padding: "12px 14px", borderRadius: 10, border: "none",
+               background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+               color: "#000", fontSize: 13, fontWeight: 900,
+               fontFamily: "'Outfit', sans-serif", cursor: "pointer", letterSpacing: 0.3,
+             }}
+           >Sign In</button>
+           <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 18, letterSpacing: 0.5 }}>Authorized personnel only · Session-only access</div>
+         </div>
+       </div>
+     );
+   }
+   // Authed → render dashboard
+   return <AdminDashboard
+     C={C}
+     onSignOut={() => {
+       try { sessionStorage.removeItem("w3g_admin_auth"); } catch (e) {}
+       setAdminAuthed(false);
+       setAdminPassword("");
+     }}
+   />;
+ }
 
  return (
  <div style={{

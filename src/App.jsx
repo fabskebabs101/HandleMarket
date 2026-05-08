@@ -2030,17 +2030,12 @@ export default function Web3Gigs() {
        appearance: {
          theme: "dark",
          accentColor: "#d4ff00",
-         logo: "https://web3gigs.app/favicon.svg",
          showWalletLoginFirst: false,
        },
        loginMethods: ["email", "twitter", "wallet"],
        embeddedWallets: {
          createOnLogin: "off",
        },
-       defaultChain: { id: 1, name: "Ethereum" },
-       supportedChains: [
-         { id: 1, name: "Ethereum" },
-       ],
      }}
    >
      <Web3GigsApp />
@@ -2343,17 +2338,6 @@ function Web3GigsApp() {
    setApplySubmitted(false);
    setApplyError("");
  };
-
- // Auto-fill apply form when user signs in while modal is open
- useEffect(() => {
-   if (authenticated && selectedJob && !applySubmitted) {
-     setApplyForm(prev => ({
-       ...prev,
-       handle: prev.handle || (user?.twitter?.username ? `@${user.twitter.username}` : ""),
-       email: prev.email || user?.email?.address || user?.google?.email || "",
-     }));
-   }
- }, [authenticated, selectedJob, user]);
 
  const runDemoTrustScore = () => {
    if (!demoHandle.trim()) return;

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceDot, Area, AreaChart } from "recharts";
 import { supabase } from "./supabase";
+import { PrivyProvider, usePrivy } from "@privy-io/react-auth";
 import {
   Home, Briefcase, Search, Shield, Trophy, User, Network, Bell,
   Mail, Menu as MenuIcon, Check, X as XIcon, AlertTriangle, Flag,
@@ -2017,7 +2018,59 @@ function AdminDashboard({ C, onSignOut }) {
 }
 
 
+// Privy App ID - public, safe to commit
+const PRIVY_APP_ID = "cmowmjc6u01m10cl1bnq8owff";
+
+// Outer wrapper that provides Privy auth context
 export default function Web3Gigs() {
+ return (
+   <PrivyProvider
+     appId={PRIVY_APP_ID}
+     config={{
+       appearance: {
+         theme: "dark",
+         accentColor: "#d4ff00",
+         logo: "https://web3gigs.app/favicon.svg",
+         showWalletLoginFirst: false,
+       },
+       loginMethods: ["email", "twitter", "wallet"],
+       embeddedWallets: {
+         createOnLogin: "off",
+       },
+       defaultChain: { id: 1, name: "Ethereum" },
+       supportedChains: [
+         { id: 1, name: "Ethereum" },
+       ],
+     }}
+   >
+     <Web3GigsApp />
+   </PrivyProvider>
+ );
+}
+
+// Main app component (was previously Web3Gigs)
+function Web3GigsApp() {
+ // Privy auth
+ const { ready, authenticated, user, login, logout } = usePrivy();
+ const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+
+ // Helper: get display name from Privy user object
+ const getUserDisplayName = () => {
+   if (!user) return "";
+   if (user.twitter?.username) return `@${user.twitter.username}`;
+   if (user.email?.address) return user.email.address;
+   if (user.wallet?.address) return `${user.wallet.address.slice(0, 6)}...${user.wallet.address.slice(-4)}`;
+   if (user.google?.email) return user.google.email;
+   return "Signed in";
+ };
+ const getUserInitial = () => {
+   const name = getUserDisplayName();
+   if (name.startsWith("@")) return name[1]?.toUpperCase() || "U";
+   if (name.includes("@")) return name[0]?.toUpperCase() || "U";
+   if (name.startsWith("0x")) return "W";
+   return name[0]?.toUpperCase() || "U";
+ };
+
  // Admin route detection (?admin=1 or /admin path)
  const [isAdminRoute, setIsAdminRoute] = useState(false);
  const [adminAuthed, setAdminAuthed] = useState(false);
@@ -2283,10 +2336,24 @@ export default function Web3Gigs() {
  };
 
  const resetApplyForm = () => {
-   setApplyForm({ handle: "", message: "", portfolio: "", expectedPay: "", email: "" });
+   // Auto-fill from Privy user if signed in
+   const prefillHandle = user?.twitter?.username ? `@${user.twitter.username}` : "";
+   const prefillEmail = user?.email?.address || user?.google?.email || "";
+   setApplyForm({ handle: prefillHandle, message: "", portfolio: "", expectedPay: "", email: prefillEmail });
    setApplySubmitted(false);
    setApplyError("");
  };
+
+ // Auto-fill apply form when user signs in while modal is open
+ useEffect(() => {
+   if (authenticated && selectedJob && !applySubmitted) {
+     setApplyForm(prev => ({
+       ...prev,
+       handle: prev.handle || (user?.twitter?.username ? `@${user.twitter.username}` : ""),
+       email: prev.email || user?.email?.address || user?.google?.email || "",
+     }));
+   }
+ }, [authenticated, selectedJob, user]);
 
  const runDemoTrustScore = () => {
    if (!demoHandle.trim()) return;
@@ -2365,11 +2432,13 @@ export default function Web3Gigs() {
  }, [tab]);
 
  const resetJobForm = () => {
+   const prefillContact = user?.twitter?.username ? `@${user.twitter.username}` : "";
+   const prefillEmail = user?.email?.address || user?.google?.email || "";
    setJobForm({
      title: "", jobType: "crypto", category: "Development",
      budget: "", currency: "USDC", deadline: "",
      description: "", deliverables: "",
-     minTrust: "0", posterName: "", contact: "", email: "",
+     minTrust: "0", posterName: "", contact: prefillContact, email: prefillEmail,
    });
    setJobSubmitted(false);
    setJobError("");
@@ -2638,6 +2707,8 @@ export default function Web3Gigs() {
 .w3g-waitlist-label { display: none!important; }
 .w3g-waitlist-short { display: inline!important; }
 .w3g-waitlist-btn { padding: 10px 14px!important; font-size: 13px!important; letter-spacing: 1px!important; }
+.w3g-signin-label { display: none!important; }
+.w3g-user-label { max-width: 80px!important; font-size: 11px!important; }
  }
  @media (max-width: 380px) {
 .w3g-tagline { display: none!important; }
@@ -2753,6 +2824,111 @@ export default function Web3Gigs() {
  </div>
  {/* Right side, waitlist + menu */}
  <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+ {/* Sign In button or User pill (Privy) */}
+ {ready && (
+ <>
+ {!authenticated ? (
+ <button
+ onClick={login}
+ style={{
+ padding: "10px 14px", borderRadius: 12,
+ background: "transparent",
+ border: "1px solid rgba(212, 255, 0, 0.3)",
+ color: C.primary, fontSize: 12, fontWeight: 800,
+ fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+ letterSpacing: 0.3, transition: "all 0.2s",
+ display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap",
+ }}
+ onMouseEnter={e => { e.currentTarget.style.background = "rgba(212, 255, 0, 0.06)"; e.currentTarget.style.borderColor = C.primary; }}
+ onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "rgba(212, 255, 0, 0.3)"; }}
+ >
+ <User size={13} strokeWidth={2.5} />
+ <span className="w3g-signin-label">Sign In</span>
+ </button>
+ ) : (
+ <div style={{ position: "relative"}}>
+ <button
+ onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+ style={{
+ padding: "6px 10px 6px 6px", borderRadius: 12,
+ background: "rgba(212, 255, 0, 0.08)",
+ border: "1px solid rgba(212, 255, 0, 0.25)",
+ color: C.primary, fontSize: 12, fontWeight: 700,
+ fontFamily: "'JetBrains Mono', monospace", cursor: "pointer",
+ transition: "all 0.15s",
+ display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap",
+ }}
+ onMouseEnter={e => { e.currentTarget.style.background = "rgba(212, 255, 0, 0.12)"; }}
+ onMouseLeave={e => { e.currentTarget.style.background = "rgba(212, 255, 0, 0.08)"; }}
+ >
+ <span style={{
+ width: 22, height: 22, borderRadius: 6,
+ background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+ display: "flex", alignItems: "center", justifyContent: "center",
+ color: "#000", fontWeight: 900, fontSize: 11,
+ }}>{getUserInitial()}</span>
+ <span className="w3g-user-label" style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis"}}>{getUserDisplayName()}</span>
+ <span style={{ fontSize: 9, opacity: 0.6, marginLeft: 2 }}>▾</span>
+ </button>
+ {userDropdownOpen && (
+ <>
+ <div onClick={() => setUserDropdownOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 990 }} />
+ <div style={{
+ position: "absolute", top: "calc(100% + 6px)", right: 0,
+ minWidth: 200, padding: 6, borderRadius: 12,
+ background: "#0a0a0a",
+ border: "1px solid rgba(212, 255, 0, 0.2)",
+ boxShadow: "0 8px 32px rgba(0, 0, 0, 0.5)",
+ zIndex: 991,
+ }}>
+ <div style={{ padding: "8px 12px", borderBottom: "1px solid rgba(255, 255, 255, 0.06)", marginBottom: 4 }}>
+ <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1 }}>Signed in as</div>
+ <div style={{ fontSize: 12, color: C.primary, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"}}>{getUserDisplayName()}</div>
+ </div>
+ <button
+ onClick={() => { setUserDropdownOpen(false); setTab("user-profile"); }}
+ style={{
+ width: "100%", padding: "10px 12px", borderRadius: 8, border: "none",
+ background: "transparent", color: C.textPrimary, fontSize: 12,
+ fontFamily: "'Outfit', sans-serif", fontWeight: 600, cursor: "pointer",
+ textAlign: "left", display: "flex", alignItems: "center", gap: 10,
+ transition: "background 0.1s",
+ }}
+ onMouseEnter={e => e.currentTarget.style.background = "rgba(212, 255, 0, 0.06)"}
+ onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+ ><User size={14} strokeWidth={2.2} /> Profile</button>
+ <button
+ onClick={() => { setUserDropdownOpen(false); setTab("user-dashboard"); }}
+ style={{
+ width: "100%", padding: "10px 12px", borderRadius: 8, border: "none",
+ background: "transparent", color: C.textPrimary, fontSize: 12,
+ fontFamily: "'Outfit', sans-serif", fontWeight: 600, cursor: "pointer",
+ textAlign: "left", display: "flex", alignItems: "center", gap: 10,
+ transition: "background 0.1s",
+ }}
+ onMouseEnter={e => e.currentTarget.style.background = "rgba(212, 255, 0, 0.06)"}
+ onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+ ><BarChart3 size={14} strokeWidth={2.2} /> Dashboard</button>
+ <div style={{ height: 1, background: "rgba(255, 255, 255, 0.06)", margin: "4px 0" }} />
+ <button
+ onClick={() => { setUserDropdownOpen(false); logout(); }}
+ style={{
+ width: "100%", padding: "10px 12px", borderRadius: 8, border: "none",
+ background: "transparent", color: "#ef4444", fontSize: 12,
+ fontFamily: "'Outfit', sans-serif", fontWeight: 600, cursor: "pointer",
+ textAlign: "left", display: "flex", alignItems: "center", gap: 10,
+ transition: "background 0.1s",
+ }}
+ onMouseEnter={e => e.currentTarget.style.background = "rgba(239, 68, 68, 0.08)"}
+ onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+ ><XIcon size={14} strokeWidth={2.5} /> Sign Out</button>
+ </div>
+ </>
+ )}
+ </div>
+ )}
+ </>
+ )}
  <button
  className="w3g-waitlist-btn"onClick={() => { setWaitlistSubmitted(false); setWaitlistError(""); setShowWaitlistModal(true); }}
  style={{
@@ -6282,6 +6458,175 @@ export default function Web3Gigs() {
  </div>
  )}
  </GlowCard>
+ </div>
+ )}
+
+ {/* ─── USER PROFILE TAB (Privy logged-in users) ──────── */}
+ {tab === "user-profile" && (
+ <div style={{ maxWidth: 720, margin: "0 auto", padding: "0 8px" }}>
+ <div style={{ textAlign: "center", marginBottom: 24 }}>
+ <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8, fontWeight: 700 }}>Your Profile</div>
+ <h1 style={{ fontSize: 38, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>{authenticated ? <>Hey, <span style={{ color: C.primary }}>{getUserDisplayName()}</span></> : "Profile"}</h1>
+ </div>
+
+ {!authenticated ? (
+ <GlowCard glow style={{ textAlign: "center", padding: "40px 30px" }}>
+ <div style={{ display: "flex", justifyContent: "center", marginBottom: 16, color: C.primary }}><User size={40} strokeWidth={1.8} /></div>
+ <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>Sign in to view your profile</div>
+ <div style={{ fontSize: 13, color: C.textSecondary, marginBottom: 22, maxWidth: 400, margin: "0 auto 22px" }}>Profile pages launch with V1. Sign in now to claim your handle and get early access.</div>
+ <button onClick={login} style={{
+ padding: "12px 24px", borderRadius: 10, border: "none",
+ background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+ color: "#000", fontSize: 13, fontWeight: 900,
+ fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+ letterSpacing: 0.3,
+ }}>Sign In</button>
+ </GlowCard>
+ ) : (
+ <>
+ <GlowCard glow style={{ marginBottom: 18 }}>
+ <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 18, flexWrap: "wrap" }}>
+ <div style={{
+ width: 64, height: 64, borderRadius: 14,
+ background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+ display: "flex", alignItems: "center", justifyContent: "center",
+ fontSize: 24, fontWeight: 900, color: "#000",
+ }}>{getUserInitial()}</div>
+ <div style={{ flex: 1, minWidth: 200 }}>
+ <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: -0.3 }}>{getUserDisplayName()}</div>
+ <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 4 }}>
+ {user?.twitter && <span>X linked · </span>}
+ {user?.email && <span>Email linked · </span>}
+ {user?.wallet && <span>Wallet linked · </span>}
+ Member since {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "today"}
+ </div>
+ </div>
+ </div>
+ <div style={{ padding: "16px 18px", background: "rgba(251, 191, 36, 0.05)", border: "1px solid rgba(251, 191, 36, 0.2)", borderRadius: 10 }}>
+ <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+ <Construction size={16} strokeWidth={2.5} style={{ color: "#fbbf24" }} />
+ <div style={{ fontSize: 13, fontWeight: 800, color: "#fbbf24" }}>Profile features launch with V1</div>
+ </div>
+ <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.5, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.3 }}>Public profile pages, Trust Score auto-pull from your X, completed jobs, ratings, and reputation badges are all coming. Your account is locked in — when V1 ships, your profile will be ready.</div>
+ </div>
+ </GlowCard>
+
+ <GlowCard style={{ marginBottom: 18 }}>
+ <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, marginBottom: 12 }}>Linked Accounts</div>
+ <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+ {user?.email && (
+ <div style={{ padding: "10px 12px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 8, display: "flex", alignItems: "center", gap: 10 }}>
+ <Mail size={14} strokeWidth={2.2} style={{ color: C.primary }} />
+ <span style={{ fontSize: 12, fontFamily: "'JetBrains Mono', monospace", flex: 1 }}>{user.email.address}</span>
+ <span style={{ fontSize: 9, color: "#10b981", fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1, textTransform: "uppercase", fontWeight: 700 }}>Verified</span>
+ </div>
+ )}
+ {user?.twitter && (
+ <div style={{ padding: "10px 12px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 8, display: "flex", alignItems: "center", gap: 10 }}>
+ <MessageCircle size={14} strokeWidth={2.2} style={{ color: C.primary }} />
+ <span style={{ fontSize: 12, fontFamily: "'JetBrains Mono', monospace", flex: 1 }}>@{user.twitter.username}</span>
+ <span style={{ fontSize: 9, color: "#10b981", fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1, textTransform: "uppercase", fontWeight: 700 }}>Linked</span>
+ </div>
+ )}
+ {user?.wallet && (
+ <div style={{ padding: "10px 12px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 8, display: "flex", alignItems: "center", gap: 10 }}>
+ <Lock size={14} strokeWidth={2.2} style={{ color: C.primary }} />
+ <span style={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace", flex: 1, overflow: "hidden", textOverflow: "ellipsis" }}>{user.wallet.address}</span>
+ <span style={{ fontSize: 9, color: "#10b981", fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1, textTransform: "uppercase", fontWeight: 700 }}>{user.wallet.walletClientType || "Wallet"}</span>
+ </div>
+ )}
+ </div>
+ </GlowCard>
+ </>
+ )}
+ </div>
+ )}
+
+ {/* ─── USER DASHBOARD TAB (Privy logged-in users) ────── */}
+ {tab === "user-dashboard" && (
+ <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 8px" }}>
+ <div style={{ textAlign: "center", marginBottom: 24 }}>
+ <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8, fontWeight: 700 }}>Your Dashboard</div>
+ <h1 style={{ fontSize: 38, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>{authenticated ? "Dashboard" : "Sign in to access"}</h1>
+ </div>
+
+ {!authenticated ? (
+ <GlowCard glow style={{ textAlign: "center", padding: "40px 30px" }}>
+ <div style={{ display: "flex", justifyContent: "center", marginBottom: 16, color: C.primary }}><BarChart3 size={40} strokeWidth={1.8} /></div>
+ <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>Sign in to view your dashboard</div>
+ <div style={{ fontSize: 13, color: C.textSecondary, marginBottom: 22, maxWidth: 420, margin: "0 auto 22px" }}>Dashboards launch with V1. Sign in now to claim your account and get early access.</div>
+ <button onClick={login} style={{
+ padding: "12px 24px", borderRadius: 10, border: "none",
+ background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+ color: "#000", fontSize: 13, fontWeight: 900,
+ fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+ letterSpacing: 0.3,
+ }}>Sign In</button>
+ </GlowCard>
+ ) : (
+ <>
+ {/* Stat cards (placeholder) */}
+ <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10, marginBottom: 18 }}>
+ {[
+ { label: "Jobs Posted", val: "—", sub: "V1 launch" },
+ { label: "Applications", val: "—", sub: "V1 launch" },
+ { label: "Completed", val: "—", sub: "V1 launch" },
+ { label: "Trust Score", val: user?.twitter?.username ? "Pending" : "—", sub: user?.twitter?.username ? "Auto-pull V1" : "Link X first" },
+ ].map((s, i) => (
+ <div key={i} style={{ padding: "14px 16px", background: "rgba(18, 18, 18, 0.7)", borderRadius: 12, border: "1px solid rgba(255, 255, 255, 0.06)", textAlign: "center" }}>
+ <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.2, fontWeight: 700 }}>{s.label}</div>
+ <div style={{ fontSize: 22, fontWeight: 900, marginTop: 6, fontFamily: "'JetBrains Mono', monospace", color: C.textMuted }}>{s.val}</div>
+ <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 2 }}>{s.sub}</div>
+ </div>
+ ))}
+ </div>
+
+ <GlowCard glow style={{ marginBottom: 18 }}>
+ <div style={{ padding: "20px 18px", textAlign: "center" }}>
+ <div style={{ display: "flex", justifyContent: "center", marginBottom: 14, color: "#fbbf24" }}><Construction size={32} strokeWidth={2} /></div>
+ <div style={{ fontSize: 18, fontWeight: 800, color: "#fbbf24", marginBottom: 8 }}>Dashboard launches with V1</div>
+ <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.6, maxWidth: 480, margin: "0 auto", marginBottom: 16 }}>When V1 ships, this will be your control panel. We'll show jobs you've posted with applicant lists, jobs you've applied to with statuses, plus your reputation and earnings history. For now, you're locked in for early access.</div>
+ <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+ <button onClick={() => setTab("jobs")} style={{
+ padding: "10px 16px", borderRadius: 10, border: "none",
+ background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+ color: "#000", fontSize: 12, fontWeight: 800,
+ fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+ letterSpacing: 0.3,
+ }}>Browse Jobs</button>
+ <button onClick={() => { setTab("jobs"); setShowPostJob(true); }} style={{
+ padding: "10px 16px", borderRadius: 10,
+ background: "transparent", color: C.textPrimary,
+ border: `1px solid ${C.borderHover}`, fontSize: 12, fontWeight: 700,
+ fontFamily: "'Outfit', sans-serif", cursor: "pointer", letterSpacing: 0.3,
+ }}>Post a Job</button>
+ </div>
+ </div>
+ </GlowCard>
+
+ {/* What's coming preview */}
+ <GlowCard>
+ <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, marginBottom: 12 }}>Coming with V1</div>
+ <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 10 }}>
+ {[
+ { icon: Briefcase, title: "Jobs you've posted", desc: "Review applications, manage status" },
+ { icon: Mail, title: "Jobs you've applied to", desc: "Track status, see replies" },
+ { icon: Trophy, title: "Reputation & ratings", desc: "Build your on-chain handshake history" },
+ { icon: Bell, title: "Watchlists & alerts", desc: "Get notified when accounts you watch change" },
+ ].map((f, i) => {
+ const Icon = f.icon;
+ return (
+ <div key={i} style={{ padding: "12px 14px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+ <Icon size={16} strokeWidth={2.2} style={{ color: C.primary, marginBottom: 6 }} />
+ <div style={{ fontSize: 13, fontWeight: 700, color: C.textPrimary, marginBottom: 3 }}>{f.title}</div>
+ <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.3, lineHeight: 1.4 }}>{f.desc}</div>
+ </div>
+ );
+ })}
+ </div>
+ </GlowCard>
+ </>
+ )}
  </div>
  )}
 

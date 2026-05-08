@@ -3105,7 +3105,7 @@ export default function Web3Gigs() {
  </h1>
  </Reveal>
  <Reveal delay={200}>
- <p style={{ color: C.textSecondary, fontSize: 18, marginTop: 20, maxWidth: 560, margin: "20px auto 0", lineHeight: 1.5 }}>Dev, design, audits, writing, or shitposts, raids, and Spaces. Every applicant comes with a Trust Score attached. No middleman. No 20% Fiverr cut. Get paid in USDC, USDT or SOL.
+ <p style={{ color: C.textSecondary, fontSize: 18, marginTop: 20, maxWidth: 560, margin: "20px auto 0", lineHeight: 1.5 }}>Dev, design, audits, writing, or shitposts, raids, and Spaces. Every applicant comes with a Trust Score attached. No middleman. No 20% Fiverr cut. Get paid in USDC, USDT, SOL or ETH.
  </p>
  </Reveal>
 
@@ -3270,7 +3270,7 @@ export default function Web3Gigs() {
  {[
  { num: "01", title: "Post or Apply", desc: "Post a job with budget, deadline, and minimum trust score. Or browse jobs and apply with your reputation attached.", Icon: FileText },
  { num: "02", title: "Handshake", desc: "Both parties sign a public on-chain commitment. Trust scores + community reputation enforce delivery. No middleman taking a cut.", Icon: Handshake },
- { num: "03", title: "Get Paid", desc: "Work delivered, buyer approves, funds released in USDC, USDT or SOL. Reputation compounds for both sides. Pure crypto-native workflow.", Icon: DollarSign },
+ { num: "03", title: "Get Paid", desc: "Work delivered, buyer approves, funds released in USDC, USDT, SOL or ETH. Reputation compounds for both sides. Pure crypto-native workflow.", Icon: DollarSign },
  ].map((step, i) => (
  <GlowCard key={step.num} glow style={{ position: "relative", paddingTop: 32 }}>
  <div style={{ position: "absolute", top: 20, right: 20, fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, letterSpacing: 2 }}>/ {step.num}</div>
@@ -3487,7 +3487,7 @@ export default function Web3Gigs() {
  },
  {
  q: "How do payments work?",
- a: "Direct wallet-to-wallet. Web3Gigs never holds your money, funds move directly between buyer and worker in USDC, USDT or SOL. No 14-day holds, no chargebacks, no platform taking a % of your payout. You keep 100% of what you earn.",
+ a: "Direct wallet-to-wallet. Web3Gigs never holds your money, funds move directly between buyer and worker in USDC, USDT, SOL or ETH. No 14-day holds, no chargebacks, no platform taking a % of your payout. You keep 100% of what you earn.",
  },
  {
  q: "Who is Web3Gigs for?",
@@ -3574,7 +3574,7 @@ export default function Web3Gigs() {
  <div style={{ fontSize: 32, fontWeight: 900, letterSpacing: -1.5, marginBottom: 12 }}>Join <span style={{ color: C.primary }}>crypto's work marketplace.</span>
  </div>
  <div style={{ fontSize: 15, color: C.textSecondary, marginBottom: 28, maxWidth: 500, margin: "0 auto 28px"}}>
- 33+ open jobs. Zero middleman fees. Paid in USDC, USDT or SOL. Reputation-first hiring. Ship the way crypto was meant to work.
+ 33+ open jobs. Zero middleman fees. Paid in USDC, USDT, SOL or ETH. Reputation-first hiring. Ship the way crypto was meant to work.
  </div>
  <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap"}}>
  <button
@@ -6344,7 +6344,7 @@ export default function Web3Gigs() {
  <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 18, fontWeight: 700 }}>How it works</div>
  <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
  {[
- { who: "For job posters", icon: Briefcase, body: "Post your job. Manually reviewed within 24h. Applicants come pre-scored. Pay direct in USDC, USDT, or SOL." },
+ { who: "For job posters", icon: Briefcase, body: "Post your job. Manually reviewed within 24h. Applicants come pre-scored. Pay direct in USDC, USDT, SOL or ETH." },
  { who: "For builders", icon: Code, body: "Apply with your X handle. Your Trust Score is auto-attached. No portfolio gymnastics required: your reputation does the talking. Get paid the day you ship." },
  { who: "For the crypto economy", icon: Network, body: "A reputation graph that makes anon work safer. Bot accounts get filtered. Real builders rise. The trenches get cleaner." },
  ].map((block, i) => (
@@ -7028,6 +7028,7 @@ export default function Web3Gigs() {
  <option value="USDC">USDC</option>
  <option value="USDT">USDT</option>
  <option value="SOL">SOL</option>
+ <option value="ETH">ETH</option>
  </select>
  </div>
  <div>

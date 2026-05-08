@@ -2031,6 +2031,7 @@ export default function Web3Gigs() {
          theme: "dark",
          accentColor: "#d4ff00",
          showWalletLoginFirst: false,
+         landingHeader: "Sign in to Web3Gigs",
        },
        loginMethods: ["email", "twitter", "wallet"],
        embeddedWallets: {
@@ -2693,6 +2694,27 @@ function Web3GigsApp() {
 .w3g-waitlist-btn { padding: 10px 14px!important; font-size: 13px!important; letter-spacing: 1px!important; }
 .w3g-signin-label { display: none!important; }
 .w3g-user-label { max-width: 80px!important; font-size: 11px!important; }
+ }
+ /* Privy modal contrast fixes - force dark inputs in dark theme */
+ #privy-modal-content input[type="email"],
+ #privy-modal-content input[type="text"],
+ #privy-modal-content input[type="tel"],
+ div[role="dialog"] input[type="email"],
+ div[role="dialog"] input[type="text"],
+ div[role="dialog"] input[type="tel"] {
+   background: rgba(0, 0, 0, 0.6) !important;
+   color: #ffffff !important;
+   border: 1px solid rgba(212, 255, 0, 0.2) !important;
+ }
+ #privy-modal-content input::placeholder,
+ div[role="dialog"] input::placeholder {
+   color: rgba(255, 255, 255, 0.4) !important;
+ }
+ /* Make sure Submit button has dark text on lime background */
+ #privy-modal-content button[type="submit"],
+ div[role="dialog"] button[type="submit"] {
+   color: #000000 !important;
+   font-weight: 700 !important;
  }
  @media (max-width: 380px) {
 .w3g-tagline { display: none!important; }

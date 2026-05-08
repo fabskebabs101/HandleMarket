@@ -2701,20 +2701,35 @@ function Web3GigsApp() {
  #privy-modal-content input[type="tel"],
  div[role="dialog"] input[type="email"],
  div[role="dialog"] input[type="text"],
- div[role="dialog"] input[type="tel"] {
+ div[role="dialog"] input[type="tel"],
+ input#email-input {
    background: rgba(0, 0, 0, 0.6) !important;
    color: #ffffff !important;
-   border: 1px solid rgba(212, 255, 0, 0.2) !important;
+   border: 1px solid rgba(212, 255, 0, 0.3) !important;
  }
  #privy-modal-content input::placeholder,
- div[role="dialog"] input::placeholder {
+ div[role="dialog"] input::placeholder,
+ input#email-input::placeholder {
    color: rgba(255, 255, 255, 0.4) !important;
  }
- /* Make sure Submit button has dark text on lime background */
- #privy-modal-content button[type="submit"],
- div[role="dialog"] button[type="submit"] {
-   color: #000000 !important;
-   font-weight: 700 !important;
+ /* The label wrapping email input + Submit button (Privy uses styled-components) */
+ #privy-modal-content label,
+ div[role="dialog"] label {
+   background: rgba(0, 0, 0, 0.6) !important;
+   border: 1px solid rgba(212, 255, 0, 0.3) !important;
+ }
+ /* Force Submit button text dark on lime — target ALL buttons inside Privy modal */
+ #privy-modal-content button,
+ div[role="dialog"] button {
+   color: inherit;
+ }
+ /* Submit button specifically — the one inside the email label */
+ #privy-modal-content label button,
+ div[role="dialog"] label button,
+ #privy-modal-content label button span,
+ div[role="dialog"] label button span {
+   color: #d4ff00 !important;
+   font-weight: 800 !important;
  }
  @media (max-width: 380px) {
 .w3g-tagline { display: none!important; }

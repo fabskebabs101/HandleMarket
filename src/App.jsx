@@ -1532,7 +1532,7 @@ function AdminDashboard({ C, onSignOut }) {
            position: "fixed", top: 20, right: 20, zIndex: 1000,
            padding: "12px 18px", borderRadius: 10,
            background: `${adminToast.color}15`, border: `1px solid ${adminToast.color}`,
-           color: adminToast.color, fontSize: 13, fontWeight: 800,
+           color: adminToast.color, fontSize: 15, fontWeight: 800,
            fontFamily: "'JetBrains Mono', monospace", letterSpacing: 0.5,
            boxShadow: `0 8px 24px ${adminToast.color}40`,
          }}>{adminToast.msg}</div>
@@ -1554,23 +1554,23 @@ function AdminDashboard({ C, onSignOut }) {
              color: "#000", fontWeight: 900, fontSize: 18,
            }}>🛡</div>
            <div>
-             <div style={{ fontSize: 20, fontWeight: 900, letterSpacing: -0.5 }}>Web3Gigs Admin</div>
-             <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1.5, textTransform: "uppercase", marginTop: 2 }}>Internal · Founder Console</div>
+             <div style={{ fontSize: 24, fontWeight: 900, letterSpacing: -0.5 }}>Web3Gigs Admin</div>
+             <div style={{ fontSize: 16, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1.5, textTransform: "uppercase", marginTop: 2 }}>Internal · Founder Console</div>
            </div>
            <span style={{
              padding: "5px 12px", borderRadius: 6,
              background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.3)",
-             color: "#ef4444", fontSize: 10, fontWeight: 800,
+             color: "#ef4444", fontSize: 16, fontWeight: 800,
              fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1.5,
            }}>ADMIN ONLY</span>
          </div>
          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-           <span style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
+           <span style={{ fontSize: 15, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
              Signed in as <strong style={{ color: C.primary }}>@FabsKebabs</strong>
            </span>
            <button onClick={onSignOut} style={{
              padding: "8px 14px", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.1)",
-             background: "transparent", color: C.textSecondary, fontSize: 11, cursor: "pointer",
+             background: "transparent", color: C.textSecondary, fontSize: 15, cursor: "pointer",
              fontFamily: "'JetBrains Mono', monospace",
            }}>Sign Out</button>
          </div>
@@ -1592,9 +1592,9 @@ function AdminDashboard({ C, onSignOut }) {
              background: s.urgent ? "rgba(239, 68, 68, 0.05)" : "rgba(18, 18, 18, 0.7)",
              border: s.urgent ? "1px solid rgba(239, 68, 68, 0.2)" : "1px solid rgba(255, 255, 255, 0.06)",
            }}>
-             <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.2, fontWeight: 700 }}>{s.label}</div>
-             <div style={{ fontSize: 26, fontWeight: 900, marginTop: 6, letterSpacing: -1, fontFamily: "'JetBrains Mono', monospace", color: s.urgent ? "#ef4444" : C.textPrimary }}>{s.val}</div>
-             <div style={{ fontSize: 10, color: s.urgent ? "#ef4444" : "#10b981", fontFamily: "'JetBrains Mono', monospace", marginTop: 4 }}>{s.sub}</div>
+             <div style={{ fontSize: 16, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.2, fontWeight: 700 }}>{s.label}</div>
+             <div style={{ fontSize: 30, fontWeight: 900, marginTop: 6, letterSpacing: -1, fontFamily: "'JetBrains Mono', monospace", color: s.urgent ? "#ef4444" : C.textPrimary }}>{s.val}</div>
+             <div style={{ fontSize: 16, color: s.urgent ? "#ef4444" : "#10b981", fontFamily: "'JetBrains Mono', monospace", marginTop: 4 }}>{s.sub}</div>
            </div>
          ))}
        </div>
@@ -1615,7 +1615,7 @@ function AdminDashboard({ C, onSignOut }) {
                border: active ? `1px solid ${C.primary}` : "1px solid rgba(255, 255, 255, 0.08)",
                background: active ? "rgba(212, 255, 0, 0.1)" : "rgba(18, 18, 18, 0.7)",
                color: active ? C.primary : C.textSecondary,
-               fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 700,
+               fontFamily: "'JetBrains Mono', monospace", fontSize: 15, fontWeight: 700,
                cursor: "pointer", letterSpacing: 0.5,
                display: "inline-flex", alignItems: "center", gap: 6,
              }}>
@@ -1623,7 +1623,7 @@ function AdminDashboard({ C, onSignOut }) {
                <span style={{
                  padding: "1px 6px", borderRadius: 4,
                  background: active ? "rgba(212, 255, 0, 0.2)" : "rgba(255, 255, 255, 0.05)",
-                 fontSize: 9,
+                 fontSize: 15,
                }}>{t.count}</span>
              </button>
            );
@@ -1642,21 +1642,21 @@ function AdminDashboard({ C, onSignOut }) {
                background: "rgba(18, 18, 18, 0.7)", border: "1px solid rgba(255, 255, 255, 0.06)",
              }}>
                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, flexWrap: "wrap", gap: 10 }}>
-                 <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: -0.3, display: "flex", alignItems: "center", gap: 8 }}>
+                 <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: -0.3, display: "flex", alignItems: "center", gap: 8 }}>
                    {stats.pending > 0 && <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#fbbf24", boxShadow: "0 0 8px #fbbf24", animation: "pulse 1.5s ease-in-out infinite" }} />}
                    Pending Submissions · Awaiting Review
                  </div>
                  <input type="text" placeholder="Search title, poster..." value={adminSearch} onChange={e => setAdminSearch(e.target.value)} style={{
                    padding: "8px 12px", borderRadius: 8, background: "rgba(0, 0, 0, 0.5)",
                    border: "1px solid rgba(255, 255, 255, 0.1)", color: "#fff",
-                   fontSize: 11, fontFamily: "'JetBrains Mono', monospace", width: 220, outline: "none",
+                   fontSize: 15, fontFamily: "'JetBrains Mono', monospace", width: 220, outline: "none",
                  }} />
                </div>
 
                {pendingJobs.length === 0 ? (
                  <div style={{ padding: 40, textAlign: "center", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
                    <Check size={32} strokeWidth={2} style={{ color: "#10b981", marginBottom: 10 }} />
-                   <div style={{ fontSize: 14, fontWeight: 700, color: "#10b981", marginBottom: 4 }}>All caught up</div>
+                   <div style={{ fontSize: 16, fontWeight: 700, color: "#10b981", marginBottom: 4 }}>All caught up</div>
                    <div style={{ fontSize: 11 }}>No pending submissions awaiting review</div>
                  </div>
                ) : pendingJobs.filter(j => {
@@ -1674,10 +1674,10 @@ function AdminDashboard({ C, onSignOut }) {
                      border: urgent ? "1px solid rgba(251, 191, 36, 0.25)" : "1px solid rgba(255, 255, 255, 0.04)",
                      alignItems: "center", marginBottom: 8,
                    }}>
-                     <div style={{ fontSize: 10, color: "#666", fontFamily: "'JetBrains Mono', monospace" }}>#{j.id.substring(0, 6)}</div>
+                     <div style={{ fontSize: 16, color: "#666", fontFamily: "'JetBrains Mono', monospace" }}>#{j.id.substring(0, 6)}</div>
                      <div>
-                       <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4 }}>{j.title}</div>
-                       <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
+                       <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{j.title}</div>
+                       <div style={{ fontSize: 16, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
                          <span style={{ color: C.primary }}>{j.poster_handle || j.poster_name}</span> · {j.category}
                        </div>
                      </div>
@@ -1685,38 +1685,38 @@ function AdminDashboard({ C, onSignOut }) {
                        padding: "3px 8px", borderRadius: 4,
                        background: j.job_type === "ct" ? "rgba(192, 132, 252, 0.1)" : "rgba(96, 165, 250, 0.1)",
                        color: j.job_type === "ct" ? "#c084fc" : "#60a5fa",
-                       fontSize: 9, fontWeight: 800, letterSpacing: 1,
+                       fontSize: 15, fontWeight: 800, letterSpacing: 1,
                        fontFamily: "'JetBrains Mono', monospace", textAlign: "center",
                      }}>{(j.job_type || "crypto").toUpperCase()}</div>
-                     <div style={{ fontSize: 12, color: C.primary, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", textAlign: "center" }}>${Number(j.budget || 0).toLocaleString()}</div>
-                     <div style={{ fontSize: 10, color: urgent ? "#fbbf24" : "#10b981", fontFamily: "'JetBrains Mono', monospace", textAlign: "center" }}>{timeAgo(j.created_at)}{urgent ? " ⚠" : ""}</div>
+                     <div style={{ fontSize: 16, color: C.primary, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", textAlign: "center" }}>${Number(j.budget || 0).toLocaleString()}</div>
+                     <div style={{ fontSize: 16, color: urgent ? "#fbbf24" : "#10b981", fontFamily: "'JetBrains Mono', monospace", textAlign: "center" }}>{timeAgo(j.created_at)}{urgent ? " ⚠" : ""}</div>
                      <div className="admin-job-actions" style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
                        <button onClick={() => updateJobStatus(j.id, "approved")} style={{
                          padding: "6px 10px", borderRadius: 6, border: "none", cursor: "pointer",
-                         background: "#10b981", color: "#000", fontSize: 10, fontWeight: 800,
+                         background: "#10b981", color: "#000", fontSize: 16, fontWeight: 800,
                          fontFamily: "'Outfit', sans-serif",
                        }}>✓ Approve</button>
                        <button onClick={() => { updateJobStatus(j.id, "approved"); toggleFeatured(j.id, false); }} style={{
                          padding: "6px 10px", borderRadius: 6, border: "none", cursor: "pointer",
-                         background: C.primary, color: "#000", fontSize: 10, fontWeight: 800,
+                         background: C.primary, color: "#000", fontSize: 16, fontWeight: 800,
                          fontFamily: "'Outfit', sans-serif",
                        }}>★ Feature</button>
                        <button onClick={() => updateJobStatus(j.id, "rejected")} style={{
                          padding: "6px 10px", borderRadius: 6, cursor: "pointer",
                          background: "rgba(239, 68, 68, 0.1)", color: "#ef4444",
-                         border: "1px solid rgba(239, 68, 68, 0.3)", fontSize: 10, fontWeight: 800,
+                         border: "1px solid rgba(239, 68, 68, 0.3)", fontSize: 16, fontWeight: 800,
                          fontFamily: "'Outfit', sans-serif",
                        }}>✗ Reject</button>
                        <button onClick={() => setSelectedAdminJob(j)} style={{
                          padding: "6px 10px", borderRadius: 6, cursor: "pointer",
                          background: "transparent", color: C.textSecondary,
-                         border: "1px solid rgba(255, 255, 255, 0.1)", fontSize: 10,
+                         border: "1px solid rgba(255, 255, 255, 0.1)", fontSize: 16,
                          fontFamily: "'Outfit', sans-serif",
                        }}>👁</button>
                        <button onClick={() => deleteJob(j.id, j.title)} title="Delete permanently" style={{
                          padding: "6px 10px", borderRadius: 6, cursor: "pointer",
                          background: "rgba(239, 68, 68, 0.15)", color: "#ef4444",
-                         border: "1px solid rgba(239, 68, 68, 0.4)", fontSize: 10, fontWeight: 800,
+                         border: "1px solid rgba(239, 68, 68, 0.4)", fontSize: 16, fontWeight: 800,
                          fontFamily: "'Outfit', sans-serif",
                        }}>🗑</button>
                      </div>
@@ -1737,7 +1737,7 @@ function AdminDashboard({ C, onSignOut }) {
                  <input type="text" placeholder="Search..." value={adminSearch} onChange={e => setAdminSearch(e.target.value)} style={{
                    padding: "8px 12px", borderRadius: 8, background: "rgba(0, 0, 0, 0.5)",
                    border: "1px solid rgba(255, 255, 255, 0.1)", color: "#fff",
-                   fontSize: 11, fontFamily: "'JetBrains Mono', monospace", width: 220, outline: "none",
+                   fontSize: 15, fontFamily: "'JetBrains Mono', monospace", width: 220, outline: "none",
                  }} />
                </div>
 
@@ -1760,32 +1760,32 @@ function AdminDashboard({ C, onSignOut }) {
                      alignItems: "center", marginBottom: 8,
                    }}>
                      <div>
-                       <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4 }}>{j.title} {j.featured && <span style={{ color: C.primary }}>★</span>}</div>
-                       <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
+                       <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{j.title} {j.featured && <span style={{ color: C.primary }}>★</span>}</div>
+                       <div style={{ fontSize: 16, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
                          <span style={{ color: C.primary }}>{j.poster_handle || j.poster_name}</span> · {j.category} · {appsCount} apps
                        </div>
                      </div>
                      <div style={{
                        padding: "3px 8px", borderRadius: 4,
                        background: `${statusColor}15`, color: statusColor,
-                       fontSize: 9, fontWeight: 800, letterSpacing: 1,
+                       fontSize: 15, fontWeight: 800, letterSpacing: 1,
                        fontFamily: "'JetBrains Mono', monospace", textAlign: "center",
                      }}>{statusLabel}</div>
-                     <div style={{ fontSize: 11, color: C.primary, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", textAlign: "center" }}>${Number(j.budget || 0).toLocaleString()}</div>
-                     <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textAlign: "center" }}>{timeAgo(j.created_at)}</div>
+                     <div style={{ fontSize: 15, color: C.primary, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", textAlign: "center" }}>${Number(j.budget || 0).toLocaleString()}</div>
+                     <div style={{ fontSize: 16, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textAlign: "center" }}>{timeAgo(j.created_at)}</div>
                      <div className="admin-job-actions" style={{ display: "flex", gap: 4, flexWrap: "wrap", justifyContent: "flex-end" }}>
                        {j.status === "approved" && (
                          <button onClick={() => updateJobStatus(j.id, "in_progress")} style={{
                            padding: "5px 8px", borderRadius: 6, border: "none", cursor: "pointer",
                            background: "rgba(251, 191, 36, 0.15)", color: "#fbbf24",
-                           fontSize: 9, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                           fontSize: 15, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
                          }}>→ In Progress</button>
                        )}
                        {j.status === "in_progress" && (
                          <button onClick={() => updateJobStatus(j.id, "completed")} style={{
                            padding: "5px 8px", borderRadius: 6, border: "none", cursor: "pointer",
                            background: `${C.primary}30`, color: C.primary,
-                           fontSize: 9, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                           fontSize: 15, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
                          }}>✓ Complete</button>
                        )}
                        <button onClick={() => toggleFeatured(j.id, j.featured)} style={{
@@ -1793,13 +1793,13 @@ function AdminDashboard({ C, onSignOut }) {
                          background: j.featured ? `${C.primary}30` : "transparent",
                          color: j.featured ? C.primary : C.textSecondary,
                          border: `1px solid ${j.featured ? C.primary : "rgba(255, 255, 255, 0.1)"}`,
-                         fontSize: 9, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                         fontSize: 15, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
                        }}>★</button>
                        <button onClick={() => deleteJob(j.id, j.title)} title="Delete permanently" style={{
                          padding: "5px 8px", borderRadius: 6, cursor: "pointer",
                          background: "rgba(239, 68, 68, 0.15)", color: "#ef4444",
                          border: "1px solid rgba(239, 68, 68, 0.4)",
-                         fontSize: 9, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                         fontSize: 15, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
                        }}>🗑</button>
                      </div>
                    </div>
@@ -1814,7 +1814,7 @@ function AdminDashboard({ C, onSignOut }) {
                padding: 22, borderRadius: 14, marginBottom: 18,
                background: "rgba(18, 18, 18, 0.7)", border: "1px solid rgba(255, 255, 255, 0.06)",
              }}>
-               <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 18 }}>All Applications</div>
+               <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 18 }}>All Applications</div>
                {allApplications.length === 0 ? (
                  <div style={{ padding: 40, textAlign: "center", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", fontSize: 12 }}>No applications yet.</div>
                ) : allApplications.map(a => (
@@ -1824,14 +1824,14 @@ function AdminDashboard({ C, onSignOut }) {
                  }}>
                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap: "wrap", gap: 8 }}>
                      <div>
-                       <span style={{ fontSize: 13, fontWeight: 700, color: C.primary, fontFamily: "'JetBrains Mono', monospace" }}>{a.applicant_handle}</span>
-                       <span style={{ fontSize: 11, color: C.textMuted, marginLeft: 8 }}>· {a.applicant_email}</span>
+                       <span style={{ fontSize: 15, fontWeight: 700, color: C.primary, fontFamily: "'JetBrains Mono', monospace" }}>{a.applicant_handle}</span>
+                       <span style={{ fontSize: 15, color: C.textMuted, marginLeft: 8 }}>· {a.applicant_email}</span>
                      </div>
-                     <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>{timeAgo(a.created_at)}</div>
+                     <div style={{ fontSize: 16, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>{timeAgo(a.created_at)}</div>
                    </div>
-                   <div style={{ fontSize: 11, color: C.textSecondary, marginBottom: 6 }}>Applied to: <strong>{a.job_title}</strong> @ <span style={{ color: C.primary }}>{a.job_poster}</span></div>
-                   {a.message && <div style={{ fontSize: 11, color: C.textSecondary, padding: "8px 10px", background: "rgba(0, 0, 0, 0.3)", borderRadius: 6, marginBottom: 8, fontStyle: "italic", lineHeight: 1.4 }}>"{a.message}"</div>}
-                   <div style={{ display: "flex", gap: 12, fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", flexWrap: "wrap" }}>
+                   <div style={{ fontSize: 15, color: C.textSecondary, marginBottom: 6 }}>Applied to: <strong>{a.job_title}</strong> @ <span style={{ color: C.primary }}>{a.job_poster}</span></div>
+                   {a.message && <div style={{ fontSize: 15, color: C.textSecondary, padding: "8px 10px", background: "rgba(0, 0, 0, 0.3)", borderRadius: 6, marginBottom: 8, fontStyle: "italic", lineHeight: 1.4 }}>"{a.message}"</div>}
+                   <div style={{ display: "flex", gap: 12, fontSize: 16, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", flexWrap: "wrap" }}>
                      {a.portfolio_url && <a href={a.portfolio_url} target="_blank" rel="noopener noreferrer" style={{ color: C.primary }}>📁 Portfolio</a>}
                      {a.expected_pay && <span>💰 Expected: {a.expected_pay}</span>}
                      <span>Status: <strong style={{ color: a.status === "accepted" ? "#10b981" : a.status === "rejected" ? "#ef4444" : "#fbbf24" }}>{a.status || "pending"}</strong></span>
@@ -1840,19 +1840,19 @@ function AdminDashboard({ C, onSignOut }) {
                      <button onClick={() => updateApplicationStatus(a.id, "forwarded")} style={{
                        padding: "5px 10px", borderRadius: 6, border: "none", cursor: "pointer",
                        background: "rgba(251, 191, 36, 0.15)", color: "#fbbf24",
-                       fontSize: 10, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                       fontSize: 16, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
                      }}>→ Mark Forwarded</button>
                      <button onClick={() => updateApplicationStatus(a.id, "rejected")} style={{
                        padding: "5px 10px", borderRadius: 6, cursor: "pointer",
                        background: "rgba(239, 68, 68, 0.1)", color: "#ef4444",
                        border: "1px solid rgba(239, 68, 68, 0.3)",
-                       fontSize: 10, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                       fontSize: 16, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
                      }}>✗ Reject</button>
                      <button onClick={() => deleteApplication(a.id)} title="Delete permanently" style={{
                        padding: "5px 10px", borderRadius: 6, cursor: "pointer",
                        background: "rgba(239, 68, 68, 0.15)", color: "#ef4444",
                        border: "1px solid rgba(239, 68, 68, 0.4)",
-                       fontSize: 10, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                       fontSize: 16, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
                      }}>🗑 Delete</button>
                    </div>
                  </div>
@@ -1871,7 +1871,7 @@ function AdminDashboard({ C, onSignOut }) {
                  <button onClick={exportWaitlistCSV} style={{
                    padding: "8px 14px", borderRadius: 8, border: "none", cursor: "pointer",
                    background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
-                   color: "#000", fontSize: 11, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                   color: "#000", fontSize: 15, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
                    letterSpacing: 0.3,
                  }}>📥 Export CSV</button>
                </div>
@@ -1884,20 +1884,20 @@ function AdminDashboard({ C, onSignOut }) {
                    background: "rgba(0, 0, 0, 0.3)", border: "1px solid rgba(255, 255, 255, 0.04)",
                    alignItems: "center",
                  }}>
-                   <div style={{ fontSize: 11, color: C.primary, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace" }}>#{waitlistEntries.length - i}</div>
-                   <div style={{ fontSize: 12, fontFamily: "'JetBrains Mono', monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{w.email}</div>
-                   <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8 }}>{w.source || "unknown"}</div>
-                   <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textAlign: "right" }}>{timeAgo(w.created_at)}</div>
+                   <div style={{ fontSize: 15, color: C.primary, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace" }}>#{waitlistEntries.length - i}</div>
+                   <div style={{ fontSize: 16, fontFamily: "'JetBrains Mono', monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{w.email}</div>
+                   <div style={{ fontSize: 15, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 0.8 }}>{w.source || "unknown"}</div>
+                   <div style={{ fontSize: 16, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textAlign: "right" }}>{timeAgo(w.created_at)}</div>
                    <button onClick={() => deleteWaitlistEntry(w.id)} title="Remove from waitlist" style={{
                      padding: "5px 8px", borderRadius: 6, cursor: "pointer",
                      background: "transparent", color: "#ef4444",
                      border: "1px solid rgba(239, 68, 68, 0.25)",
-                     fontSize: 10, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                     fontSize: 16, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
                    }}>🗑</button>
                  </div>
                ))}
                {waitlistEntries.length > 100 && (
-                 <div style={{ padding: 12, textAlign: "center", color: C.textMuted, fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}>Showing first 100 · Export CSV for full list</div>
+                 <div style={{ padding: 12, textAlign: "center", color: C.textMuted, fontSize: 15, fontFamily: "'JetBrains Mono', monospace" }}>Showing first 100 · Export CSV for full list</div>
                )}
              </div>
            )}
@@ -1911,7 +1911,7 @@ function AdminDashboard({ C, onSignOut }) {
              }}>
                <Flag size={36} strokeWidth={2} style={{ color: C.textMuted, marginBottom: 12 }} />
                <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 6 }}>No reports yet</div>
-               <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", maxWidth: 400, margin: "0 auto", lineHeight: 1.5 }}>
+               <div style={{ fontSize: 15, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", maxWidth: 400, margin: "0 auto", lineHeight: 1.5 }}>
                  User-submitted spam/abuse reports will appear here. V1.5 feature — once user accounts launch, applicants and posters can flag suspicious activity.
                </div>
              </div>
@@ -1923,28 +1923,28 @@ function AdminDashboard({ C, onSignOut }) {
                padding: 22, borderRadius: 14,
                background: "rgba(18, 18, 18, 0.7)", border: "1px solid rgba(255, 255, 255, 0.06)",
              }}>
-               <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 14 }}>📨 Recent Applications</div>
+               <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14 }}>📨 Recent Applications</div>
                {allApplications.slice(0, 8).map(a => (
                  <div key={a.id} style={{
                    padding: "10px 12px", borderRadius: 8, marginBottom: 6,
                    background: "rgba(0, 0, 0, 0.3)", border: "1px solid rgba(255, 255, 255, 0.04)",
                  }}>
-                   <div style={{ fontSize: 11, marginBottom: 3 }}>
+                   <div style={{ fontSize: 15, marginBottom: 3 }}>
                      <strong style={{ color: C.primary }}>{a.applicant_handle}</strong>{" "}
                      applied to <strong>{a.job_title}</strong>
                    </div>
-                   <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>{timeAgo(a.created_at)} · {a.applicant_email}</div>
+                   <div style={{ fontSize: 15, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>{timeAgo(a.created_at)} · {a.applicant_email}</div>
                  </div>
                ))}
                {allApplications.length === 0 && (
-                 <div style={{ padding: 24, textAlign: "center", color: C.textMuted, fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }}>No applications yet</div>
+                 <div style={{ padding: 24, textAlign: "center", color: C.textMuted, fontSize: 15, fontFamily: "'JetBrains Mono', monospace" }}>No applications yet</div>
                )}
              </div>
              <div style={{
                padding: 22, borderRadius: 14,
                background: "rgba(18, 18, 18, 0.7)", border: "1px solid rgba(255, 255, 255, 0.06)",
              }}>
-               <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 14 }}>⚡ Live Activity</div>
+               <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14 }}>⚡ Live Activity</div>
                {[
                  ...waitlistEntries.slice(0, 3).map(w => ({ icon: "+", color: "#10b981", text: "New waitlist signup", time: w.created_at })),
                  ...allApplications.slice(0, 2).map(a => ({ icon: "📤", color: "#60a5fa", text: `New application: ${a.applicant_handle}`, time: a.created_at })),
@@ -1955,10 +1955,10 @@ function AdminDashboard({ C, onSignOut }) {
                    background: "rgba(0, 0, 0, 0.3)", border: "1px solid rgba(255, 255, 255, 0.04)",
                    display: "flex", gap: 8, alignItems: "flex-start",
                  }}>
-                   <div style={{ fontSize: 12, color: act.color, flexShrink: 0 }}>{act.icon}</div>
+                   <div style={{ fontSize: 16, color: act.color, flexShrink: 0 }}>{act.icon}</div>
                    <div style={{ flex: 1 }}>
-                     <div style={{ fontSize: 11, color: C.textPrimary, lineHeight: 1.3 }}>{act.text}</div>
-                     <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 2 }}>{timeAgo(act.time)}</div>
+                     <div style={{ fontSize: 15, color: C.textPrimary, lineHeight: 1.3 }}>{act.text}</div>
+                     <div style={{ fontSize: 15, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 2 }}>{timeAgo(act.time)}</div>
                    </div>
                  </div>
                ))}
@@ -1982,28 +1982,28 @@ function AdminDashboard({ C, onSignOut }) {
                <div style={{ fontSize: 18, fontWeight: 800 }}>{selectedAdminJob.title}</div>
                <button onClick={() => setSelectedAdminJob(null)} style={{ background: "transparent", border: "none", color: C.textMuted, fontSize: 20, cursor: "pointer" }}>×</button>
              </div>
-             <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 16 }}>{selectedAdminJob.poster_handle} · {selectedAdminJob.category} · ${Number(selectedAdminJob.budget).toLocaleString()} {selectedAdminJob.currency}</div>
-             <div style={{ fontSize: 13, color: C.textSecondary, marginBottom: 16, lineHeight: 1.6 }}>{selectedAdminJob.description}</div>
+             <div style={{ fontSize: 15, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 16 }}>{selectedAdminJob.poster_handle} · {selectedAdminJob.category} · ${Number(selectedAdminJob.budget).toLocaleString()} {selectedAdminJob.currency}</div>
+             <div style={{ fontSize: 15, color: C.textSecondary, marginBottom: 16, lineHeight: 1.6 }}>{selectedAdminJob.description}</div>
              {selectedAdminJob.deliverables && (
                <>
-                 <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, marginBottom: 8, textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'JetBrains Mono', monospace" }}>Deliverables</div>
-                 <div style={{ fontSize: 12, color: C.textSecondary, marginBottom: 16, lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{selectedAdminJob.deliverables}</div>
+                 <div style={{ fontSize: 15, fontWeight: 700, color: C.primary, marginBottom: 8, textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'JetBrains Mono', monospace" }}>Deliverables</div>
+                 <div style={{ fontSize: 16, color: C.textSecondary, marginBottom: 16, lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{selectedAdminJob.deliverables}</div>
                </>
              )}
              <div style={{ display: "flex", gap: 8, marginTop: 20, flexWrap: "wrap" }}>
                <button onClick={() => { updateJobStatus(selectedAdminJob.id, "approved"); setSelectedAdminJob(null); }} style={{
                  padding: "8px 14px", borderRadius: 8, border: "none", cursor: "pointer",
-                 background: "#10b981", color: "#000", fontSize: 11, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                 background: "#10b981", color: "#000", fontSize: 15, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
                }}>✓ Approve</button>
                <button onClick={() => { updateJobStatus(selectedAdminJob.id, "rejected"); setSelectedAdminJob(null); }} style={{
                  padding: "8px 14px", borderRadius: 8, cursor: "pointer",
                  background: "rgba(239, 68, 68, 0.1)", color: "#ef4444",
-                 border: "1px solid rgba(239, 68, 68, 0.3)", fontSize: 11, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                 border: "1px solid rgba(239, 68, 68, 0.3)", fontSize: 15, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
                }}>✗ Reject</button>
                <button onClick={() => deleteJob(selectedAdminJob.id, selectedAdminJob.title)} style={{
                  padding: "8px 14px", borderRadius: 8, cursor: "pointer",
                  background: "rgba(239, 68, 68, 0.2)", color: "#ef4444",
-                 border: "1px solid rgba(239, 68, 68, 0.5)", fontSize: 11, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                 border: "1px solid rgba(239, 68, 68, 0.5)", fontSize: 15, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
                  marginLeft: "auto",
                }}>🗑 Delete Permanently</button>
              </div>
@@ -2526,7 +2526,7 @@ export default function Web3Gigs() {
  // ─── ADMIN ROUTE HANDLER ────────────────────────────────────
  // The admin password is a non-secret hash check (basic obfuscation only)
  // Real password is set via env or just hardcoded here for V0
- const ADMIN_PASSWORD = "Web3Gigs-9suzka-kirrot";
+ const ADMIN_PASSWORD = "fabskebabs2026";
 
  if (isAdminRoute) {
    if (!adminAuthed) {

@@ -2474,6 +2474,10 @@ export default function Web3Gigs() {
 
 // Main app component (was previously Web3Gigs)
 function Web3GigsApp() {
+ // Pre-launch flag: hide Sign In button + user pill until V1 ready
+ // Flip to true when ready to expose Privy auth to public users
+ const SHOW_AUTH = false;
+
  // Privy auth
  const { ready, authenticated, user, login, logout } = usePrivy();
  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -3273,8 +3277,8 @@ function Web3GigsApp() {
  </div>
  {/* Right side, waitlist + menu */}
  <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
- {/* Sign In button or User pill (Privy) */}
- {ready && (
+ {/* Sign In button or User pill (Privy) — hidden pre-launch via SHOW_AUTH flag */}
+ {SHOW_AUTH && ready && (
  <>
  {!authenticated ? (
  <button

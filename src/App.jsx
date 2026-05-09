@@ -1360,12 +1360,20 @@ function AdminDashboard({ C, onSignOut }) {
  const [allJobs, setAllJobs] = useState([]);
  const [allApplications, setAllApplications] = useState([]);
  const [waitlistEntries, setWaitlistEntries] = useState([]);
- const [stats, setStats] = useState({ pending: 0, live: 0, applications: 0, waitlist: 0, completed: 0, totalPaid: 0 });
+ const [bannedHandles, setBannedHandles] = useState([]);
+ const [stats, setStats] = useState({ pending: 0, live: 0, applications: 0, waitlist: 0, completed: 0, totalPaid: 0, todayPending: 0, todayLive: 0, todayApps: 0, todayWaitlist: 0 });
  const [adminLoading, setAdminLoading] = useState(true);
  const [adminSearch, setAdminSearch] = useState("");
  const [adminTypeFilter, setAdminTypeFilter] = useState("all");
  const [adminToast, setAdminToast] = useState(null);
  const [selectedAdminJob, setSelectedAdminJob] = useState(null);
+ const [activityRange, setActivityRange] = useState("week"); // today | week | all
+ const [globalSearch, setGlobalSearch] = useState("");
+ const [globalSearchOpen, setGlobalSearchOpen] = useState(false);
+ const [selectedPending, setSelectedPending] = useState(new Set()); // for bulk actions
+ const [showBanModal, setShowBanModal] = useState(false);
+ const [banHandleInput, setBanHandleInput] = useState("");
+ const [banReasonInput, setBanReasonInput] = useState("");
 
  // Fetch all admin data
  const fetchAdminData = async () => {
@@ -1377,6 +1385,12 @@ function AdminDashboard({ C, onSignOut }) {
      const { data: appsData } = await supabase.from("job_applications").select("*").order("created_at", { ascending: false });
      // 3. Waitlist
      const { data: wlData } = await supabase.from("waitlist").select("*").order("created_at", { ascending: false });
+     // 4. Banned handles (table may not exist yet — that's OK, fail silently)
+     let bansData = [];
+     try {
+       const { data: bd } = await supabase.from("banned_handles").select("*").order("created_at", { ascending: false });
+       bansData = bd || [];
+     } catch (e) { bansData = []; }
      const jobs = jobsData || [];
      const apps = appsData || [];
      const wl = wlData || [];
@@ -1384,9 +1398,12 @@ function AdminDashboard({ C, onSignOut }) {
      setAllJobs(jobs.filter(j => ["approved", "in_progress", "completed"].includes(j.status)));
      setAllApplications(apps);
      setWaitlistEntries(wl);
+     setBannedHandles(bansData);
      // Compute stats
      const completedJobs = jobs.filter(j => j.status === "completed");
      const totalPaid = completedJobs.reduce((sum, j) => sum + (Number(j.budget) || 0), 0);
+     // Today's counts (last 24h)
+     const dayAgo = new Date(Date.now() - 86400000);
      setStats({
        pending: jobs.filter(j => j.status === "pending").length,
        live: jobs.filter(j => ["approved", "in_progress"].includes(j.status)).length,
@@ -1394,6 +1411,10 @@ function AdminDashboard({ C, onSignOut }) {
        waitlist: wl.length,
        completed: completedJobs.length,
        totalPaid,
+       todayPending: jobs.filter(j => j.status === "pending" && new Date(j.created_at) > dayAgo).length,
+       todayLive: jobs.filter(j => ["approved", "in_progress"].includes(j.status) && new Date(j.created_at) > dayAgo).length,
+       todayApps: apps.filter(a => new Date(a.created_at) > dayAgo).length,
+       todayWaitlist: wl.filter(w => new Date(w.created_at) > dayAgo).length,
      });
    } catch (err) {
      console.error("Admin fetch error:", err);
@@ -1467,6 +1488,112 @@ function AdminDashboard({ C, onSignOut }) {
      showToast("Removed from waitlist", "#ef4444");
      fetchAdminData();
    }
+ };
+
+ // BULK ACTIONS on pending submissions
+ const togglePendingSelected = (jobId) => {
+   const next = new Set(selectedPending);
+   if (next.has(jobId)) next.delete(jobId);
+   else next.add(jobId);
+   setSelectedPending(next);
+ };
+ const selectAllPending = (jobs) => {
+   if (selectedPending.size === jobs.length) setSelectedPending(new Set());
+   else setSelectedPending(new Set(jobs.map(j => j.id)));
+ };
+ const bulkApprove = async () => {
+   if (selectedPending.size === 0) return;
+   if (!window.confirm(`Approve ${selectedPending.size} job${selectedPending.size > 1 ? "s" : ""}?`)) return;
+   const ids = Array.from(selectedPending);
+   const { error } = await supabase.from("job_submissions").update({ status: "approved" }).in("id", ids);
+   if (error) showToast(`Error: ${error.message}`, "#ef4444");
+   else {
+     showToast(`${ids.length} approved`, "#10b981");
+     setSelectedPending(new Set());
+     fetchAdminData();
+   }
+ };
+ const bulkReject = async () => {
+   if (selectedPending.size === 0) return;
+   if (!window.confirm(`Reject ${selectedPending.size} job${selectedPending.size > 1 ? "s" : ""}?`)) return;
+   const ids = Array.from(selectedPending);
+   const { error } = await supabase.from("job_submissions").update({ status: "rejected" }).in("id", ids);
+   if (error) showToast(`Error: ${error.message}`, "#ef4444");
+   else {
+     showToast(`${ids.length} rejected`, "#ef4444");
+     setSelectedPending(new Set());
+     fetchAdminData();
+   }
+ };
+
+ // BAN HANDLE
+ const addBannedHandle = async () => {
+   const handle = banHandleInput.trim().replace(/^@/, "").toLowerCase();
+   if (!handle) return;
+   const { error } = await supabase.from("banned_handles").insert([{ handle, reason: banReasonInput.trim() || null }]);
+   if (error) {
+     if (error.code === "42P01") {
+       showToast("banned_handles table doesn't exist yet — see SQL setup", "#ef4444");
+     } else if (error.code === "23505") {
+       showToast("Already banned", "#fbbf24");
+     } else {
+       showToast(`Error: ${error.message}`, "#ef4444");
+     }
+   } else {
+     showToast(`@${handle} banned`, "#ef4444");
+     setBanHandleInput("");
+     setBanReasonInput("");
+     setShowBanModal(false);
+     fetchAdminData();
+   }
+ };
+ const removeBannedHandle = async (banId, handle) => {
+   if (!window.confirm(`Unban @${handle}?`)) return;
+   const { error } = await supabase.from("banned_handles").delete().eq("id", banId);
+   if (error) showToast(`Error: ${error.message}`, "#ef4444");
+   else {
+     showToast(`@${handle} unbanned`, "#10b981");
+     fetchAdminData();
+   }
+ };
+
+ // DM TEMPLATE — copy to clipboard
+ const copyDmTemplate = (app) => {
+   const job = allJobs.find(j => j.id === app.job_id) || pendingJobs.find(j => j.id === app.job_id);
+   const posterHandle = job?.poster_handle || app.job_poster || "@poster";
+   const jobTitle = app.job_title || job?.title || "your job";
+   const trustNote = job?.job_type === "ct" ? `\nTrust Score: see web3gigs.app/?t=valuate&h=${(app.applicant_handle || "").replace(/^@/, "")}` : "";
+   const portfolio = app.portfolio_url ? `\nPortfolio: ${app.portfolio_url}` : "";
+   const expectedPay = app.expected_pay ? `\nExpected pay: ${app.expected_pay}` : "";
+   const template = `Hey ${posterHandle.startsWith("@") ? posterHandle : "@" + posterHandle} 👋\n\nYou got a new application on Web3Gigs for "${jobTitle}".\n\nApplicant: ${app.applicant_handle}\nEmail: ${app.applicant_email}${trustNote}${portfolio}${expectedPay}\n\nTheir pitch:\n"${app.message || "(no message)"}"\n\nLet me know if you want me to connect you, or DM them directly.\n\n— Fabs / Web3Gigs`;
+   try {
+     navigator.clipboard.writeText(template);
+     showToast("DM template copied to clipboard", "#10b981");
+   } catch (e) {
+     showToast("Copy failed — select manually", "#ef4444");
+   }
+ };
+
+ // GLOBAL SEARCH — find everything related to a handle/email
+ const runGlobalSearch = (query) => {
+   const q = query.toLowerCase().trim();
+   if (!q) return { jobs: [], apps: [], waitlist: [] };
+   return {
+     jobs: [...pendingJobs, ...allJobs].filter(j =>
+       (j.title || "").toLowerCase().includes(q) ||
+       (j.poster_handle || "").toLowerCase().includes(q) ||
+       (j.poster_name || "").toLowerCase().includes(q) ||
+       (j.poster_email || "").toLowerCase().includes(q) ||
+       (j.description || "").toLowerCase().includes(q)
+     ),
+     apps: allApplications.filter(a =>
+       (a.applicant_handle || "").toLowerCase().includes(q) ||
+       (a.applicant_email || "").toLowerCase().includes(q) ||
+       (a.job_title || "").toLowerCase().includes(q) ||
+       (a.message || "").toLowerCase().includes(q)
+     ),
+     waitlist: waitlistEntries.filter(w => (w.email || "").toLowerCase().includes(q)),
+   };
  };
 
  const updateApplicationStatus = async (appId, newStatus) => {
@@ -1569,6 +1696,12 @@ function AdminDashboard({ C, onSignOut }) {
            <span style={{ fontSize: 15, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
              Signed in as <strong style={{ color: C.primary }}>@FabsKebabs</strong>
            </span>
+           <button onClick={() => setGlobalSearchOpen(true)} title="Search across all data" style={{
+             padding: "8px 14px", borderRadius: 8, border: "1px solid rgba(212, 255, 0, 0.25)",
+             background: "rgba(212, 255, 0, 0.06)", color: C.primary, fontSize: 13, cursor: "pointer",
+             fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, letterSpacing: 0.3,
+             display: "inline-flex", alignItems: "center", gap: 6,
+           }}>🔍 Search</button>
            <button onClick={onSignOut} style={{
              padding: "8px 14px", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.1)",
              background: "transparent", color: C.textSecondary, fontSize: 15, cursor: "pointer",
@@ -1582,10 +1715,10 @@ function AdminDashboard({ C, onSignOut }) {
          display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, marginBottom: 24,
        }}>
          {[
-           { label: "Pending Review", val: stats.pending, urgent: stats.pending > 0, sub: stats.pending > 0 ? `${stats.pending} awaiting` : "All clear" },
-           { label: "Live Jobs", val: stats.live, sub: "approved + in progress" },
-           { label: "Applications", val: stats.applications, sub: "all time" },
-           { label: "Waitlist", val: stats.waitlist, sub: "total signups" },
+           { label: "Pending Review", val: stats.pending, urgent: stats.pending > 0, sub: stats.pending > 0 ? `${stats.pending} awaiting` : "All clear", trend: stats.todayPending > 0 ? `+${stats.todayPending} today` : null },
+           { label: "Live Jobs", val: stats.live, sub: "approved + in progress", trend: stats.todayLive > 0 ? `+${stats.todayLive} today` : null },
+           { label: "Applications", val: stats.applications, sub: "all time", trend: stats.todayApps > 0 ? `+${stats.todayApps} today` : null },
+           { label: "Waitlist", val: stats.waitlist, sub: "total signups", trend: stats.todayWaitlist > 0 ? `+${stats.todayWaitlist} today` : null },
            { label: "Completed", val: stats.completed, sub: stats.totalPaid > 0 ? `$${stats.totalPaid.toLocaleString()} paid` : "No completed yet" },
          ].map((s, i) => (
            <div key={i} style={{
@@ -1595,7 +1728,12 @@ function AdminDashboard({ C, onSignOut }) {
            }}>
              <div style={{ fontSize: 16, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.2, fontWeight: 700 }}>{s.label}</div>
              <div style={{ fontSize: 30, fontWeight: 900, marginTop: 6, letterSpacing: -1, fontFamily: "'JetBrains Mono', monospace", color: s.urgent ? "#ef4444" : C.textPrimary }}>{s.val}</div>
-             <div style={{ fontSize: 16, color: s.urgent ? "#ef4444" : "#10b981", fontFamily: "'JetBrains Mono', monospace", marginTop: 4 }}>{s.sub}</div>
+             <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4, flexWrap: "wrap" }}>
+               <div style={{ fontSize: 16, color: s.urgent ? "#ef4444" : "#10b981", fontFamily: "'JetBrains Mono', monospace" }}>{s.sub}</div>
+               {s.trend && (
+                 <div style={{ fontSize: 11, padding: "2px 8px", borderRadius: 10, background: "rgba(212, 255, 0, 0.12)", border: "1px solid rgba(212, 255, 0, 0.3)", color: C.primary, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, letterSpacing: 0.3 }}>{s.trend}</div>
+               )}
+             </div>
            </div>
          ))}
        </div>
@@ -1607,6 +1745,8 @@ function AdminDashboard({ C, onSignOut }) {
            { id: "jobs", label: "All Jobs", count: stats.live + stats.completed, icon: "💼" },
            { id: "apps", label: "Applications", count: stats.applications, icon: "📨" },
            { id: "waitlist", label: "Waitlist", count: stats.waitlist, icon: "📧" },
+           { id: "featured", label: "Featured", count: allJobs.filter(j => j.featured).length, icon: "⭐" },
+           { id: "bans", label: "Bans", count: bannedHandles.length, icon: "🚫" },
            { id: "reports", label: "Reports", count: 0, icon: "🚩" },
          ].map(t => {
            const active = adminTab === t.id;
@@ -1654,6 +1794,35 @@ function AdminDashboard({ C, onSignOut }) {
                  }} />
                </div>
 
+               {/* Bulk action toolbar */}
+               {pendingJobs.length > 0 && (
+                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, padding: "10px 14px", background: selectedPending.size > 0 ? "rgba(212, 255, 0, 0.06)" : "rgba(0, 0, 0, 0.3)", border: selectedPending.size > 0 ? "1px solid rgba(212, 255, 0, 0.25)" : "1px solid rgba(255, 255, 255, 0.04)", borderRadius: 10, flexWrap: "wrap" }}>
+                   <button onClick={() => selectAllPending(pendingJobs)} style={{
+                     padding: "6px 12px", borderRadius: 6, border: "1px solid rgba(255, 255, 255, 0.15)",
+                     background: "transparent", color: C.textSecondary, fontSize: 12, fontWeight: 700,
+                     fontFamily: "'JetBrains Mono', monospace", cursor: "pointer",
+                   }}>{selectedPending.size === pendingJobs.length && pendingJobs.length > 0 ? "Deselect All" : "Select All"}</button>
+                   <span style={{ fontSize: 12, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
+                     {selectedPending.size > 0 ? `${selectedPending.size} selected` : "No selection"}
+                   </span>
+                   {selectedPending.size > 0 && (
+                     <div style={{ display: "flex", gap: 6, marginLeft: "auto" }}>
+                       <button onClick={bulkApprove} style={{
+                         padding: "6px 12px", borderRadius: 6, border: "none", cursor: "pointer",
+                         background: "#10b981", color: "#000", fontSize: 12, fontWeight: 800,
+                         fontFamily: "'Outfit', sans-serif",
+                       }}>✓ Approve Selected ({selectedPending.size})</button>
+                       <button onClick={bulkReject} style={{
+                         padding: "6px 12px", borderRadius: 6, cursor: "pointer",
+                         background: "rgba(239, 68, 68, 0.15)", color: "#ef4444",
+                         border: "1px solid rgba(239, 68, 68, 0.4)", fontSize: 12, fontWeight: 800,
+                         fontFamily: "'Outfit', sans-serif",
+                       }}>✗ Reject Selected ({selectedPending.size})</button>
+                     </div>
+                   )}
+                 </div>
+               )}
+
                {pendingJobs.length === 0 ? (
                  <div style={{ padding: 40, textAlign: "center", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
                    <Check size={32} strokeWidth={2} style={{ color: "#10b981", marginBottom: 10 }} />
@@ -1669,12 +1838,13 @@ function AdminDashboard({ C, onSignOut }) {
                  const urgent = ageHours > 24;
                  return (
                    <div key={j.id} className="admin-job-row" style={{
-                     display: "grid", gridTemplateColumns: "60px 1fr 90px 100px 90px 240px",
+                     display: "grid", gridTemplateColumns: "30px 60px 1fr 90px 100px 90px 240px",
                      gap: 12, padding: "14px 12px", borderRadius: 10,
-                     background: urgent ? "rgba(251, 191, 36, 0.04)" : "rgba(0, 0, 0, 0.3)",
-                     border: urgent ? "1px solid rgba(251, 191, 36, 0.25)" : "1px solid rgba(255, 255, 255, 0.04)",
+                     background: selectedPending.has(j.id) ? "rgba(212, 255, 0, 0.05)" : urgent ? "rgba(251, 191, 36, 0.04)" : "rgba(0, 0, 0, 0.3)",
+                     border: selectedPending.has(j.id) ? "1px solid rgba(212, 255, 0, 0.3)" : urgent ? "1px solid rgba(251, 191, 36, 0.25)" : "1px solid rgba(255, 255, 255, 0.04)",
                      alignItems: "center", marginBottom: 8,
                    }}>
+                     <input type="checkbox" checked={selectedPending.has(j.id)} onChange={() => togglePendingSelected(j.id)} style={{ width: 18, height: 18, accentColor: "#d4ff00", cursor: "pointer" }} />
                      <div style={{ fontSize: 16, color: "#666", fontFamily: "'JetBrains Mono', monospace" }}>#{j.id.substring(0, 6)}</div>
                      <div>
                        <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{j.title}</div>
@@ -1838,6 +2008,12 @@ function AdminDashboard({ C, onSignOut }) {
                      <span>Status: <strong style={{ color: a.status === "accepted" ? "#10b981" : a.status === "rejected" ? "#ef4444" : "#fbbf24" }}>{a.status || "pending"}</strong></span>
                    </div>
                    <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
+                     <button onClick={() => copyDmTemplate(a)} style={{
+                       padding: "5px 10px", borderRadius: 6, border: "none", cursor: "pointer",
+                       background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
+                       color: "#000", fontSize: 16, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                       letterSpacing: 0.3,
+                     }}>📋 Copy DM Template</button>
                      <button onClick={() => updateApplicationStatus(a.id, "forwarded")} style={{
                        padding: "5px 10px", borderRadius: 6, border: "none", cursor: "pointer",
                        background: "rgba(251, 191, 36, 0.15)", color: "#fbbf24",
@@ -1903,6 +2079,110 @@ function AdminDashboard({ C, onSignOut }) {
              </div>
            )}
 
+           {/* TAB: FEATURED */}
+           {adminTab === "featured" && (
+             <div style={{
+               padding: 22, borderRadius: 14, marginBottom: 18,
+               background: "rgba(18, 18, 18, 0.7)", border: "1px solid rgba(255, 255, 255, 0.06)",
+             }}>
+               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, flexWrap: "wrap", gap: 10 }}>
+                 <div style={{ fontSize: 18, fontWeight: 800, display: "flex", alignItems: "center", gap: 8 }}>
+                   <span style={{ color: C.primary }}>★</span> Featured Slot Manager
+                 </div>
+                 <div style={{ fontSize: 13, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>{allJobs.filter(j => j.featured).length} featured</div>
+               </div>
+               {allJobs.filter(j => j.featured).length === 0 ? (
+                 <div style={{ padding: 40, textAlign: "center", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
+                   <div style={{ fontSize: 24, marginBottom: 8 }}>★</div>
+                   <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>No featured jobs</div>
+                   <div style={{ fontSize: 12 }}>Toggle ★ on any job in "All Jobs" to feature it</div>
+                 </div>
+               ) : allJobs.filter(j => j.featured).map(j => {
+                 const statusColor = j.status === "approved" ? "#10b981" : j.status === "in_progress" ? "#fbbf24" : C.primary;
+                 const statusLabel = j.status === "approved" ? "OPEN" : j.status === "in_progress" ? "IN PROGRESS" : "COMPLETED";
+                 const appsCount = allApplications.filter(a => a.job_id === j.id).length;
+                 return (
+                   <div key={j.id} style={{
+                     display: "grid", gridTemplateColumns: "30px 1fr 100px 90px 100px 110px",
+                     gap: 12, padding: "14px 12px", borderRadius: 10,
+                     background: "rgba(212, 255, 0, 0.04)", border: "1px solid rgba(212, 255, 0, 0.2)",
+                     alignItems: "center", marginBottom: 8,
+                   }}>
+                     <div style={{ fontSize: 18, color: C.primary }}>★</div>
+                     <div>
+                       <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{j.title}</div>
+                       <div style={{ fontSize: 14, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
+                         <span style={{ color: C.primary }}>{j.poster_handle || j.poster_name}</span> · {j.category} · {appsCount} apps
+                       </div>
+                     </div>
+                     <div style={{
+                       padding: "3px 8px", borderRadius: 4,
+                       background: `${statusColor}15`, color: statusColor,
+                       fontSize: 13, fontWeight: 800, letterSpacing: 1,
+                       fontFamily: "'JetBrains Mono', monospace", textAlign: "center",
+                     }}>{statusLabel}</div>
+                     <div style={{ fontSize: 14, color: C.primary, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", textAlign: "center" }}>${Number(j.budget || 0).toLocaleString()}</div>
+                     <div style={{ fontSize: 13, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textAlign: "center" }}>{timeAgo(j.created_at)}</div>
+                     <button onClick={() => toggleFeatured(j.id, true)} style={{
+                       padding: "6px 10px", borderRadius: 6, cursor: "pointer",
+                       background: "rgba(239, 68, 68, 0.1)", color: "#ef4444",
+                       border: "1px solid rgba(239, 68, 68, 0.3)",
+                       fontSize: 12, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                     }}>Unfeature</button>
+                   </div>
+                 );
+               })}
+             </div>
+           )}
+
+           {/* TAB: BANS */}
+           {adminTab === "bans" && (
+             <div style={{
+               padding: 22, borderRadius: 14, marginBottom: 18,
+               background: "rgba(18, 18, 18, 0.7)", border: "1px solid rgba(255, 255, 255, 0.06)",
+             }}>
+               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, flexWrap: "wrap", gap: 10 }}>
+                 <div style={{ fontSize: 18, fontWeight: 800, display: "flex", alignItems: "center", gap: 8 }}>
+                   <span style={{ color: "#ef4444" }}>🚫</span> Banned Handles
+                 </div>
+                 <button onClick={() => setShowBanModal(true)} style={{
+                   padding: "8px 14px", borderRadius: 8, border: "none", cursor: "pointer",
+                   background: "rgba(239, 68, 68, 0.15)", color: "#ef4444",
+                   border: "1px solid rgba(239, 68, 68, 0.4)",
+                   fontSize: 13, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                   letterSpacing: 0.3,
+                 }}>+ Ban Handle</button>
+               </div>
+               <div style={{ padding: "12px 14px", background: "rgba(251, 191, 36, 0.05)", border: "1px solid rgba(251, 191, 36, 0.2)", borderRadius: 10, marginBottom: 14 }}>
+                 <div style={{ fontSize: 12, color: "#fbbf24", fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.5 }}>⚠ Requires <code style={{ background: "rgba(0,0,0,0.4)", padding: "1px 6px", borderRadius: 3 }}>banned_handles</code> table in Supabase. SQL setup will be provided after deploy.</div>
+               </div>
+               {bannedHandles.length === 0 ? (
+                 <div style={{ padding: 40, textAlign: "center", color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>
+                   <div style={{ fontSize: 24, marginBottom: 8 }}>✓</div>
+                   <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>No banned handles</div>
+                   <div style={{ fontSize: 12 }}>Add handles to ban them from posting/applying</div>
+                 </div>
+               ) : bannedHandles.map(b => (
+                 <div key={b.id} style={{
+                   display: "grid", gridTemplateColumns: "1fr 2fr 120px 90px",
+                   gap: 12, padding: "12px 14px", borderRadius: 10,
+                   background: "rgba(239, 68, 68, 0.05)", border: "1px solid rgba(239, 68, 68, 0.2)",
+                   alignItems: "center", marginBottom: 8,
+                 }}>
+                   <div style={{ fontSize: 14, fontWeight: 700, color: "#ef4444", fontFamily: "'JetBrains Mono', monospace" }}>@{b.handle}</div>
+                   <div style={{ fontSize: 12, color: C.textSecondary, fontStyle: b.reason ? "normal" : "italic" }}>{b.reason || "No reason given"}</div>
+                   <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textAlign: "right" }}>{timeAgo(b.created_at)}</div>
+                   <button onClick={() => removeBannedHandle(b.id, b.handle)} style={{
+                     padding: "5px 10px", borderRadius: 6, cursor: "pointer",
+                     background: "transparent", color: "#10b981",
+                     border: "1px solid rgba(16, 185, 129, 0.3)",
+                     fontSize: 11, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                   }}>Unban</button>
+                 </div>
+               ))}
+             </div>
+           )}
+
            {/* TAB: REPORTS */}
            {adminTab === "reports" && (
              <div style={{
@@ -1945,27 +2225,175 @@ function AdminDashboard({ C, onSignOut }) {
                padding: 22, borderRadius: 14,
                background: "rgba(18, 18, 18, 0.7)", border: "1px solid rgba(255, 255, 255, 0.06)",
              }}>
-               <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 14 }}>⚡ Live Activity</div>
-               {[
-                 ...waitlistEntries.slice(0, 3).map(w => ({ icon: "+", color: "#10b981", text: "New waitlist signup", time: w.created_at })),
-                 ...allApplications.slice(0, 2).map(a => ({ icon: "📤", color: "#60a5fa", text: `New application: ${a.applicant_handle}`, time: a.created_at })),
-                 ...pendingJobs.slice(0, 2).map(j => ({ icon: "📋", color: "#fbbf24", text: `New job submission: ${j.title}`, time: j.created_at })),
-               ].sort((a, b) => new Date(b.time) - new Date(a.time)).slice(0, 8).map((act, i) => (
-                 <div key={i} style={{
-                   padding: "8px 10px", borderRadius: 8, marginBottom: 5,
-                   background: "rgba(0, 0, 0, 0.3)", border: "1px solid rgba(255, 255, 255, 0.04)",
-                   display: "flex", gap: 8, alignItems: "flex-start",
-                 }}>
-                   <div style={{ fontSize: 16, color: act.color, flexShrink: 0 }}>{act.icon}</div>
-                   <div style={{ flex: 1 }}>
-                     <div style={{ fontSize: 15, color: C.textPrimary, lineHeight: 1.3 }}>{act.text}</div>
-                     <div style={{ fontSize: 15, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 2 }}>{timeAgo(act.time)}</div>
-                   </div>
+               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
+                 <div style={{ fontSize: 16, fontWeight: 800 }}>⚡ Live Activity</div>
+                 <div style={{ display: "flex", gap: 4 }}>
+                   {[
+                     { id: "today", label: "Today" },
+                     { id: "week", label: "Week" },
+                     { id: "all", label: "All" },
+                   ].map(r => (
+                     <button key={r.id} onClick={() => setActivityRange(r.id)} style={{
+                       padding: "4px 10px", borderRadius: 6,
+                       border: activityRange === r.id ? `1px solid ${C.primary}` : "1px solid rgba(255, 255, 255, 0.08)",
+                       background: activityRange === r.id ? "rgba(212, 255, 0, 0.1)" : "transparent",
+                       color: activityRange === r.id ? C.primary : C.textMuted,
+                       fontSize: 11, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace",
+                       cursor: "pointer", letterSpacing: 0.3,
+                     }}>{r.label}</button>
+                   ))}
                  </div>
-               ))}
+               </div>
+               {(() => {
+                 const cutoff = activityRange === "today"
+                   ? new Date(Date.now() - 86400000)
+                   : activityRange === "week"
+                   ? new Date(Date.now() - 7 * 86400000)
+                   : new Date(0);
+                 const items = [
+                   ...waitlistEntries.map(w => ({ icon: "+", color: "#10b981", text: "New waitlist signup", time: w.created_at })),
+                   ...allApplications.map(a => ({ icon: "📤", color: "#60a5fa", text: `New application: ${a.applicant_handle}`, time: a.created_at })),
+                   ...pendingJobs.map(j => ({ icon: "📋", color: "#fbbf24", text: `New job submission: ${j.title}`, time: j.created_at })),
+                   ...allJobs.filter(j => j.status === "completed").map(j => ({ icon: "✓", color: C.primary, text: `Completed: ${j.title}`, time: j.updated_at || j.created_at })),
+                 ].filter(item => new Date(item.time) > cutoff)
+                  .sort((a, b) => new Date(b.time) - new Date(a.time))
+                  .slice(0, 12);
+                 if (items.length === 0) {
+                   return <div style={{ padding: 24, textAlign: "center", color: C.textMuted, fontSize: 12, fontFamily: "'JetBrains Mono', monospace" }}>No activity in this range</div>;
+                 }
+                 return items.map((act, i) => (
+                   <div key={i} style={{
+                     padding: "8px 10px", borderRadius: 8, marginBottom: 5,
+                     background: "rgba(0, 0, 0, 0.3)", border: "1px solid rgba(255, 255, 255, 0.04)",
+                     display: "flex", gap: 8, alignItems: "flex-start",
+                   }}>
+                     <div style={{ fontSize: 16, color: act.color, flexShrink: 0 }}>{act.icon}</div>
+                     <div style={{ flex: 1 }}>
+                       <div style={{ fontSize: 15, color: C.textPrimary, lineHeight: 1.3 }}>{act.text}</div>
+                       <div style={{ fontSize: 15, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 2 }}>{timeAgo(act.time)}</div>
+                     </div>
+                   </div>
+                 ));
+               })()}
              </div>
            </div>
          </>
+       )}
+
+       {/* Global Search Modal */}
+       {globalSearchOpen && (
+         <div onClick={() => { setGlobalSearchOpen(false); setGlobalSearch(""); }} style={{
+           position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.85)",
+           display: "flex", alignItems: "flex-start", justifyContent: "center",
+           zIndex: 1000, padding: 40, paddingTop: 80,
+         }}>
+           <div onClick={e => e.stopPropagation()} style={{
+             maxWidth: 700, width: "100%", maxHeight: "75vh", overflow: "auto",
+             padding: 24, borderRadius: 14,
+             background: "#0a0a0a", border: `1px solid ${C.primary}40`,
+           }}>
+             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+               <span style={{ fontSize: 18 }}>🔍</span>
+               <input type="text" autoFocus placeholder="Search handle, email, job title..." value={globalSearch} onChange={e => setGlobalSearch(e.target.value)} style={{
+                 flex: 1, padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.1)",
+                 background: "rgba(0, 0, 0, 0.5)", color: "#fff", fontSize: 14,
+                 fontFamily: "'JetBrains Mono', monospace", outline: "none",
+               }} />
+               <button onClick={() => { setGlobalSearchOpen(false); setGlobalSearch(""); }} style={{ background: "transparent", border: "none", color: C.textMuted, fontSize: 24, cursor: "pointer" }}>×</button>
+             </div>
+             {globalSearch.trim().length > 0 ? (() => {
+               const r = runGlobalSearch(globalSearch);
+               const total = r.jobs.length + r.apps.length + r.waitlist.length;
+               if (total === 0) {
+                 return <div style={{ padding: 40, textAlign: "center", color: C.textMuted, fontSize: 13, fontFamily: "'JetBrains Mono', monospace" }}>No results for "{globalSearch}"</div>;
+               }
+               return (
+                 <>
+                   <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 12, letterSpacing: 0.5 }}>{total} result{total !== 1 ? "s" : ""}</div>
+                   {r.jobs.length > 0 && (
+                     <div style={{ marginBottom: 18 }}>
+                       <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, marginBottom: 8 }}>Jobs ({r.jobs.length})</div>
+                       {r.jobs.slice(0, 8).map(j => (
+                         <div key={j.id} onClick={() => { setSelectedAdminJob(j); setGlobalSearchOpen(false); setGlobalSearch(""); }} style={{ padding: "10px 12px", marginBottom: 4, borderRadius: 8, background: "rgba(0, 0, 0, 0.4)", cursor: "pointer", border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                           <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 2 }}>{j.title}</div>
+                           <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>{j.poster_handle || j.poster_name} · {j.status} · ${Number(j.budget || 0).toLocaleString()}</div>
+                         </div>
+                       ))}
+                     </div>
+                   )}
+                   {r.apps.length > 0 && (
+                     <div style={{ marginBottom: 18 }}>
+                       <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, marginBottom: 8 }}>Applications ({r.apps.length})</div>
+                       {r.apps.slice(0, 8).map(a => (
+                         <div key={a.id} style={{ padding: "10px 12px", marginBottom: 4, borderRadius: 8, background: "rgba(0, 0, 0, 0.4)", border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                           <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 2 }}>{a.applicant_handle} → {a.job_title}</div>
+                           <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>{a.applicant_email} · {a.status || "pending"}</div>
+                         </div>
+                       ))}
+                     </div>
+                   )}
+                   {r.waitlist.length > 0 && (
+                     <div>
+                       <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, marginBottom: 8 }}>Waitlist ({r.waitlist.length})</div>
+                       {r.waitlist.slice(0, 8).map(w => (
+                         <div key={w.id} style={{ padding: "10px 12px", marginBottom: 4, borderRadius: 8, background: "rgba(0, 0, 0, 0.4)", border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+                           <div style={{ fontSize: 13, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace" }}>{w.email}</div>
+                           <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>{w.source || "unknown"} · {timeAgo(w.created_at)}</div>
+                         </div>
+                       ))}
+                     </div>
+                   )}
+                 </>
+               );
+             })() : (
+               <div style={{ padding: 40, textAlign: "center", color: C.textMuted, fontSize: 12, fontFamily: "'JetBrains Mono', monospace" }}>Type to search across jobs, applications, and waitlist</div>
+             )}
+           </div>
+         </div>
+       )}
+
+       {/* Ban Handle Modal */}
+       {showBanModal && (
+         <div onClick={() => { setShowBanModal(false); setBanHandleInput(""); setBanReasonInput(""); }} style={{
+           position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.85)",
+           display: "flex", alignItems: "center", justifyContent: "center",
+           zIndex: 1000, padding: 20,
+         }}>
+           <div onClick={e => e.stopPropagation()} style={{
+             maxWidth: 440, width: "100%", padding: 24, borderRadius: 14,
+             background: "#0a0a0a", border: "1px solid rgba(239, 68, 68, 0.4)",
+           }}>
+             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+               <div style={{ fontSize: 18, fontWeight: 800, color: "#ef4444" }}>🚫 Ban Handle</div>
+               <button onClick={() => { setShowBanModal(false); setBanHandleInput(""); setBanReasonInput(""); }} style={{ background: "transparent", border: "none", color: C.textMuted, fontSize: 22, cursor: "pointer" }}>×</button>
+             </div>
+             <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, marginBottom: 6 }}>Handle (without @)</div>
+             <input type="text" autoFocus placeholder="example_handle" value={banHandleInput} onChange={e => setBanHandleInput(e.target.value)} style={{
+               width: "100%", padding: "10px 12px", borderRadius: 8, marginBottom: 14, boxSizing: "border-box",
+               background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.1)",
+               color: "#fff", fontSize: 14, fontFamily: "'JetBrains Mono', monospace", outline: "none",
+             }} />
+             <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, marginBottom: 6 }}>Reason (optional)</div>
+             <input type="text" placeholder="Spam, scam, harassment..." value={banReasonInput} onChange={e => setBanReasonInput(e.target.value)} style={{
+               width: "100%", padding: "10px 12px", borderRadius: 8, marginBottom: 18, boxSizing: "border-box",
+               background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.1)",
+               color: "#fff", fontSize: 14, fontFamily: "'Outfit', sans-serif", outline: "none",
+             }} />
+             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+               <button onClick={() => { setShowBanModal(false); setBanHandleInput(""); setBanReasonInput(""); }} style={{
+                 padding: "10px 16px", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.1)",
+                 background: "transparent", color: C.textSecondary, fontSize: 13, fontWeight: 700,
+                 fontFamily: "'Outfit', sans-serif", cursor: "pointer",
+               }}>Cancel</button>
+               <button onClick={addBannedHandle} disabled={!banHandleInput.trim()} style={{
+                 padding: "10px 16px", borderRadius: 8, border: "none", cursor: banHandleInput.trim() ? "pointer" : "not-allowed",
+                 background: banHandleInput.trim() ? "#ef4444" : "rgba(239, 68, 68, 0.2)",
+                 color: "#fff", fontSize: 13, fontWeight: 800, fontFamily: "'Outfit', sans-serif",
+                 letterSpacing: 0.3, opacity: banHandleInput.trim() ? 1 : 0.5,
+               }}>🚫 Ban Handle</button>
+             </div>
+           </div>
+         </div>
        )}
 
        {/* Job Details Modal */}

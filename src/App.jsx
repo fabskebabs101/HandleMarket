@@ -3730,7 +3730,7 @@ function Web3GigsApp() {
  </h1>
  </Reveal>
  <Reveal delay={200}>
- <p style={{ color: C.textSecondary, fontSize: 18, marginTop: 20, maxWidth: 560, margin: "20px auto 0", lineHeight: 1.5 }}>Dev, design, audits, writing, or shitposts, raids, and Spaces. Every applicant comes with a Trust Score attached. No middleman. No 20% Fiverr cut. Get paid in USDC, USDT, SOL or ETH.
+ <p style={{ color: C.textSecondary, fontSize: 18, marginTop: 20, maxWidth: 560, margin: "20px auto 0", lineHeight: 1.5 }}>Dev, design, audits, writing, or shitposts, raids, and Spaces. Every applicant comes with a Trust Score attached. No middleman. No platform cut. Get paid in USDC, USDT, SOL or ETH.
  </p>
  </Reveal>
 
@@ -4000,7 +4000,7 @@ function Web3GigsApp() {
  {[
  { label: "Open Jobs", val: "33", Icon: Briefcase },
  { label: "Total Budget", val: "$80k+", Icon: DollarSign },
- { label: "vs Fiverr Cut", val: "0%", Icon: Zap },
+ { label: "Platform Cut", val: "0%", Icon: Zap },
  { label: "Paid in", val: "USDC", Icon: Sparkles },
  { label: "Disputes", val: "0", Icon: Shield },
  ].map(s => (

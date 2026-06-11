@@ -8,7 +8,7 @@ import {
   Code, Palette, Lock, PenTool, Video, MessageCircle, Bot, Scissors,
   Mic, Swords, Smile, Hash, Megaphone, Tv, BarChart3, Clock,
   DollarSign, Rocket, Handshake, Zap, TrendingUp, Eye, Sparkles,
-  ArrowRight, Construction, Radio, Globe, FileText
+  ArrowRight, Construction, Radio, Globe, FileText, Star, Plus, Pencil
 } from "lucide-react";
 
 const VALUATION_WEIGHTS = {
@@ -1354,6 +1354,217 @@ const WATCHLIST = [
 ];
 
 // ─── ADMIN DASHBOARD COMPONENT ──────────────────────────────────
+// ─── V1 PREVIEW (mock data, no APIs) ────────────────────────────
+// Reputation scoring per V1 spec: new = prev + ((rating-3)/2) * WEIGHT
+const V1_WEIGHT = 6;
+const V1_MIN_REVIEWS = 3; // guardrail: hide score until enough history
+function v1ApplyRating(prev, rating) {
+ const delta = ((rating - 3) / 2) * V1_WEIGHT;
+ return Math.max(10, Math.min(100, Math.round((prev + delta) * 10) / 10));
+}
+function v1Tier(score) {
+ if (score >= 85) return { label: "SUPREME", color: C.primary };
+ if (score >= 70) return { label: "CREDIBLE", color: "#10b981" };
+ if (score >= 55) return { label: "NOTED", color: "#fbbf24" };
+ if (score >= 40) return { label: "BUILDING", color: "#60a5fa" };
+ return { label: "NEW", color: C.textMuted };
+}
+
+// Shared V1 mock state lives in the parent and is passed down so Profile
+// and Dashboard tabs stay in sync. This component renders one or the other.
+function V1Preview({ mode, v1, setV1, setTab }) {
+ const [powLabel, setPowLabel] = useState("");
+ const [powUrl, setPowUrl] = useState("");
+ const [savedFlash, setSavedFlash] = useState(false);
+
+ const scoreVisible = v1.reviewCount >= V1_MIN_REVIEWS;
+ const tier = v1Tier(v1.score);
+
+ const labelStyle = { fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, marginBottom: 6 };
+ const inputStyle = { width: "100%", boxSizing: "border-box", padding: "11px 13px", borderRadius: 10, background: "rgba(0, 0, 0, 0.5)", border: "1px solid rgba(255, 255, 255, 0.08)", color: C.textPrimary, fontSize: 14, fontFamily: "'Outfit', sans-serif", outline: "none", marginBottom: 14 };
+ const limeBtn = { padding: "12px 22px", borderRadius: 10, border: "none", background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`, color: "#000", fontSize: 13, fontWeight: 900, fontFamily: "'Outfit', sans-serif", cursor: "pointer", letterSpacing: 0.3 };
+
+ const addPow = () => {
+   if (!powLabel.trim()) return;
+   setV1(p => ({ ...p, pow: [...p.pow, { id: "p" + Date.now(), label: powLabel.trim(), url: powUrl.trim() || "—" }] }));
+   setPowLabel(""); setPowUrl("");
+ };
+ const removePow = (id) => setV1(p => ({ ...p, pow: p.pow.filter(x => x.id !== id) }));
+ const saveFlash = () => { setSavedFlash(true); setTimeout(() => setSavedFlash(false), 1800); };
+
+ // simulate a completed job + rating to show scoring in action
+ const simulate = (rating) => {
+   setV1(p => ({
+     ...p,
+     score: v1ApplyRating(p.score, rating),
+     reviewCount: p.reviewCount + 1,
+     reviews: [{ id: "r" + Date.now(), from: "@poster" + (p.reviewCount + 1), rating, comment: rating >= 4 ? "Great work, fast and clean." : rating === 3 ? "Decent, met the brief." : "Missed the mark." }, ...p.reviews],
+   }));
+ };
+
+ // ─── PROFILE MODE ─────────────────────────────────────────
+ if (mode === "profile") {
+   return (
+     <div style={{ maxWidth: 720, margin: "0 auto", padding: "0 8px" }}>
+       <div style={{ textAlign: "center", marginBottom: 24 }}>
+         <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8, fontWeight: 700 }}>Your Profile</div>
+         <h1 style={{ fontSize: 38, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>Hey, <span className="w3g-shimmer-text">{v1.handle || "@yourhandle"}</span></h1>
+         <div style={{ fontSize: 13, color: C.textSecondary, marginTop: 10 }}>Fill this once. It autofills every application you send.</div>
+       </div>
+
+       {/* Identity editor */}
+       <GlowCard glow style={{ marginBottom: 18 }}>
+         <div style={labelStyle}>Handle</div>
+         <input value={v1.handle} onChange={e => setV1(p => ({ ...p, handle: e.target.value }))} placeholder="@yourhandle" style={inputStyle} />
+         <div style={labelStyle}>Bio</div>
+         <textarea value={v1.bio} onChange={e => setV1(p => ({ ...p, bio: e.target.value }))} placeholder="One line on what you do" rows={2} style={{ ...inputStyle, resize: "vertical" }} />
+         <div style={labelStyle}>Portfolio URL</div>
+         <input value={v1.portfolio} onChange={e => setV1(p => ({ ...p, portfolio: e.target.value }))} placeholder="https://..." style={inputStyle} />
+         <div style={labelStyle}>GitHub</div>
+         <input value={v1.github} onChange={e => setV1(p => ({ ...p, github: e.target.value }))} placeholder="github.com/you" style={{ ...inputStyle, marginBottom: 4 }} />
+       </GlowCard>
+
+       {/* Proof of work */}
+       <GlowCard style={{ marginBottom: 18 }}>
+         <div style={{ ...labelStyle, marginBottom: 12 }}>Proof of work</div>
+         {v1.pow.length === 0 && <div style={{ fontSize: 13, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginBottom: 12 }}>Nothing added yet. Add links to past work you can attach to applications.</div>}
+         {v1.pow.map(p => (
+           <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 9, marginBottom: 7, background: "rgba(0, 0, 0, 0.4)", border: "1px solid rgba(255, 255, 255, 0.05)" }}>
+             <Code size={14} strokeWidth={2.2} style={{ color: C.primary, flexShrink: 0 }} />
+             <span style={{ fontSize: 13, fontWeight: 600 }}>{p.label}</span>
+             <span style={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace", color: C.textMuted, marginLeft: "auto", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "40%" }}>{p.url}</span>
+             <button onClick={() => removePow(p.id)} style={{ background: "transparent", border: "none", color: "#ef4444", cursor: "pointer", fontSize: 18, lineHeight: 1, flexShrink: 0 }}>×</button>
+           </div>
+         ))}
+         <div style={{ display: "flex", gap: 8, marginTop: 8, flexWrap: "wrap" }}>
+           <input value={powLabel} onChange={e => setPowLabel(e.target.value)} placeholder="Label (e.g. NFT mint site)" style={{ ...inputStyle, flex: "1 1 160px", marginBottom: 0 }} />
+           <input value={powUrl} onChange={e => setPowUrl(e.target.value)} placeholder="URL" style={{ ...inputStyle, flex: "1 1 120px", marginBottom: 0 }} />
+           <button onClick={addPow} style={{ padding: "0 18px", borderRadius: 10, border: `1px solid ${C.borderHover}`, background: "transparent", color: C.primary, fontWeight: 800, cursor: "pointer", fontFamily: "'Outfit', sans-serif", fontSize: 13, display: "inline-flex", alignItems: "center", gap: 6 }}><Plus size={14} strokeWidth={2.5} /> Add</button>
+         </div>
+       </GlowCard>
+
+       <button onClick={saveFlash} style={{ ...limeBtn, width: "100%", marginBottom: 18 }}>{savedFlash ? "✓ Saved" : "Save profile"}</button>
+
+       {/* Reputation preview */}
+       <GlowCard glow>
+         <div style={{ ...labelStyle, marginBottom: 14 }}>Your reputation</div>
+         {scoreVisible ? (
+           <div style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }}>
+             <div>
+               <div style={{ fontSize: 44, fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", color: tier.color, lineHeight: 1 }}>{v1.score}<span style={{ fontSize: 17, color: C.textMuted }}>/100</span></div>
+               <div style={{ fontSize: 12, fontFamily: "'JetBrains Mono', monospace", color: tier.color, fontWeight: 800, marginTop: 6, letterSpacing: 1 }}>{tier.label}</div>
+             </div>
+             <div style={{ fontSize: 13, fontFamily: "'JetBrains Mono', monospace", color: C.textSecondary }}>Built from {v1.reviewCount} completed jobs</div>
+           </div>
+         ) : (
+           <div style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.6 }}>
+             Score stays hidden until you complete <strong style={{ color: C.primary }}>{V1_MIN_REVIEWS} jobs</strong> ({v1.reviewCount}/{V1_MIN_REVIEWS} so far).<br/>
+             <span style={{ fontSize: 12, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>Guardrail: one early review can't define you.</span>
+           </div>
+         )}
+       </GlowCard>
+     </div>
+   );
+ }
+
+ // ─── DASHBOARD MODE ───────────────────────────────────────
+ return (
+   <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 8px" }}>
+     <div style={{ textAlign: "center", marginBottom: 24 }}>
+       <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8, fontWeight: 700 }}>Your Dashboard</div>
+       <h1 style={{ fontSize: 38, fontWeight: 900, margin: 0, letterSpacing: -1.5 }}>Dashboard</h1>
+     </div>
+
+     {/* Stat row */}
+     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 10, marginBottom: 18 }}>
+       {[
+         { label: "Reputation", val: scoreVisible ? v1.score : "—", sub: scoreVisible ? tier.label : `${v1.reviewCount}/${V1_MIN_REVIEWS} jobs`, color: scoreVisible ? tier.color : C.textMuted },
+         { label: "Applications", val: v1.applications.length, sub: "sent", color: C.textPrimary },
+         { label: "Jobs done", val: v1.reviewCount, sub: "completed", color: C.textPrimary },
+         { label: "PoW saved", val: v1.pow.length, sub: "on profile", color: C.textPrimary },
+       ].map((s, i) => (
+         <div key={i} style={{ padding: "16px 18px", background: "rgba(18, 18, 18, 0.7)", borderRadius: 12, border: "1px solid rgba(255, 255, 255, 0.06)" }}>
+           <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.2, fontWeight: 700 }}>{s.label}</div>
+           <div style={{ fontSize: 26, fontWeight: 900, marginTop: 6, fontFamily: "'JetBrains Mono', monospace", color: s.color, lineHeight: 1 }}>{s.val}</div>
+           <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", marginTop: 4 }}>{s.sub}</div>
+         </div>
+       ))}
+     </div>
+
+     {/* Scoring demo */}
+     <GlowCard glow style={{ marginBottom: 18 }}>
+       <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, marginBottom: 8 }}>Scoring demo</div>
+       <p style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.6, margin: "0 0 14px" }}>Simulate completing a job and getting a rating. Watch the score move with the spec formula:
+         <span style={{ display: "block", marginTop: 8, fontFamily: "'JetBrains Mono', monospace", color: C.textPrimary, fontSize: 13 }}>new = prev + ((rating − 3) / 2) × {V1_WEIGHT}</span>
+       </p>
+       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+         {[5, 4, 3, 2, 1].map(r => {
+           const col = r >= 4 ? "#10b981" : r === 3 ? "#fbbf24" : "#ef4444";
+           return (
+             <button key={r} onClick={() => simulate(r)} style={{ padding: "9px 15px", borderRadius: 10, cursor: "pointer", fontFamily: "'JetBrains Mono', monospace", fontWeight: 800, fontSize: 13, border: `1px solid ${col}`, background: "transparent", color: col, display: "inline-flex", alignItems: "center", gap: 5 }}>
+               Rate {r}<Star size={12} strokeWidth={2.5} fill={col} />
+             </button>
+           );
+         })}
+       </div>
+       <div style={{ marginTop: 14, fontSize: 13, fontFamily: "'JetBrains Mono', monospace", color: C.textMuted }}>Current: <span style={{ color: tier.color, fontWeight: 800 }}>{v1.score}/100</span> {scoreVisible ? `· ${tier.label}` : `· hidden until ${V1_MIN_REVIEWS} jobs`}</div>
+     </GlowCard>
+
+     {/* Reviews received */}
+     <GlowCard style={{ marginBottom: 18 }}>
+       <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, marginBottom: 14 }}>Reviews received</div>
+       {v1.reviews.length === 0 ? (
+         <div style={{ fontSize: 13, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>No reviews yet. Complete jobs to build reputation.</div>
+       ) : v1.reviews.map(rv => {
+         const col = rv.rating >= 4 ? "#10b981" : rv.rating === 3 ? "#fbbf24" : "#ef4444";
+         return (
+           <div key={rv.id} style={{ padding: "11px 13px", borderRadius: 9, marginBottom: 8, background: "rgba(0, 0, 0, 0.4)", border: "1px solid rgba(255, 255, 255, 0.05)" }}>
+             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+               <span style={{ fontSize: 13, fontWeight: 700, color: C.primary, fontFamily: "'JetBrains Mono', monospace" }}>{rv.from}</span>
+               <span style={{ fontSize: 13, fontFamily: "'JetBrains Mono', monospace", color: col, letterSpacing: 1 }}>{"★".repeat(rv.rating)}{"☆".repeat(5 - rv.rating)}</span>
+             </div>
+             <div style={{ fontSize: 13, color: C.textSecondary }}>{rv.comment}</div>
+           </div>
+         );
+       })}
+     </GlowCard>
+
+     {/* Applications */}
+     <GlowCard style={{ marginBottom: 18 }}>
+       <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, marginBottom: 14 }}>Your applications</div>
+       {v1.applications.length === 0 ? (
+         <div style={{ fontSize: 13, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>None yet. Apply to a job from the Jobs tab — your saved profile autofills the form.</div>
+       ) : v1.applications.map(a => (
+         <div key={a.id} style={{ padding: "11px 13px", borderRadius: 9, marginBottom: 8, background: "rgba(0, 0, 0, 0.4)", border: "1px solid rgba(255, 255, 255, 0.05)" }}>
+           <div style={{ fontSize: 14, fontWeight: 700 }}>{a.jobTitle}</div>
+           <div style={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace", color: C.textMuted, marginTop: 3 }}>{a.poster} · {a.attachedPow} PoW attached · <span style={{ color: "#fbbf24" }}>{a.status}</span></div>
+         </div>
+       ))}
+     </GlowCard>
+
+     {/* What's coming */}
+     <GlowCard>
+       <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700, marginBottom: 12 }}>Also coming with V1</div>
+       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 10 }}>
+         {[
+           { icon: Briefcase, title: "Jobs you've posted", desc: "Review applicants, manage status" },
+           { icon: Bell, title: "Watchlists & alerts", desc: "Get notified on accounts you watch" },
+         ].map((f, i) => {
+           const Icon = f.icon;
+           return (
+             <div key={i} style={{ padding: "12px 14px", background: "rgba(0, 0, 0, 0.4)", borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.04)" }}>
+               <Icon size={16} strokeWidth={2.2} style={{ color: C.primary, marginBottom: 6 }} />
+               <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 3 }}>{f.title}</div>
+               <div style={{ fontSize: 10, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.4 }}>{f.desc}</div>
+             </div>
+           );
+         })}
+       </div>
+     </GlowCard>
+   </div>
+ );
+}
+
 function AdminDashboard({ C, onSignOut }) {
  const [adminTab, setAdminTab] = useState("pending");
  const [pendingJobs, setPendingJobs] = useState([]);
@@ -2478,9 +2689,29 @@ function Web3GigsApp() {
  // Flip to true when ready to expose Privy auth to public users
  const SHOW_AUTH = false;
 
+ // V1 PREVIEW: when true, the Profile + Dashboard tabs render the real
+ // functional V1 (profile editor, autofill, reputation scoring) using
+ // MOCK in-memory data only — no Supabase, no Privy needed.
+ // Reach it at ?t=user-dashboard or ?t=user-profile. Public never sees it
+ // because nothing links there while SHOW_AUTH is false.
+ const SHOW_V1_PREVIEW = true;
+
  // Privy auth
  const { ready, authenticated, user, login, logout } = usePrivy();
  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+
+ // V1 preview mock state (no APIs) — shared between Profile + Dashboard tabs
+ const [v1, setV1] = useState({
+   handle: "@yourhandle",
+   bio: "",
+   portfolio: "",
+   github: "",
+   pow: [],
+   score: 50,
+   reviewCount: 0,
+   reviews: [],
+   applications: [],
+ });
 
  // Helper: get display name from Privy user object
  const getUserDisplayName = () => {
@@ -2524,6 +2755,15 @@ function Web3GigsApp() {
  }, []);
 
  const [tab, setTab] = useState("home");
+
+ // Read ?t=<tab> from URL on mount so links like ?t=user-dashboard work
+ useEffect(() => {
+   if (typeof window === "undefined") return;
+   const params = new URLSearchParams(window.location.search);
+   const t = params.get("t");
+   const allowed = ["home", "jobs", "valuate", "trust", "leaderboard", "alerts", "about", "user-profile", "user-dashboard"];
+   if (t && allowed.includes(t)) setTab(t);
+ }, []);
  const [form, setForm] = useState({
  followers: "", avgLikes: "", avgRetweets: "", avgReplies: "",
  tweets: "", accountAgeDays: "", verified: false, cryptoNiche: true,
@@ -2735,6 +2975,25 @@ function Web3GigsApp() {
    }
    setApplySubmitting(true);
    setApplyError("");
+
+   // V1 PREVIEW: record locally in mock state, no DB call
+   if (SHOW_V1_PREVIEW) {
+     setV1(p => ({
+       ...p,
+       applications: [...p.applications, {
+         id: "a" + Date.now(),
+         jobId: selectedJob.id,
+         jobTitle: selectedJob.title,
+         poster: selectedJob.poster,
+         attachedPow: p.pow.length,
+         status: "sent",
+       }],
+     }));
+     setApplySubmitted(true);
+     setApplySubmitting(false);
+     return;
+   }
+
    try {
      const { error } = await supabase
        .from("job_applications")
@@ -2764,10 +3023,12 @@ function Web3GigsApp() {
  };
 
  const resetApplyForm = () => {
-   // Auto-fill from Privy user if signed in
-   const prefillHandle = user?.twitter?.username ? `@${user.twitter.username}` : "";
+   // V1 preview: autofill from the saved V1 profile (mock). Otherwise from Privy user.
+   const prefillHandle = (SHOW_V1_PREVIEW && v1.handle) ? v1.handle
+     : user?.twitter?.username ? `@${user.twitter.username}` : "";
    const prefillEmail = user?.email?.address || user?.google?.email || "";
-   setApplyForm({ handle: prefillHandle, message: "", portfolio: "", expectedPay: "", email: prefillEmail });
+   const prefillPortfolio = (SHOW_V1_PREVIEW && v1.portfolio) ? v1.portfolio : "";
+   setApplyForm({ handle: prefillHandle, message: "", portfolio: prefillPortfolio, expectedPay: "", email: prefillEmail });
    setApplySubmitted(false);
    setApplyError("");
  };
@@ -6751,6 +7012,7 @@ function Web3GigsApp() {
 
  {/* ─── USER PROFILE TAB (Privy logged-in users) ──────── */}
  {tab === "user-profile" && (
+ SHOW_V1_PREVIEW ? <V1Preview mode="profile" v1={v1} setV1={setV1} setTab={setTab} /> : (
  <div style={{ maxWidth: 720, margin: "0 auto", padding: "0 8px" }}>
  <div style={{ textAlign: "center", marginBottom: 24 }}>
  <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8, fontWeight: 700 }}>Your Profile</div>
@@ -6828,10 +7090,11 @@ function Web3GigsApp() {
  </>
  )}
  </div>
- )}
+ ))}
 
  {/* ─── USER DASHBOARD TAB (Privy logged-in users) ────── */}
  {tab === "user-dashboard" && (
+ SHOW_V1_PREVIEW ? <V1Preview mode="dashboard" v1={v1} setV1={setV1} setTab={setTab} /> : (
  <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 8px" }}>
  <div style={{ textAlign: "center", marginBottom: 24 }}>
  <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8, fontWeight: 700 }}>Your Dashboard</div>
@@ -6916,7 +7179,7 @@ function Web3GigsApp() {
  </>
  )}
  </div>
- )}
+ ))}
 
  {/* ─── ABOUT TAB ─────────────────────────────────────── */}
  {tab === "about" && (

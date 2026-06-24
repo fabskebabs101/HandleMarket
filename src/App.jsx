@@ -2950,6 +2950,7 @@ function Web3GigsApp() {
          poster_name: jobForm.posterName.trim(),
          poster_handle: jobForm.contact.trim().replace(/^@/, ""),
          poster_email: jobForm.email.trim().toLowerCase(),
+         poster_privy_id: user?.id || null,
          status: "pending",
        }]);
      if (error) {
@@ -3054,8 +3055,26 @@ function Web3GigsApp() {
    setApplySubmitting(true);
    setApplyError("");
 
-   // V1 PREVIEW: record locally in mock state, no DB call
+   // V1 PREVIEW: if signed in, write a REAL application (so applicant_privy_id
+   // lands) and mirror into the dashboard. If not signed in, stay fully mock.
    if (SHOW_V1_PREVIEW) {
+     if (authenticated && user?.id) {
+       try {
+         const { error } = await supabase.from("job_applications").insert([{
+           job_id: selectedJob.id,
+           job_title: selectedJob.title,
+           job_poster: selectedJob.poster,
+           applicant_handle: applyForm.handle.trim().replace(/^@/, ""),
+           applicant_email: applyForm.email.trim().toLowerCase(),
+           applicant_privy_id: user.id,
+           message: applyForm.message.trim(),
+           portfolio_url: applyForm.portfolio.trim(),
+           expected_pay: applyForm.expectedPay.trim(),
+           status: "pending",
+         }]);
+         if (error) console.warn("preview apply insert:", error.message);
+       } catch (e) { console.warn("preview apply insert failed:", e?.message); }
+     }
      setV1(p => ({
        ...p,
        applications: [...p.applications, {
@@ -3081,6 +3100,7 @@ function Web3GigsApp() {
          job_poster: selectedJob.poster,
          applicant_handle: applyForm.handle.trim().replace(/^@/, ""),
          applicant_email: applyForm.email.trim().toLowerCase(),
+         applicant_privy_id: user?.id || null,
          message: applyForm.message.trim(),
          portfolio_url: applyForm.portfolio.trim(),
          expected_pay: applyForm.expectedPay.trim(),

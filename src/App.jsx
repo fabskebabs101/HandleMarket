@@ -1372,10 +1372,50 @@ function v1Tier(score) {
 
 // Shared V1 mock state lives in the parent and is passed down so Profile
 // and Dashboard tabs stay in sync. This component renders one or the other.
-function V1Preview({ mode, v1, setV1, setTab }) {
+function V1Preview({ mode, v1, setV1, setTab, authenticated, user, login, ready }) {
  const [powLabel, setPowLabel] = useState("");
  const [powUrl, setPowUrl] = useState("");
  const [savedFlash, setSavedFlash] = useState(false);
+ const [loading, setLoading] = useState(false);
+ const [saving, setSaving] = useState(false);
+
+ const privyId = user?.id || null;
+
+ // Load this user's profile from Supabase once authenticated
+ useEffect(() => {
+   if (!authenticated || !privyId) return;
+   let cancelled = false;
+   (async () => {
+     setLoading(true);
+     try {
+       const { data } = await supabase.from("profiles").select("*").eq("privy_id", privyId).maybeSingle();
+       if (cancelled) return;
+       if (data) {
+         setV1({
+           handle: data.handle || (user?.twitter?.username ? `@${user.twitter.username}` : ""),
+           bio: data.bio || "",
+           portfolio: data.portfolio_url || "",
+           github: data.github_url || "",
+           pow: Array.isArray(data.pow) ? data.pow : [],
+           score: Number(data.score) || 50,
+           reviewCount: data.review_count || 0,
+           reviews: v1.reviews || [],
+           applications: v1.applications || [],
+         });
+       } else {
+         // No profile yet — seed handle from Privy if available
+         setV1(p => ({ ...p, handle: p.handle || (user?.twitter?.username ? `@${user.twitter.username}` : (user?.email?.address || "")) }));
+       }
+     } catch (e) {
+       // table may not exist yet (SQL not run) — fail soft, stay on mock state
+       console.warn("profiles load skipped:", e?.message);
+     } finally {
+       if (!cancelled) setLoading(false);
+     }
+   })();
+   return () => { cancelled = true; };
+ // eslint-disable-next-line react-hooks/exhaustive-deps
+ }, [authenticated, privyId]);
 
  const scoreVisible = v1.reviewCount >= V1_MIN_REVIEWS;
  const tier = v1Tier(v1.score);
@@ -1390,9 +1430,33 @@ function V1Preview({ mode, v1, setV1, setTab }) {
    setPowLabel(""); setPowUrl("");
  };
  const removePow = (id) => setV1(p => ({ ...p, pow: p.pow.filter(x => x.id !== id) }));
- const saveFlash = () => { setSavedFlash(true); setTimeout(() => setSavedFlash(false), 1800); };
 
- // simulate a completed job + rating to show scoring in action
+ // Save profile to Supabase (upsert by privy_id)
+ const saveProfile = async () => {
+   if (!authenticated || !privyId) { login && login(); return; }
+   setSaving(true);
+   try {
+     const row = {
+       privy_id: privyId,
+       handle: v1.handle || null,
+       bio: v1.bio || null,
+       portfolio_url: v1.portfolio || null,
+       github_url: v1.github || null,
+       pow: v1.pow || [],
+     };
+     const { error } = await supabase.from("profiles").upsert(row, { onConflict: "privy_id" });
+     if (error) throw error;
+     setSavedFlash(true);
+     setTimeout(() => setSavedFlash(false), 1800);
+   } catch (e) {
+     console.warn("profile save failed:", e?.message);
+     alert("Couldn't save — make sure the profiles table exists in Supabase (run the V1 SQL).");
+   } finally {
+     setSaving(false);
+   }
+ };
+
+ // simulate a completed job + rating to show scoring in action (preview only)
  const simulate = (rating) => {
    setV1(p => ({
      ...p,
@@ -1401,6 +1465,20 @@ function V1Preview({ mode, v1, setV1, setTab }) {
      reviews: [{ id: "r" + Date.now(), from: "@poster" + (p.reviewCount + 1), rating, comment: rating >= 4 ? "Great work, fast and clean." : rating === 3 ? "Decent, met the brief." : "Missed the mark." }, ...p.reviews],
    }));
  };
+
+ // ─── SIGN-IN GATE ─────────────────────────────────────────
+ if (ready && !authenticated) {
+   return (
+     <div style={{ maxWidth: 480, margin: "60px auto 0", padding: "0 8px", textAlign: "center" }}>
+       <GlowCard glow style={{ padding: "40px 30px" }}>
+         <div style={{ display: "flex", justifyContent: "center", marginBottom: 16, color: C.primary }}><User size={40} strokeWidth={1.8} /></div>
+         <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 8 }}>Sign in to continue</div>
+         <div style={{ fontSize: 13, color: C.textSecondary, marginBottom: 22, lineHeight: 1.5 }}>Your profile, applications and reputation live on your account. Sign in to load them.</div>
+         <button onClick={() => login && login()} style={{ ...limeBtn, width: "100%" }}>Sign In</button>
+       </GlowCard>
+     </div>
+   );
+ }
 
  // ─── PROFILE MODE ─────────────────────────────────────────
  if (mode === "profile") {
@@ -1443,7 +1521,7 @@ function V1Preview({ mode, v1, setV1, setTab }) {
          </div>
        </GlowCard>
 
-       <button onClick={saveFlash} style={{ ...limeBtn, width: "100%", marginBottom: 18 }}>{savedFlash ? "✓ Saved" : "Save profile"}</button>
+       <button onClick={saveProfile} disabled={saving} style={{ ...limeBtn, width: "100%", marginBottom: 18, opacity: saving ? 0.6 : 1 }}>{saving ? "Saving..." : savedFlash ? "✓ Saved" : "Save profile"}</button>
 
        {/* Reputation preview */}
        <GlowCard glow>
@@ -7012,7 +7090,7 @@ function Web3GigsApp() {
 
  {/* ─── USER PROFILE TAB (Privy logged-in users) ──────── */}
  {tab === "user-profile" && (
- SHOW_V1_PREVIEW ? <V1Preview mode="profile" v1={v1} setV1={setV1} setTab={setTab} /> : (
+ SHOW_V1_PREVIEW ? <V1Preview mode="profile" v1={v1} setV1={setV1} setTab={setTab} authenticated={authenticated} user={user} login={login} ready={ready} /> : (
  <div style={{ maxWidth: 720, margin: "0 auto", padding: "0 8px" }}>
  <div style={{ textAlign: "center", marginBottom: 24 }}>
  <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8, fontWeight: 700 }}>Your Profile</div>
@@ -7094,7 +7172,7 @@ function Web3GigsApp() {
 
  {/* ─── USER DASHBOARD TAB (Privy logged-in users) ────── */}
  {tab === "user-dashboard" && (
- SHOW_V1_PREVIEW ? <V1Preview mode="dashboard" v1={v1} setV1={setV1} setTab={setTab} /> : (
+ SHOW_V1_PREVIEW ? <V1Preview mode="dashboard" v1={v1} setV1={setV1} setTab={setTab} authenticated={authenticated} user={user} login={login} ready={ready} /> : (
  <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 8px" }}>
  <div style={{ textAlign: "center", marginBottom: 24 }}>
  <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 2, marginBottom: 8, fontWeight: 700 }}>Your Dashboard</div>

@@ -1379,6 +1379,13 @@ function V1Preview({ mode, v1, setV1, setTab, authenticated, user, login, ready 
  const [loading, setLoading] = useState(false);
  const [saving, setSaving] = useState(false);
 
+ // 2b: real "jobs I posted" + their applicants
+ const [myJobs, setMyJobs] = useState([]);
+ const [jobsLoading, setJobsLoading] = useState(false);
+ const [expandedJob, setExpandedJob] = useState(null);
+ const [jobApplicants, setJobApplicants] = useState({}); // { jobId: [apps] }
+ const [applicantsLoading, setApplicantsLoading] = useState(false);
+
  const privyId = user?.id || null;
 
  // Load this user's profile from Supabase once authenticated
@@ -1416,6 +1423,57 @@ function V1Preview({ mode, v1, setV1, setTab, authenticated, user, login, ready 
    return () => { cancelled = true; };
  // eslint-disable-next-line react-hooks/exhaustive-deps
  }, [authenticated, privyId]);
+
+ // 2b: load jobs this user posted (by poster_privy_id)
+ useEffect(() => {
+   if (mode !== "dashboard" || !authenticated || !privyId) return;
+   let cancelled = false;
+   (async () => {
+     setJobsLoading(true);
+     try {
+       const { data } = await supabase
+         .from("job_submissions")
+         .select("*")
+         .eq("poster_privy_id", privyId)
+         .order("created_at", { ascending: false });
+       if (!cancelled) setMyJobs(data || []);
+     } catch (e) {
+       console.warn("my jobs load skipped:", e?.message);
+     } finally {
+       if (!cancelled) setJobsLoading(false);
+     }
+   })();
+   return () => { cancelled = true; };
+ // eslint-disable-next-line react-hooks/exhaustive-deps
+ }, [mode, authenticated, privyId]);
+
+ // 2b: load applicants for a specific job, cache by job id
+ const toggleJobApplicants = async (jobId) => {
+   if (expandedJob === jobId) { setExpandedJob(null); return; }
+   setExpandedJob(jobId);
+   if (jobApplicants[jobId]) return; // cached
+   setApplicantsLoading(true);
+   try {
+     const { data } = await supabase
+       .from("job_applications")
+       .select("*")
+       .eq("job_id", jobId)
+       .order("created_at", { ascending: false });
+     setJobApplicants(prev => ({ ...prev, [jobId]: data || [] }));
+   } catch (e) {
+     console.warn("applicants load skipped:", e?.message);
+     setJobApplicants(prev => ({ ...prev, [jobId]: [] }));
+   } finally {
+     setApplicantsLoading(false);
+   }
+ };
+
+ const jobTimeAgo = (d) => {
+   const diff = (Date.now() - new Date(d)) / 1000;
+   if (diff < 3600) return `${Math.max(1, Math.floor(diff / 60))}m ago`;
+   if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+   return `${Math.floor(diff / 86400)}d ago`;
+ };
 
  const scoreVisible = v1.reviewCount >= V1_MIN_REVIEWS;
  const tier = v1Tier(v1.score);
@@ -1586,6 +1644,58 @@ function V1Preview({ mode, v1, setV1, setTab, authenticated, user, login, ready 
          })}
        </div>
        <div style={{ marginTop: 14, fontSize: 13, fontFamily: "'JetBrains Mono', monospace", color: C.textMuted }}>Current: <span style={{ color: tier.color, fontWeight: 800 }}>{v1.score}/100</span> {scoreVisible ? `· ${tier.label}` : `· hidden until ${V1_MIN_REVIEWS} jobs`}</div>
+     </GlowCard>
+
+     {/* Jobs I posted (2b - real data) */}
+     <GlowCard style={{ marginBottom: 18 }}>
+       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
+         <div style={{ fontSize: 11, color: C.primary, fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: 1.5, fontWeight: 700 }}>Jobs you've posted</div>
+         {jobsLoading && <div style={{ fontSize: 11, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>Loading...</div>}
+       </div>
+       {!jobsLoading && myJobs.length === 0 ? (
+         <div style={{ fontSize: 13, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.5 }}>
+           No posted jobs yet. Post a job while signed in and it shows here with its applicants.
+         </div>
+       ) : myJobs.map(j => {
+         const stColor = j.status === "approved" ? "#10b981" : j.status === "in_progress" ? "#fbbf24" : j.status === "completed" ? C.primary : j.status === "pending" ? "#60a5fa" : C.textMuted;
+         const stLabel = j.status === "approved" ? "LIVE" : (j.status || "pending").toUpperCase().replace("_", " ");
+         const isOpen = expandedJob === j.id;
+         const apps = jobApplicants[j.id] || [];
+         return (
+           <div key={j.id} style={{ borderRadius: 10, marginBottom: 8, background: "rgba(0, 0, 0, 0.4)", border: `1px solid ${isOpen ? "rgba(212,255,0,0.2)" : "rgba(255, 255, 255, 0.05)"}` }}>
+             <div onClick={() => toggleJobApplicants(j.id)} style={{ display: "flex", alignItems: "center", gap: 12, padding: "13px 14px", cursor: "pointer", flexWrap: "wrap" }}>
+               <div style={{ flex: 1, minWidth: 150 }}>
+                 <div style={{ fontSize: 14, fontWeight: 700 }}>{j.title}</div>
+                 <div style={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace", color: C.textMuted, marginTop: 2 }}>${Number(j.budget || 0).toLocaleString()} {j.currency} · {jobTimeAgo(j.created_at)}</div>
+               </div>
+               <span style={{ padding: "3px 9px", borderRadius: 5, fontSize: 9, fontWeight: 800, fontFamily: "'JetBrains Mono', monospace", letterSpacing: 1, background: `${stColor}18`, color: stColor }}>{stLabel}</span>
+               <span style={{ fontSize: 12, fontFamily: "'JetBrains Mono', monospace", color: C.primary, fontWeight: 700 }}>{isOpen ? "▾" : "▸"} applicants</span>
+             </div>
+             {isOpen && (
+               <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", padding: "12px 14px" }}>
+                 {applicantsLoading && !jobApplicants[j.id] ? (
+                   <div style={{ fontSize: 12, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>Loading applicants...</div>
+                 ) : apps.length === 0 ? (
+                   <div style={{ fontSize: 12, color: C.textMuted, fontFamily: "'JetBrains Mono', monospace" }}>No applicants yet for this job.</div>
+                 ) : apps.map(a => (
+                   <div key={a.id} style={{ padding: "11px 12px", borderRadius: 8, marginBottom: 7, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 6, marginBottom: a.message ? 6 : 0 }}>
+                       <span style={{ fontSize: 13, fontWeight: 700, color: C.primary, fontFamily: "'JetBrains Mono', monospace" }}>@{(a.applicant_handle || "anon").replace(/^@/, "")}</span>
+                       <span style={{ fontSize: 10, fontFamily: "'JetBrains Mono', monospace", color: C.textMuted }}>{jobTimeAgo(a.created_at)}{a.applicant_privy_id ? " · verified acct" : ""}</span>
+                     </div>
+                     {a.message && <div style={{ fontSize: 12, color: C.textSecondary, lineHeight: 1.5, marginBottom: 7, fontStyle: "italic" }}>"{a.message}"</div>}
+                     <div style={{ display: "flex", gap: 12, flexWrap: "wrap", fontSize: 11, fontFamily: "'JetBrains Mono', monospace", color: C.textMuted }}>
+                       {a.portfolio_url && <a href={a.portfolio_url} target="_blank" rel="noopener noreferrer" style={{ color: C.primary }}>📁 Portfolio</a>}
+                       {a.expected_pay && <span>💰 {a.expected_pay}</span>}
+                       {a.applicant_email && <span>✉ {a.applicant_email}</span>}
+                     </div>
+                   </div>
+                 ))}
+               </div>
+             )}
+           </div>
+         );
+       })}
      </GlowCard>
 
      {/* Reviews received */}
